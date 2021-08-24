@@ -1,0 +1,1 @@
+sort: dart pub global run import_sorter:main
