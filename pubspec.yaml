@@ -1,20 +1,16 @@
 name: firefuel
 description: A Firebase Cloud Firestore architecture to fuel your application's growth!
 version: 0.0.1
-homepage: 
+repository: https://github.com/SupposedlySam/firefuel
 
 environment:
   sdk: ">=2.12.0 <3.0.0"
-  flutter: ">=2.2.0"
 
 dependencies:
   equatable: ^2.0.3
-  flutter:
-    sdk: flutter
 
 dev_dependencies:
-  flutter_test:
-    sdk: flutter
+  test: ^1.17.11
   
 import_sorter:
   comments: false
