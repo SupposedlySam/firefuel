@@ -15,36 +15,36 @@ abstract class FirefuelRepository<T extends Serializable>
   @override
   Future<Either<FirefuelFailure, DocumentId>> create({
     required T value,
-    DocumentId? documentId,
+    DocumentId? docId,
   }) {
-    return guard(() => _collection.create(docId: documentId, value: value));
+    return guard(() => _collection.create(docId: docId, value: value));
   }
 
   @override
-  Future<Either<FirefuelFailure, T?>> read(DocumentId documentId) async {
-    return guard(() => _collection.read(documentId));
+  Future<Either<FirefuelFailure, T?>> read(DocumentId docId) async {
+    return guard(() => _collection.read(docId));
   }
 
   @override
-  Stream<T?> readAsStream(DocumentId documentId) {
-    return _collection.readAsStream(documentId);
+  Stream<T?> readAsStream(DocumentId docId) {
+    return _collection.readAsStream(docId);
   }
 
   @override
   Future<Either<FirefuelFailure, Null>> update({
-    required DocumentId documentId,
+    required DocumentId docId,
     required T value,
   }) async {
     return guard(() {
       return _collection.update(
-        docId: documentId,
+        docId: docId,
         value: value.toJson(),
       );
     });
   }
 
   @override
-  Future<Either<FirefuelFailure, Null>> delete(DocumentId documentId) {
-    return guard(() => _collection.delete(documentId));
+  Future<Either<FirefuelFailure, Null>> delete(DocumentId docId) {
+    return guard(() => _collection.delete(docId));
   }
 }

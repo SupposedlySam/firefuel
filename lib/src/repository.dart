@@ -5,17 +5,17 @@ import 'package:firefuel_core/firefuel_core.dart';
 abstract class Repository<T> {
   Future<Either<FirefuelFailure, DocumentId>> create({
     required T value,
-    DocumentId documentId,
+    DocumentId docId,
   });
 
-  Future<Either<FirefuelFailure, T?>> read(DocumentId documentId);
+  Future<Either<FirefuelFailure, T?>> read(DocumentId docId);
 
-  Stream<T?> readAsStream(DocumentId documentId);
+  Stream<T?> readAsStream(DocumentId docId);
 
   Future<Either<FirefuelFailure, Null>> update({
-    required DocumentId documentId,
+    required DocumentId docId,
     required T value,
   });
 
-  Future<Either<FirefuelFailure, Null>> delete(DocumentId documentId);
+  Future<Either<FirefuelFailure, Null>> delete(DocumentId docId);
 }

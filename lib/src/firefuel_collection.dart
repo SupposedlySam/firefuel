@@ -58,13 +58,13 @@ abstract class FirefuelCollection<T extends Serializable>
         );
   }
 
-  Future<T?> read(DocumentId documentId) async {
-    final snapshot = await collectionRef.doc(documentId.docId).get();
+  Future<T?> read(DocumentId docId) async {
+    final snapshot = await collectionRef.doc(docId.docId).get();
     return snapshot.data();
   }
 
-  Stream<T?> readAsStream(DocumentId documentId) {
-    final snapshots = collectionRef.doc(documentId.docId).snapshots();
+  Stream<T?> readAsStream(DocumentId docId) {
+    final snapshots = collectionRef.doc(docId.docId).snapshots();
 
     return snapshots.map((documentSnapshot) => documentSnapshot.data());
   }

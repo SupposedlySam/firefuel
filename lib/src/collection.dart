@@ -34,12 +34,12 @@ abstract class Collection<T extends Serializable> {
   });
 
   /// Deletes the current document from the collection.
-  Future<Null> delete(DocumentId documentId);
+  Future<Null> delete(DocumentId docId);
 
   /// Get the document by id, or create a new one
   ///
   /// If the documentId returns a snapshot that does not exist, or `data()`
-  /// returns `null`, create a new document with the [documentId] provided.
+  /// returns `null`, create a new document with the [docId] provided.
   Future<T> getOrCreate({
     required DocumentId docId,
     required T createValue,
@@ -52,7 +52,7 @@ abstract class Collection<T extends Serializable> {
   /// See: StreamBuilder
   Stream<T?> listen<T>(
     CollectionReference<T> collectionRef,
-    DocumentId documentId,
+    DocumentId docId,
   );
 
   /// Get a list of all documents from the collection as a list
@@ -65,10 +65,10 @@ abstract class Collection<T extends Serializable> {
   /// Gets a single document from the collection
   ///
   /// Does NOT refresh automatically
-  Future<T?> read(DocumentId documentId);
+  Future<T?> read(DocumentId docId);
 
   /// Gets a stream of the document requested
-  Stream<T?> readAsStream(DocumentId documentId);
+  Stream<T?> readAsStream(DocumentId docId);
 
   /// Updates data on the document. Data will be merged with any existing
   /// document data.
