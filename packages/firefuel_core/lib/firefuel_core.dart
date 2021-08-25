@@ -1,0 +1,5 @@
+library firefuel_core;
+
+export 'package:firefuel_core/src/firefuel_failure.dart';
+export 'package:firefuel_core/src/models/models.dart';
+export 'package:firefuel_core/src/serializable.dart';

@@ -1,4 +1,4 @@
-import 'package:firefuel/src/data/models/uid/uid_model.dart';
+import 'package:firefuel_core/src/models/uid/uid_model.dart';
 
 class UIDSerializer extends UID {
   UIDSerializer(String uid) : super(uid);

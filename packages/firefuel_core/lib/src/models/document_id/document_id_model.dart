@@ -1,7 +1,7 @@
 import 'dart:convert';
 
-import 'package:firefuel/src/data/models/document_id/document_id_serializer.dart';
-import 'package:firefuel/src/data/serializable.dart';
+import 'package:firefuel_core/src/models/document_id/document_id_serializer.dart';
+import 'package:firefuel_core/src/serializable.dart';
 
 /// Strips out illegal characters from a string intended to be used as a
 /// document ID in Firestore

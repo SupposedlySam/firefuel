@@ -1,4 +1,4 @@
-import 'package:firefuel/src/data/models/models.dart';
+import 'package:firefuel_core/src/models/models.dart';
 
 class DocumentIdSerializer extends DocumentId {
   DocumentIdSerializer(String uid) : super(uid);

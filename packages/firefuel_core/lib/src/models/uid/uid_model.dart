@@ -1,5 +1,5 @@
-import 'package:firefuel/src/data/models/models.dart';
-import 'package:firefuel/src/data/models/uid/uid_serializer.dart';
+import 'package:firefuel_core/src/models/models.dart';
+import 'package:firefuel_core/src/models/uid/uid_serializer.dart';
 
 class UID extends DocumentId {
   static const fieldOriginal = 'uid';
