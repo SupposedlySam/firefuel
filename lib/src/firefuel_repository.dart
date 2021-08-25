@@ -5,6 +5,7 @@ import 'package:firefuel/src/repository.dart';
 import 'package:firefuel_core/firefuel_core.dart';
 
 abstract class FirefuelRepository<T extends Serializable>
+    with FirefuelFetchMixin
     implements Repository<T> {
   final Collection<T> _collection;
 
@@ -16,12 +17,12 @@ abstract class FirefuelRepository<T extends Serializable>
     required T value,
     DocumentId? documentId,
   }) {
-    return _collection.create(documentId: documentId, value: value);
+    return guard(() => _collection.create(docId: documentId, value: value));
   }
 
   @override
   Future<Either<FirefuelFailure, T?>> read(DocumentId documentId) async {
-    return _collection.read(documentId);
+    return guard(() => _collection.read(documentId));
   }
 
   @override
@@ -34,14 +35,16 @@ abstract class FirefuelRepository<T extends Serializable>
     required DocumentId documentId,
     required T value,
   }) async {
-    return _collection.update(
-      documentId: documentId,
-      value: value.toJson(),
-    );
+    return guard(() {
+      return _collection.update(
+        docId: documentId,
+        value: value.toJson(),
+      );
+    });
   }
 
   @override
   Future<Either<FirefuelFailure, Null>> delete(DocumentId documentId) {
-    return _collection.delete(documentId);
+    return guard(() => _collection.delete(documentId));
   }
 }
