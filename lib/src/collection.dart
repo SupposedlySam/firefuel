@@ -1,0 +1,83 @@
+import 'dart:async';
+
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:dartz/dartz.dart';
+import 'package:firefuel/firefuel.dart';
+import 'package:firefuel_core/firefuel_core.dart';
+
+abstract class Collection<T extends Serializable> {
+  const Collection();
+
+  CollectionReference<T> get collectionRef;
+
+  /// Exposes the Typed Stream from the Collection
+  ///
+  /// Use the [listen] method to implement this getter
+  ///
+  ///### Example
+  ///#### Stream a top level collection
+  /// ```
+  /// Stream<List<YourType>> get stream => listen(collectionRef);
+  /// ```
+  ///
+  /// #### Stream a subcollection
+  ///
+  /// ```
+  /// Stream<List<T>> streamSubcollection<T>(CollectionReference<T> collectionReference) {
+  ///   return listen<T>(collectionReference);
+  /// }
+  /// ```
+  Stream<List<T>> get stream;
+
+  /// Get a list of all documents from the collection as a list
+  ///
+  /// Refreshes automatically when new data is added to the collection
+  ///
+  /// See: StreamBuilder
+  Stream<List<T>> listenAll<T>(CollectionReference<T> collectionRef);
+
+  /// Get a document from the collection
+  ///
+  /// Refreshes automatically when new data is added to the document
+  ///
+  /// See: StreamBuilder
+  Stream<T?> listen<T>(
+    CollectionReference<T> collectionRef,
+    DocumentId documentId,
+  );
+
+  /// Get the document by id, or create a new one
+  ///
+  /// If the documentId returns a snapshot that does not exist, or `data()`
+  /// returns `null`, create a new document with the [documentId] provided.
+  Future<Either<FirefuelFailure, T>> getOrCreate({
+    required DocumentId docId,
+    required T createValue,
+  });
+
+  /// Overwrite existing data or create a new record if it doesn't exist
+  Future<Either<FirefuelFailure, DocumentId>> create({
+    required T value,
+    DocumentId? documentId,
+  });
+
+  /// Gets a single document from the collection
+  ///
+  /// Does NOT refresh automatically
+  Future<Either<FirefuelFailure, T?>> read(DocumentId documentId);
+
+  /// Gets a stream of the document requested
+  Stream<T?> readAsStream(DocumentId documentId);
+
+  /// Updates data on the document. Data will be merged with any existing
+  /// document data.
+  ///
+  /// If no document exists yet, the update will fail.
+  Future<Either<FirefuelFailure, Null>> update({
+    required DocumentId documentId,
+    required Map<String, Object?> value,
+  });
+
+  /// Deletes the current document from the collection.
+  Future<Either<FirefuelFailure, Null>> delete(DocumentId documentId);
+}
