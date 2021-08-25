@@ -1,8 +1,6 @@
 import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:dartz/dartz.dart';
-import 'package:firefuel/firefuel.dart';
 import 'package:firefuel_core/firefuel_core.dart';
 
 abstract class Collection<T extends Serializable> {
@@ -29,12 +27,23 @@ abstract class Collection<T extends Serializable> {
   /// ```
   Stream<List<T>> get stream;
 
-  /// Get a list of all documents from the collection as a list
+  /// Overwrite existing data or create a new record if it doesn't exist
+  Future<DocumentId> create({
+    required T value,
+    DocumentId? docId,
+  });
+
+  /// Deletes the current document from the collection.
+  Future<Null> delete(DocumentId documentId);
+
+  /// Get the document by id, or create a new one
   ///
-  /// Refreshes automatically when new data is added to the collection
-  ///
-  /// See: StreamBuilder
-  Stream<List<T>> listenAll<T>(CollectionReference<T> collectionRef);
+  /// If the documentId returns a snapshot that does not exist, or `data()`
+  /// returns `null`, create a new document with the [documentId] provided.
+  Future<T> getOrCreate({
+    required DocumentId docId,
+    required T createValue,
+  });
 
   /// Get a document from the collection
   ///
@@ -46,25 +55,17 @@ abstract class Collection<T extends Serializable> {
     DocumentId documentId,
   );
 
-  /// Get the document by id, or create a new one
+  /// Get a list of all documents from the collection as a list
   ///
-  /// If the documentId returns a snapshot that does not exist, or `data()`
-  /// returns `null`, create a new document with the [documentId] provided.
-  Future<Either<FirefuelFailure, T>> getOrCreate({
-    required DocumentId docId,
-    required T createValue,
-  });
-
-  /// Overwrite existing data or create a new record if it doesn't exist
-  Future<Either<FirefuelFailure, DocumentId>> create({
-    required T value,
-    DocumentId? documentId,
-  });
+  /// Refreshes automatically when new data is added to the collection
+  ///
+  /// See: StreamBuilder
+  Stream<List<T>> listenAll<T>(CollectionReference<T> collectionRef);
 
   /// Gets a single document from the collection
   ///
   /// Does NOT refresh automatically
-  Future<Either<FirefuelFailure, T?>> read(DocumentId documentId);
+  Future<T?> read(DocumentId documentId);
 
   /// Gets a stream of the document requested
   Stream<T?> readAsStream(DocumentId documentId);
@@ -73,11 +74,8 @@ abstract class Collection<T extends Serializable> {
   /// document data.
   ///
   /// If no document exists yet, the update will fail.
-  Future<Either<FirefuelFailure, Null>> update({
-    required DocumentId documentId,
+  Future<Null> update({
+    required DocumentId docId,
     required Map<String, Object?> value,
   });
-
-  /// Deletes the current document from the collection.
-  Future<Either<FirefuelFailure, Null>> delete(DocumentId documentId);
 }
