@@ -12,8 +12,10 @@ dependencies:
   dartz: ^0.10.0
   equatable: ^2.0.3
   stack_trace: ^1.10.0
-  firefuel_core: 
-    path: packages/firefuel_core
+  firefuel_core:
+    git: 
+      url: https://github.com/SupposedlySam/firefuel.git
+      path: packages/firefuel_core
 
 dev_dependencies:
   test: ^1.17.11
