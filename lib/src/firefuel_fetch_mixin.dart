@@ -6,7 +6,7 @@ import 'package:stack_trace/stack_trace.dart';
 import 'package:firefuel_core/firefuel_core.dart';
 
 mixin FirefuelFetchMixin {
-  Future<Either<FirefuelFailure, R>> guard<R>(
+  Future<Either<Failure, R>> guard<R>(
     FutureOr<R> Function() callback,
   ) async {
     try {

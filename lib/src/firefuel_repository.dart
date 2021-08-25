@@ -13,7 +13,7 @@ abstract class FirefuelRepository<T extends Serializable>
       : _collection = collection;
 
   @override
-  Future<Either<FirefuelFailure, DocumentId>> create({
+  Future<Either<Failure, DocumentId>> create({
     required T value,
     DocumentId? docId,
   }) {
@@ -21,7 +21,7 @@ abstract class FirefuelRepository<T extends Serializable>
   }
 
   @override
-  Future<Either<FirefuelFailure, T?>> read(DocumentId docId) async {
+  Future<Either<Failure, T?>> read(DocumentId docId) async {
     return guard(() => _collection.read(docId));
   }
 
@@ -31,7 +31,7 @@ abstract class FirefuelRepository<T extends Serializable>
   }
 
   @override
-  Future<Either<FirefuelFailure, Null>> update({
+  Future<Either<Failure, Null>> update({
     required DocumentId docId,
     required T value,
   }) async {
@@ -44,7 +44,7 @@ abstract class FirefuelRepository<T extends Serializable>
   }
 
   @override
-  Future<Either<FirefuelFailure, Null>> delete(DocumentId docId) {
+  Future<Either<Failure, Null>> delete(DocumentId docId) {
     return guard(() => _collection.delete(docId));
   }
 }
