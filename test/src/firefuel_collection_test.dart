@@ -61,7 +61,22 @@ void main() {
     });
   });
 
-  group('#delete', () {}, skip: true);
+  group('#delete', () {
+    final originalUser = TestUser('testName');
+    late DocumentId originalDocId;
+
+    setUp(() async {
+      originalDocId = await testCollection.create(value: originalUser);
+    });
+
+    test('should remove the document', () async {
+      await testCollection.delete(originalDocId);
+
+      final readResult = await testCollection.read(originalDocId);
+
+      expect(readResult, isNull);
+    });
+  });
 
   group('#getOrCreate', () {}, skip: true);
 
@@ -82,10 +97,13 @@ class TestCollection extends FirefuelCollection<TestUser> {
   final FirebaseFirestore instance;
 
   @override
-  CollectionReference<TestUser> get collectionRef =>
+  CollectionReference<TestUser?> get collectionRef =>
       super.untypedCollectionRef(instance).withConverter(
-            fromFirestore: (snapshot, _) => TestUser.fromJson(snapshot.data()!),
-            toFirestore: (model, _) => model.toJson(),
+            fromFirestore: (snapshot, _) {
+              final data = snapshot.data();
+              return data == null ? null : TestUser.fromJson(snapshot.data()!);
+            },
+            toFirestore: (model, _) => model?.toJson() ?? <String, Object?>{},
           );
 
   @override
