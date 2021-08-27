@@ -97,7 +97,34 @@ void main() {
     });
   });
 
-  group('#listen', () {}, skip: true);
+  group('#listen', () {
+    late Stream<TestUser?> stream;
+    late DocumentId docId;
+
+    setUp(() async {
+      docId = await testCollection.create(value: defaultUser);
+
+      stream = testCollection.listen(testCollection.collectionRef, docId);
+      print('done setup');
+    });
+
+    test('should output new value when doc updates', () async {
+      print('starting');
+      final newUser = TestUser('newUser');
+
+      stream.listen((event) async {
+        expect(defaultUser, isNot(newUser));
+      });
+
+      // print('got first result! $firstResult');
+      await testCollection.update(
+          docId: docId, value: TestUser('newUser').toJson());
+      // final secondResult = await stream.
+      // print(secondResult);
+    });
+
+    test('should output null when doc no longer exists', () {}, skip: true);
+  });
 
   group('#listenAll', () {}, skip: true);
 
