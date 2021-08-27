@@ -105,25 +105,28 @@ void main() {
       docId = await testCollection.create(value: defaultUser);
 
       stream = testCollection.listen(testCollection.collectionRef, docId);
-      print('done setup');
     });
 
     test('should output new value when doc updates', () async {
-      print('starting');
-      final newUser = TestUser('newUser');
+      final newUser1 = TestUser('newUser1');
+      final newUser2 = TestUser('newUser2');
+      final newUser3 = TestUser('newUser3');
 
-      stream.listen((event) async {
-        expect(defaultUser, isNot(newUser));
-      });
+      expect(stream, emitsInOrder([newUser1, newUser2, newUser3]));
 
-      // print('got first result! $firstResult');
-      await testCollection.update(
-          docId: docId, value: TestUser('newUser').toJson());
-      // final secondResult = await stream.
-      // print(secondResult);
+      await testCollection.update(docId: docId, value: newUser1.toJson());
+      await testCollection.update(docId: docId, value: newUser2.toJson());
+      await testCollection.update(docId: docId, value: newUser3.toJson());
     });
 
-    test('should output null when doc no longer exists', () {}, skip: true);
+    test('should output null when doc no longer exists', () async {
+      final newUser = TestUser('newUser');
+
+      expect(stream, emitsInOrder([newUser, null]));
+
+      await testCollection.update(docId: docId, value: newUser.toJson());
+      await testCollection.delete(docId);
+    });
   });
 
   group('#listenAll', () {}, skip: true);
