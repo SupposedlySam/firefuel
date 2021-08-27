@@ -52,9 +52,10 @@ abstract class FirefuelCollection<T extends Serializable>
   }
 
   @override
-  Stream<List<T>> listenAll<T>(CollectionReference<T> collectionRef) {
+  Stream<List<T>> listenAll<T>(CollectionReference<T?> collectionRef) {
     return collectionRef.snapshots().map(
-          (collection) => collection.docs.map((doc) => doc.data()).toList(),
+          (collection) =>
+              collection.docs.map((doc) => doc.data()).whereType<T>().toList(),
         );
   }
 
