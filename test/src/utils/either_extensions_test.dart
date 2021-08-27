@@ -25,6 +25,26 @@ void main() {
     });
   });
 
+  group('#getLeft', () {
+    test('should return Left when $Failure exists', () {
+      final Either<Failure, String> result = Left(ExpectedFailure());
+
+      final left = result.getLeft();
+
+      expect(left, isA<Failure>());
+    });
+
+    test('should throw $MissingValueException when $Failure does not exist',
+        () {
+      final Either<Failure, String> result = Right('testValue');
+
+      expect(
+        () => result.getLeft(),
+        throwsA(isA<MissingValueException>()),
+      );
+    });
+  });
+
   group('#getRightOrElseNull', () {
     test('should return a nullable Right', () {
       final Either<Failure, String> right = Right('testValue');
