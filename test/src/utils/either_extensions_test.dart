@@ -63,7 +63,7 @@ void main() {
       expect(result, success);
     });
 
-    test('should return null when not successful', () {
+    test('should return null when Right does not exist', () {
       final Either<Failure, String> result = Left(ExpectedFailure());
 
       final right = result.getRightOrElseNull();
