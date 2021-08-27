@@ -54,7 +54,7 @@ void main() {
       expect(result, isA<String?>());
     });
 
-    test('should return Right value when Right is provided', () {
+    test('should return Right value when Right exists', () {
       final success = 'testValue';
       final Either<Failure, String> right = Right(success);
 
