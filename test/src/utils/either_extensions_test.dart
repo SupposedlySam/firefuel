@@ -6,7 +6,7 @@ import '../../utils/expected_failure.dart';
 
 void main() {
   group('#getRight', () {
-    test('should return Right when successful', () {
+    test('should return Right when Right exists', () {
       final Either<Failure, String> result = Right('testValue');
 
       final right = result.getRight();
