@@ -30,7 +30,7 @@ extension EitherExtension<T> on Either<Failure, T> {
     return failure!;
   }
 
-  T? getOrElseNull() {
+  T? getRightOrElseNull() {
     T? result;
 
     fold((_) {}, (right) {
