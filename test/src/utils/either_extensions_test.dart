@@ -25,11 +25,11 @@ void main() {
     });
   });
 
-  group('#getOrElseNull', () {
+  group('#getRightOrElseNull', () {
     test('should return a nullable Right', () {
       final Either<Failure, String> right = Right('testValue');
 
-      final result = right.getOrElseNull();
+      final result = right.getRightOrElseNull();
 
       expect(result, isA<String?>());
     });
@@ -38,7 +38,7 @@ void main() {
       final success = 'testValue';
       final Either<Failure, String> right = Right(success);
 
-      final result = right.getOrElseNull();
+      final result = right.getRightOrElseNull();
 
       expect(result, success);
     });
@@ -46,7 +46,7 @@ void main() {
     test('should return null when not successful', () {
       final Either<Failure, String> result = Left(ExpectedFailure());
 
-      final right = result.getOrElseNull();
+      final right = result.getRightOrElseNull();
 
       expect(right, isNull);
     });
