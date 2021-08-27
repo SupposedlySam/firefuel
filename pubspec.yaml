@@ -6,8 +6,11 @@ publish_to: none
 
 environment:
   sdk: ">=2.12.0 <3.0.0"
+  flutter: ">=2.2.0 <3.0.0"
 
 dependencies:
+  flutter:
+    sdk: flutter
   cloud_firestore: ^2.5.0
   dartz: ^0.10.0
   equatable: ^2.0.3
@@ -18,7 +21,8 @@ dependencies:
       path: packages/firefuel_core
 
 dev_dependencies:
-  test: ^1.17.11
+  flutter_test:
+    sdk: flutter
   mocktail: ^0.1.4
   
 import_sorter:
