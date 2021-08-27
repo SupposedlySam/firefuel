@@ -6,6 +6,7 @@ import 'package:test/test.dart';
 void main() {
   late FirebaseFirestore instance;
   late TestCollection testCollection;
+  final defaultUser = TestUser('testName');
 
   setUp(() {
     instance = FakeFirebaseFirestore();
@@ -13,17 +14,16 @@ void main() {
   });
 
   group('#create', () {
-    final originalUser = TestUser('testName');
     late DocumentId originalDocId;
 
     setUp(() async {
-      originalDocId = await testCollection.create(value: originalUser);
+      originalDocId = await testCollection.create(value: defaultUser);
     });
 
     group('when docId is provided', () {
       test('should return the same document', () async {
         final createResult = await testCollection.create(
-          value: originalUser,
+          value: defaultUser,
           docId: originalDocId,
         );
 
@@ -45,7 +45,7 @@ void main() {
 
     group('when docId is not provided', () {
       test('should return a new document', () async {
-        final secondDocId = await testCollection.create(value: originalUser);
+        final secondDocId = await testCollection.create(value: defaultUser);
 
         expect(originalDocId, isNot(secondDocId));
       });
@@ -62,23 +62,40 @@ void main() {
   });
 
   group('#delete', () {
-    final originalUser = TestUser('testName');
-    late DocumentId originalDocId;
+    late DocumentId defaultDocId;
 
     setUp(() async {
-      originalDocId = await testCollection.create(value: originalUser);
+      defaultDocId = await testCollection.create(value: defaultUser);
     });
 
     test('should remove the document', () async {
-      await testCollection.delete(originalDocId);
+      await testCollection.delete(defaultDocId);
 
-      final readResult = await testCollection.read(originalDocId);
+      final readResult = await testCollection.read(defaultDocId);
 
       expect(readResult, isNull);
     });
   });
 
-  group('#getOrCreate', () {}, skip: true);
+  group('#getOrCreate', () {
+    final documentId = DocumentId('testName');
+
+    test('should create the doc when it does not exist', () async {
+      final result = await testCollection.getOrCreate(
+          docId: documentId, createValue: defaultUser);
+
+      expect(result, defaultUser);
+    });
+
+    test('should get doc when it exists', () async {
+      final docId = await testCollection.create(value: defaultUser);
+
+      final testUser = await testCollection.getOrCreate(
+          docId: docId, createValue: defaultUser);
+
+      expect(docId.docId, testUser.docId);
+    });
+  });
 
   group('#listen', () {}, skip: true);
 
@@ -101,7 +118,9 @@ class TestCollection extends FirefuelCollection<TestUser> {
       super.untypedCollectionRef(instance).withConverter(
             fromFirestore: (snapshot, _) {
               final data = snapshot.data();
-              return data == null ? null : TestUser.fromJson(snapshot.data()!);
+              return data == null
+                  ? null
+                  : TestUser.fromJson(snapshot.data()!, snapshot.id);
             },
             toFirestore: (model, _) => model?.toJson() ?? <String, Object?>{},
           );
@@ -113,15 +132,17 @@ class TestCollection extends FirefuelCollection<TestUser> {
 class TestUser extends Serializable {
   static const String fieldName = 'name';
 
-  TestUser(this.name);
+  TestUser(this.name, [this.docId]);
 
   final String name;
+
+  final String? docId;
 
   @override
   List<Object?> get props => [name];
 
-  factory TestUser.fromJson(Map<String, dynamic> json) {
-    return TestUser(json[fieldName]);
+  factory TestUser.fromJson(Map<String, dynamic> json, String id) {
+    return TestUser(json[fieldName], id);
   }
 
   @override
