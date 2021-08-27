@@ -45,7 +45,10 @@ abstract class FirefuelCollection<T extends Serializable>
   }
 
   @override
-  Stream<T?> listen<T>(CollectionReference<T> collectionRef, DocumentId docId) {
+  Stream<T?> listen<T>(
+    CollectionReference<T?> collectionRef,
+    DocumentId docId,
+  ) {
     return collectionRef.doc(docId.docId).snapshots().map(
           (snapshot) => snapshot.data(),
         );
