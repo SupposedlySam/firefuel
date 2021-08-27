@@ -14,7 +14,7 @@ void main() {
       expect(right, isA<String>());
     });
 
-    test('should throw $MissingValueException when Right was not successful',
+    test('should throw $MissingValueException when Right does not exist',
         () {
       final Either<Failure, String> result = Left(ExpectedFailure());
 
