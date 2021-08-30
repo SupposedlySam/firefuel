@@ -166,9 +166,23 @@ void main() {
     });
   });
 
-  group('#read', () {}, skip: true);
+  group('#read', () {
+    test('should return the Type when docId exists', () async {
+      final docId = await testCollection.create(value: defaultUser);
 
-  group('#readAsStream', () {}, skip: true);
+      final readResult = await testCollection.read(docId);
+
+      expect(readResult, defaultUser);
+    });
+
+    test('should return null when docId does not exist', () async {
+      final readResult = await testCollection.read(DocumentId('dodo_bird'));
+
+      expect(readResult, isNull);
+    });
+  });
+
+  group('#readAsStream', () {});
 
   group('#update', () {}, skip: true);
 }
