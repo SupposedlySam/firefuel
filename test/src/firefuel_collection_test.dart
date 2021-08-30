@@ -182,7 +182,39 @@ void main() {
     });
   });
 
-  group('#readAsStream', () {});
+  group('#readAsStream', () {
+    late Stream<TestUser?> docStream;
+    late DocumentId docId;
+
+    setUp(() async {
+      docId = await testCollection.create(value: defaultUser);
+
+      docStream = testCollection.readAsStream(docId);
+    });
+
+    test('should update when a field changes', () async {
+      final updatedUser = TestUser('updatedValue');
+
+      expect(
+        docStream,
+        emitsInOrder([updatedUser]),
+      );
+
+      await testCollection.update(
+        docId: docId,
+        value: updatedUser.toJson(),
+      );
+    });
+
+    test('should update when document is deleted', () async {
+      expect(
+        docStream,
+        emitsInOrder([null]),
+      );
+
+      await testCollection.delete(docId);
+    });
+  });
 
   group('#update', () {}, skip: true);
 }
