@@ -8,11 +8,11 @@ class MockCollection<T extends Serializable> extends Mock
     implements Collection<T> {}
 
 extension MockCollectionX<T extends Serializable> on MockCollection<T> {
-  void initialize({Future<DocumentId>? createReturn}) {
+  void initialize({DocumentId? createReturn}) {
     if (createReturn != null) {
       when(
         () => create(docId: any(named: 'docId'), value: any(named: 'value')),
-      ).thenAnswer((_) => createReturn);
+      ).thenAnswer((_) => Future.value(createReturn));
     }
   }
 }
