@@ -37,6 +37,22 @@ void main() {
   );
 
   group('#readAsStream', () {}, skip: true);
-  group('#update', () {}, skip: true);
+
+  RepositoryTestUtil.runTests<Null, TestUser>(
+    methodName: 'update',
+    mockCollection: MockCollection(),
+    initHappyPath: (mockCollection) async {
+      mockCollection.initialize(onUpdate: () => null);
+    },
+    initSadPath: (mockCollection) async {
+      mockCollection.initialize(onUpdate: () => throw ExpectedFailure());
+    },
+    methodCallback: (testRepository) {
+      return testRepository.update(
+        docId: docId,
+        value: TestUser('updatedUser'),
+      );
+    },
+  );
   group('#delete', () {}, skip: true);
 }

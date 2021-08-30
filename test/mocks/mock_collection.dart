@@ -13,6 +13,7 @@ extension MockCollectionX<T extends Serializable?> on MockCollection<T> {
   void initialize({
     DocumentId Function()? onCreate,
     T? Function()? onRead,
+    Null Function()? onUpdate,
   }) {
     registerFallbackValue(DocumentId('fallbackValue'));
     registerFallbackValue<Serializable>(TestUser('fallbackValue'));
@@ -25,6 +26,11 @@ extension MockCollectionX<T extends Serializable?> on MockCollection<T> {
 
     if (onRead != null) {
       when(() => read(any())).thenAnswer((_) => Future.value(onRead()));
+    }
+
+    if (onUpdate != null) {
+      when(() => update(docId: any(named: 'docId'), value: any(named: 'value')))
+          .thenAnswer((_) => Future.value(onUpdate()));
     }
   }
 }
