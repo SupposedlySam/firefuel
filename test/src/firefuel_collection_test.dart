@@ -3,6 +3,8 @@ import 'package:fake_cloud_firestore/fake_cloud_firestore.dart';
 import 'package:firefuel/firefuel.dart';
 import 'package:test/test.dart';
 
+const _testUsersCollectionName = 'testUsers';
+
 void main() {
   late FirebaseFirestore instance;
   late TestCollection testCollection;
@@ -176,7 +178,7 @@ void main() {
     });
 
     test('should return null when docId does not exist', () async {
-      final readResult = await testCollection.read(DocumentId('dodo_bird'));
+      final readResult = await testCollection.read(DocumentId('dodoBird'));
 
       expect(readResult, isNull);
     });
@@ -216,11 +218,57 @@ void main() {
     });
   });
 
-  group('#update', () {}, skip: true);
+  group('#update', () {
+    test('should fail silently when document does not exist', () async {
+      final updateResult = await testCollection.update(
+        docId: DocumentId('dodoBird'),
+        value: TestUser('Clark Kent').toJson(),
+      );
+
+      expect(updateResult, isNull);
+    });
+
+    test('should overwrite existing fields', () async {
+      final updatedDoc = TestUser('updateValue');
+      final docId = await testCollection.create(value: defaultUser);
+
+      await testCollection.update(
+        docId: docId,
+        value: updatedDoc.toJson(),
+      );
+
+      final readResult = await testCollection.read(docId);
+
+      expect(readResult, updatedDoc);
+    });
+
+    test('should add new fields', () async {
+      const newField = 'newField';
+      final updatedDoc = TestUser('updateValue');
+      final updatedRawJson = updatedDoc.toJson()
+        ..addAll({newField: 'fieldValue'});
+      final docId = await testCollection.create(value: defaultUser);
+
+      await testCollection.update(
+        docId: docId,
+        value: updatedRawJson,
+      );
+
+      // Manually get the json from the collection because the new field won't
+      //be parsed into the [TestUser] object since we didn't update the
+      //[TestUser.fromJson] factory
+      final docSnapshot = await instance
+          .collection(_testUsersCollectionName)
+          .doc(docId.docId)
+          .get();
+
+      expect(docSnapshot.data(), updatedRawJson);
+    });
+  });
 }
 
 class TestCollection extends FirefuelCollection<TestUser> {
-  TestCollection(this.instance) : super('testUsers');
+  TestCollection(this.instance) : super(_testUsersCollectionName);
 
   final FirebaseFirestore instance;
 
