@@ -4,27 +4,33 @@ import 'package:flutter_test/flutter_test.dart';
 import '../../mocks/mock_collection.dart';
 import '../../utils/test_repository.dart';
 
-typedef RepoMethodCallback<R, T extends Serializable?>
-    = Future<Either<Failure, R>> Function(MockCollection<T>, TestRepository<T>);
+typedef MethodCallback<R, T extends Serializable?> = Future<Either<Failure, R>>
+    Function(TestRepository<T>);
+typedef Initializer<T extends Serializable?> = void Function(MockCollection<T>);
 
 class RepositoryTestUtil {
   static void runTests<R, T extends Serializable?>({
     required String methodName,
     required MockCollection<T> mockCollection,
-    required RepoMethodCallback<R, T> onHappyPath,
-    required RepoMethodCallback<R, T> onSadPath,
+    required Initializer<T> initHappyPath,
+    required Initializer<T> initSadPath,
+    required MethodCallback<R, T> methodCallback,
   }) {
     final testRepository = TestRepository(collection: mockCollection);
 
     group('#$methodName', () {
       test('should return Right when successful', () async {
-        final result = await onHappyPath(mockCollection, testRepository);
+        initHappyPath(mockCollection);
+
+        final result = await methodCallback(testRepository);
 
         expect(result, isA<Right<Failure, R>>());
       });
 
       test('should return Left when not successful', () async {
-        final result = await onSadPath(mockCollection, testRepository);
+        initSadPath(mockCollection);
+
+        final result = await methodCallback(testRepository);
 
         expect(result, isA<Left<Failure, R>>());
       });

@@ -13,14 +13,13 @@ void main() {
   RepositoryTestUtil.runTests<DocumentId, TestUser>(
     methodName: 'create',
     mockCollection: MockCollection(),
-    onHappyPath: (mockCollection, testRepository) async {
+    initHappyPath: (mockCollection) async {
       mockCollection.initialize(onCreate: () => docId);
-
-      return testRepository.create(value: defaultUser);
     },
-    onSadPath: (mockCollection, testRepository) async {
+    initSadPath: (mockCollection) async {
       mockCollection.initialize(onCreate: () => throw ExpectedFailure());
-
+    },
+    methodCallback: (testRepository) {
       return testRepository.create(value: defaultUser);
     },
   );
@@ -28,17 +27,15 @@ void main() {
   RepositoryTestUtil.runTests<TestUser?, TestUser>(
     methodName: 'read',
     mockCollection: MockCollection(),
-    onHappyPath: (mockCollection, testRepository) async {
+    initHappyPath: (mockCollection) async {
       mockCollection.initialize(onRead: () => defaultUser);
-
-      return testRepository.read(docId);
     },
-    onSadPath: (mockCollection, testRepository) async {
+    initSadPath: (mockCollection) async {
       mockCollection.initialize(onRead: () => throw ExpectedFailure());
-
-      return testRepository.read(docId);
     },
+    methodCallback: (testRepository) => testRepository.read(docId),
   );
+
   group('#readAsStream', () {}, skip: true);
   group('#update', () {}, skip: true);
   group('#delete', () {}, skip: true);
