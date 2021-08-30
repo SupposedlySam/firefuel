@@ -54,5 +54,16 @@ void main() {
       );
     },
   );
-  group('#delete', () {}, skip: true);
+
+  RepositoryTestUtil.runTests<Null, TestUser>(
+    methodName: 'delete',
+    mockCollection: MockCollection(),
+    initHappyPath: (mockCollection) async {
+      mockCollection.initialize(onDelete: () => null);
+    },
+    initSadPath: (mockCollection) async {
+      mockCollection.initialize(onDelete: () => throw ExpectedFailure());
+    },
+    methodCallback: (testRepository) => testRepository.delete(docId),
+  );
 }
