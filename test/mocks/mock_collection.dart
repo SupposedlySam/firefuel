@@ -10,13 +10,13 @@ class MockCollection<T extends Serializable> extends Mock
     implements Collection<T> {}
 
 extension MockCollectionX<T extends Serializable> on MockCollection<T> {
-  void initialize({DocumentId? createReturn}) {
+  void initialize({DocumentId Function()? onCreate}) {
     registerFallbackValue<Serializable>(TestUser('fallbackValue'));
 
-    if (createReturn != null) {
+    if (onCreate != null) {
       when(
         () => create(docId: any(named: 'docId'), value: any(named: 'value')),
-      ).thenAnswer((_) => Future.value(createReturn));
+      ).thenAnswer((_) => Future.value(onCreate()));
     }
   }
 }
