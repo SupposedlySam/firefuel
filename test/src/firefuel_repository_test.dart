@@ -7,14 +7,14 @@ import '../utils/test_user.dart';
 import 'utils/repository_test_util.dart';
 
 void main() {
+  final docId = DocumentId('h34jfhg43fiuy3gv4');
   final defaultUser = TestUser('testUser');
 
-  RepositoryTestUtil.runTests(
+  RepositoryTestUtil.runTests<DocumentId, TestUser>(
     methodName: 'create',
     mockCollection: MockCollection(),
     onHappyPath: (mockCollection, testRepository) async {
-      mockCollection.initialize(
-          onCreate: () => DocumentId('h34jfhg43fiuy3gv4'));
+      mockCollection.initialize(onCreate: () => docId);
 
       return testRepository.create(value: defaultUser);
     },
@@ -25,7 +25,20 @@ void main() {
     },
   );
 
-  group('#read', () {}, skip: true);
+  RepositoryTestUtil.runTests<TestUser?, TestUser>(
+    methodName: 'read',
+    mockCollection: MockCollection(),
+    onHappyPath: (mockCollection, testRepository) async {
+      mockCollection.initialize(onRead: () => defaultUser);
+
+      return testRepository.read(docId);
+    },
+    onSadPath: (mockCollection, testRepository) async {
+      mockCollection.initialize(onRead: () => throw ExpectedFailure());
+
+      return testRepository.read(docId);
+    },
+  );
   group('#readAsStream', () {}, skip: true);
   group('#update', () {}, skip: true);
   group('#delete', () {}, skip: true);
