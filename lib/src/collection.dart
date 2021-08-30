@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firefuel_core/firefuel_core.dart';
 
-abstract class Collection<T extends Serializable> {
+abstract class Collection<T extends Serializable?> {
   const Collection();
 
   CollectionReference<T?> get collectionRef;

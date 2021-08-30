@@ -4,7 +4,7 @@ import 'package:firefuel/src/collection.dart';
 import 'package:firefuel/src/repository.dart';
 import 'package:firefuel_core/firefuel_core.dart';
 
-abstract class FirefuelRepository<T extends Serializable>
+abstract class FirefuelRepository<T extends Serializable?>
     with FirefuelFetchMixin
     implements Repository<T> {
   final Collection<T> _collection;
@@ -36,10 +36,12 @@ abstract class FirefuelRepository<T extends Serializable>
     required T value,
   }) async {
     return guard(() {
-      return _collection.update(
-        docId: docId,
-        value: value.toJson(),
-      );
+      if (value != null) {
+        return _collection.update(
+          docId: docId,
+          value: value.toJson(),
+        );
+      }
     });
   }
 
