@@ -26,4 +26,25 @@ mixin FirefuelFetchMixin {
       );
     }
   }
+
+  Stream<Either<Failure, R>> guardStream<R>(
+    Stream<R> Function() streamCallback,
+  ) async* {
+    try {
+      await for (var result in streamCallback()) {
+        yield Right(result);
+      }
+    } catch (e) {
+      if (e is FormatException) {
+        print('Format Exception: ${e.message}');
+      }
+
+      yield Left(
+        FirestoreFailure(
+          error: e,
+          stackTrace: Chain.current(),
+        ),
+      );
+    }
+  }
 }
