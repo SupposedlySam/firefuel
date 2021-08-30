@@ -26,8 +26,8 @@ abstract class FirefuelRepository<T extends Serializable?>
   }
 
   @override
-  Stream<T?> readAsStream(DocumentId docId) {
-    return _collection.readAsStream(docId);
+  Stream<Either<Failure, T?>> readAsStream(DocumentId docId) {
+    return guardStream(() => _collection.readAsStream(docId));
   }
 
   @override

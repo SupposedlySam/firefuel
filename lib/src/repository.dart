@@ -10,7 +10,7 @@ abstract class Repository<T> {
 
   Future<Either<Failure, T?>> read(DocumentId docId);
 
-  Stream<T?> readAsStream(DocumentId docId);
+  Stream<Either<Failure, T?>> readAsStream(DocumentId docId);
 
   Future<Either<Failure, Null>> update({
     required DocumentId docId,
