@@ -129,7 +129,42 @@ void main() {
     });
   });
 
-  group('#listenAll', () {}, skip: true);
+  group('#listenAll', () {
+    late Stream<List<TestUser>> stream;
+    late DocumentId docId;
+    final newUser1 = TestUser('newUser1');
+    final newUser2 = TestUser('newUser2');
+
+    setUp(() async {
+      docId = await testCollection.create(value: defaultUser);
+      await testCollection.create(value: newUser1);
+
+      stream = testCollection.listenAll(testCollection.collectionRef);
+    });
+
+    test('should update when an item is added', () async {
+      expect(
+        stream,
+        emitsInOrder([
+          [defaultUser, newUser1],
+          [defaultUser, newUser1, newUser2],
+        ]),
+      );
+
+      await testCollection.create(value: newUser2);
+    });
+
+    test('should update when an item is deleted', () async {
+      expect(
+        stream,
+        emitsInOrder([
+          [newUser1],
+        ]),
+      );
+
+      await testCollection.delete(docId);
+    });
+  });
 
   group('#read', () {}, skip: true);
 
