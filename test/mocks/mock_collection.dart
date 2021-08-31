@@ -6,10 +6,10 @@ import 'package:firefuel/firefuel.dart';
 import 'package:firefuel/src/collection.dart';
 import '../utils/test_user.dart';
 
-class MockCollection<T extends Serializable?> extends Mock
+class MockCollection<T extends Serializable> extends Mock
     implements Collection<T> {}
 
-extension MockCollectionX<T extends Serializable?> on MockCollection<T> {
+extension MockCollectionX<T extends Serializable> on MockCollection<T> {
   void initialize({
     DocumentId Function()? onCreate,
     T? Function()? onRead,
