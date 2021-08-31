@@ -36,7 +36,23 @@ void main() {
     methodCallback: (testRepository) => testRepository.read(docId),
   );
 
-  group('#readAsStream', () {}, skip: true);
+  RepositoryTestUtil.runStreamTests<TestUser?, TestUser>(
+    methodName: 'readAsStream',
+    mockCollection: MockCollection(),
+    initHappyPath: (mockCollection) async {
+      mockCollection.initialize(
+        onReadAsStream: () => Stream.fromIterable(
+          [TestUser('streamUser')],
+        ),
+      );
+    },
+    initSadPath: (mockCollection) async {
+      mockCollection.initialize(onReadAsStream: () => throw ExpectedFailure());
+    },
+    streamCallback: (testRepository) {
+      return testRepository.readAsStream(docId);
+    },
+  );
 
   RepositoryTestUtil.runTests<Null, TestUser>(
     methodName: 'update',
