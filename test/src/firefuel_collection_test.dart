@@ -1,7 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:fake_cloud_firestore/fake_cloud_firestore.dart';
-import 'package:firefuel/firefuel.dart';
 import 'package:test/test.dart';
+
+import 'package:firefuel/firefuel.dart';
+import '../utils/test_user.dart';
 
 const _testUsersCollectionName = 'testUsers';
 
@@ -286,26 +288,4 @@ class TestCollection extends FirefuelCollection<TestUser> {
 
   @override
   Stream<List<TestUser>> get stream => listenAll(collectionRef);
-}
-
-class TestUser extends Serializable {
-  static const String fieldName = 'name';
-
-  TestUser(this.name, [this.docId]);
-
-  final String name;
-
-  final String? docId;
-
-  @override
-  List<Object?> get props => [name];
-
-  factory TestUser.fromJson(Map<String, dynamic> json, String id) {
-    return TestUser(json[fieldName], id);
-  }
-
-  @override
-  Map<String, dynamic> toJson() {
-    return {fieldName: name};
-  }
 }

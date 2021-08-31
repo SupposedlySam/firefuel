@@ -1,7 +1,7 @@
 import 'package:dartz/dartz.dart';
-import 'package:firefuel/firefuel.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import 'package:firefuel/firefuel.dart';
 import '../../utils/expected_failure.dart';
 
 void main() {

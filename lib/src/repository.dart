@@ -1,6 +1,7 @@
 import 'package:dartz/dartz.dart';
-import 'package:firefuel/firefuel.dart';
 import 'package:firefuel_core/firefuel_core.dart';
+
+import 'package:firefuel/firefuel.dart';
 
 abstract class Repository<T> {
   Future<Either<Failure, DocumentId>> create({
@@ -10,7 +11,7 @@ abstract class Repository<T> {
 
   Future<Either<Failure, T?>> read(DocumentId docId);
 
-  Stream<T?> readAsStream(DocumentId docId);
+  Stream<Either<Failure, T?>> readAsStream(DocumentId docId);
 
   Future<Either<Failure, Null>> update({
     required DocumentId docId,

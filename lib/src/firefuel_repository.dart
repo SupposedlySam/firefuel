@@ -1,8 +1,9 @@
 import 'package:dartz/dartz.dart';
+import 'package:firefuel_core/firefuel_core.dart';
+
 import 'package:firefuel/firefuel.dart';
 import 'package:firefuel/src/collection.dart';
 import 'package:firefuel/src/repository.dart';
-import 'package:firefuel_core/firefuel_core.dart';
 
 abstract class FirefuelRepository<T extends Serializable>
     with FirefuelFetchMixin
@@ -26,8 +27,8 @@ abstract class FirefuelRepository<T extends Serializable>
   }
 
   @override
-  Stream<T?> readAsStream(DocumentId docId) {
-    return _collection.readAsStream(docId);
+  Stream<Either<Failure, T?>> readAsStream(DocumentId docId) {
+    return guardStream(() => _collection.readAsStream(docId));
   }
 
   @override

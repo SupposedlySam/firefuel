@@ -1,5 +1,6 @@
-import 'package:firefuel/firefuel.dart';
 import 'package:test/test.dart';
+
+import 'package:firefuel/firefuel.dart';
 
 void main() {
   late TestFetchMixin testFetchMixin;
