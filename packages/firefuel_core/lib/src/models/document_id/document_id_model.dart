@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:equatable/equatable.dart';
 import 'package:firefuel_core/src/models/document_id/document_id_serializer.dart';
 import 'package:firefuel_core/src/serializable.dart';
 
@@ -13,7 +14,7 @@ import 'package:firefuel_core/src/serializable.dart';
 /// Potential to throw [FormatException] of type [CannotBeNoLongerThan1500Bytes],
 /// [CannotSolelyConsistOfASingleOrDoublePeriod],
 /// [CannotStartAndEndWithDoubleUnderscore], or [CannotContainForwardSlash].
-class DocumentId extends Serializable {
+class DocumentId extends Serializable with EquatableMixin {
   static const fieldDocId = 'docId';
 
   final String docId;

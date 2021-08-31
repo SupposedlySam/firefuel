@@ -1,6 +1,4 @@
-import 'package:equatable/equatable.dart';
-
-abstract class Serializable extends Equatable {
+abstract class Serializable {
   const Serializable();
 
   Map<String, dynamic> toJson();
