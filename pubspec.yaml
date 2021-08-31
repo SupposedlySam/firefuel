@@ -14,13 +14,14 @@ dependencies:
   cloud_firestore: ^2.5.0
   dartz: ^0.10.0
   equatable: ^2.0.3
-  stack_trace: ^1.10.0
   firefuel_core:
     git: 
       url: https://github.com/SupposedlySam/firefuel.git
       path: packages/firefuel_core
+  stack_trace: ^1.10.0
 
 dev_dependencies:
+  fake_cloud_firestore: ^1.1.3
   flutter_test:
     sdk: flutter
   mocktail: ^0.1.4
