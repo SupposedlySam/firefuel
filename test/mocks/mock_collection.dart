@@ -1,9 +1,9 @@
 import 'dart:async';
 
-import 'package:firefuel/firefuel.dart';
-import 'package:firefuel/src/collection.dart';
 import 'package:mocktail/mocktail.dart';
 
+import 'package:firefuel/firefuel.dart';
+import 'package:firefuel/src/collection.dart';
 import '../utils/test_user.dart';
 
 class MockCollection<T extends Serializable?> extends Mock

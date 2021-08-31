@@ -1,9 +1,10 @@
 import 'dart:async';
 
 import 'package:dartz/dartz.dart';
-import 'package:firefuel/firefuel.dart';
-import 'package:stack_trace/stack_trace.dart';
 import 'package:firefuel_core/firefuel_core.dart';
+import 'package:stack_trace/stack_trace.dart';
+
+import 'package:firefuel/firefuel.dart';
 
 mixin FirefuelFetchMixin {
   Future<Either<Failure, R>> guard<R>(

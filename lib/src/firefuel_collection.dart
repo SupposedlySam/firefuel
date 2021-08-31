@@ -1,8 +1,9 @@
 import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firefuel/src/collection.dart';
 import 'package:firefuel_core/firefuel_core.dart';
+
+import 'package:firefuel/src/collection.dart';
 
 abstract class FirefuelCollection<T extends Serializable>
     implements Collection<T> {

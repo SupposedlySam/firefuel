@@ -1,6 +1,4 @@
 import 'package:firefuel/firefuel.dart';
-import 'package:flutter_test/flutter_test.dart';
-
 import '../mocks/mock_collection.dart';
 import '../utils/expected_failure.dart';
 import '../utils/test_user.dart';
