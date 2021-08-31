@@ -1,6 +1,7 @@
+import 'package:equatable/equatable.dart';
 import 'package:firefuel/firefuel.dart';
 
-class TestUser extends Serializable {
+class TestUser extends Serializable with EquatableMixin {
   static const String fieldName = 'name';
 
   TestUser(this.name, [this.docId]);
