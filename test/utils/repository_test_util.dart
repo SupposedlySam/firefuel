@@ -1,8 +1,8 @@
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:firefuel/firefuel.dart';
-import '../../mocks/mock_collection.dart';
-import '../../utils/test_repository.dart';
+import '../mocks/mock_collection.dart';
+import 'test_repository.dart';
 
 typedef FutureCallback<R, T extends Serializable?> = Future<Either<Failure, R>>
     Function(TestRepository<T>);
