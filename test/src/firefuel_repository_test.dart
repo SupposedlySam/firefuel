@@ -1,8 +1,8 @@
 import 'package:firefuel/firefuel.dart';
 import '../mocks/mock_collection.dart';
 import '../utils/expected_failure.dart';
-import '../utils/test_user.dart';
 import '../utils/repository_test_util.dart';
+import '../utils/test_user.dart';
 
 void main() {
   final docId = DocumentId('h34jfhg43fiuy3gv4');

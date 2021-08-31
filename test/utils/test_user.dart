@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+
 import 'package:firefuel/firefuel.dart';
 
 class TestUser extends Serializable with EquatableMixin {
