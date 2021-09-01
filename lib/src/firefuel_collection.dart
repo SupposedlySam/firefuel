@@ -43,7 +43,7 @@ abstract class FirefuelCollection<T extends Serializable>
     return null;
   }
 
-  /// Converts a [DocumentSnapshot] to a [T]
+  /// Converts a [DocumentSnapshot] to a [T?]
   T? fromFirestore(
     DocumentSnapshot<Map<String, dynamic>> snapshot,
     SnapshotOptions? options,
