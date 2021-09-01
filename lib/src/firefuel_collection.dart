@@ -15,6 +15,25 @@ abstract class FirefuelCollection<T extends Serializable>
     required this.firestoreInstance,
   });
 
+  /// Converts a [DocumentSnapshot] to a [T]
+  T fromFirestore(
+    DocumentSnapshot<Map<String, dynamic>> document,
+    SnapshotOptions? options,
+  );
+
+  /// Converts a [T] to a [Map<String, dynamic>] to upload to Firestore.
+  Map<String, Object?> toFirestore(
+    T? value,
+    SetOptions? options,
+  );
+
+  @override
+  CollectionReference<T?> get collectionRef =>
+      untypedCollectionRef(firestoreInstance).withConverter(
+        fromFirestore: fromFirestore,
+        toFirestore: toFirestore,
+      );
+
   @override
   Future<DocumentId> create({required T value, DocumentId? docId}) async {
     final documentRef = docId != null
