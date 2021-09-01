@@ -21,7 +21,7 @@ abstract class FirefuelCollection<T extends Serializable>
     SnapshotOptions? options,
   );
 
-  /// Converts a [T] to a [Map<String, dynamic>] to upload to Firestore.
+  /// Converts a [T] to a [Map<String, Object?>] to upload to Firestore.
   Map<String, Object?> toFirestore(
     T? value,
     SetOptions? options,
