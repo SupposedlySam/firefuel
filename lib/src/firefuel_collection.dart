@@ -39,12 +39,14 @@ abstract class FirefuelCollection<T extends Serializable>
     final documentRef = docId != null
         ? (collectionRef.doc(docId.docId)..set(value))
         : await collectionRef.add(value);
+
     return DocumentId(documentRef.id);
   }
 
   @override
   Future<Null> delete(DocumentId docId) async {
     await collectionRef.doc(docId.docId).delete();
+
     return null;
   }
 
