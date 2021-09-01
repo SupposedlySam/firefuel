@@ -8,22 +8,24 @@ import 'package:firefuel/src/collection.dart';
 abstract class FirefuelCollection<T extends Serializable>
     implements Collection<T> {
   final String collectionName;
+  final FirebaseFirestore firestoreInstance;
 
-  FirefuelCollection(this.collectionName);
+  const FirefuelCollection(
+    this.collectionName, {
+    required this.firestoreInstance,
+  });
 
   @override
   Future<DocumentId> create({required T value, DocumentId? docId}) async {
     final documentRef = docId != null
         ? (collectionRef.doc(docId.docId)..set(value))
         : await collectionRef.add(value);
-
     return DocumentId(documentRef.id);
   }
 
   @override
   Future<Null> delete(DocumentId docId) async {
     await collectionRef.doc(docId.docId).delete();
-
     return null;
   }
 
