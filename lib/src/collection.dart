@@ -40,7 +40,7 @@ abstract class Collection<T extends Serializable> {
   ///
   /// If the documentId returns a snapshot that does not exist, or `data()`
   /// returns `null`, create a new document with the [docId] provided.
-  Future<T> getOrCreate({
+  Future<T> readOrCreate({
     required DocumentId docId,
     required T createValue,
   });

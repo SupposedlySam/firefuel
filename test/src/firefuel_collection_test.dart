@@ -81,11 +81,11 @@ void main() {
     });
   });
 
-  group('#getOrCreate', () {
+  group('#readOrCreate', () {
     final documentId = DocumentId('testName');
 
     test('should create the doc when it does not exist', () async {
-      final result = await testCollection.getOrCreate(
+      final result = await testCollection.readOrCreate(
           docId: documentId, createValue: defaultUser);
 
       expect(result, defaultUser);
@@ -94,7 +94,7 @@ void main() {
     test('should get doc when it exists', () async {
       final docId = await testCollection.create(value: defaultUser);
 
-      final testUser = await testCollection.getOrCreate(
+      final testUser = await testCollection.readOrCreate(
           docId: docId, createValue: defaultUser);
 
       expect(docId.docId, testUser.docId);
