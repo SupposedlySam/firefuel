@@ -270,22 +270,20 @@ void main() {
 }
 
 class TestCollection extends FirefuelCollection<TestUser> {
-  TestCollection(this.instance) : super(_testUsersCollectionName);
-
-  final FirebaseFirestore instance;
-
-  @override
-  CollectionReference<TestUser?> get collectionRef =>
-      super.untypedCollectionRef(instance).withConverter(
-            fromFirestore: (snapshot, _) {
-              final data = snapshot.data();
-              return data == null
-                  ? null
-                  : TestUser.fromJson(snapshot.data()!, snapshot.id);
-            },
-            toFirestore: (model, _) => model?.toJson() ?? <String, Object?>{},
-          );
+  TestCollection(FirebaseFirestore firestore)
+      : super(_testUsersCollectionName, firestore: firestore);
 
   @override
-  Stream<List<TestUser>> get stream => listenAll(collectionRef);
+  TestUser? fromFirestore(DocumentSnapshot<Map<String, dynamic>> snapshot,
+      SnapshotOptions? options) {
+    final data = snapshot.data();
+    return data == null
+        ? null
+        : TestUser.fromJson(snapshot.data()!, snapshot.id);
+  }
+
+  @override
+  Map<String, Object?> toFirestore(TestUser? model, SetOptions? options) {
+    return model?.toJson() ?? <String, Object?>{};
+  }
 }
