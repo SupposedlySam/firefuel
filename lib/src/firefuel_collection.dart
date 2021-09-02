@@ -7,32 +7,25 @@ import 'package:firefuel/src/collection.dart';
 
 abstract class FirefuelCollection<T extends Serializable>
     implements Collection<T> {
-  final String collectionName;
-  final FirebaseFirestore firestoreInstance;
+  final String collectionPath;
+  final FirebaseFirestore firestore;
 
-  const FirefuelCollection(
-    this.collectionName, {
-    required this.firestoreInstance,
-  });
-
-  /// Converts a [DocumentSnapshot] to a [T]
-  T fromFirestore(
-    DocumentSnapshot<Map<String, dynamic>> document,
-    SnapshotOptions? options,
-  );
-
-  /// Converts a [T] to a [Map<String, Object?>] to upload to Firestore.
-  Map<String, Object?> toFirestore(
-    T? value,
-    SetOptions? options,
-  );
+  const FirefuelCollection(this.collectionPath, {required this.firestore});
 
   @override
-  CollectionReference<T?> get collectionRef =>
-      untypedCollectionRef(firestoreInstance).withConverter(
-        fromFirestore: fromFirestore,
-        toFirestore: toFirestore,
-      );
+  CollectionReference<T?> get collectionRef {
+    return untypedCollectionRef.withConverter(
+      fromFirestore: fromFirestore,
+      toFirestore: toFirestore,
+    );
+  }
+
+  @override
+  Stream<List<T>> get stream => listenAll(collectionRef);
+
+  CollectionReference<Map<String, dynamic>> get untypedCollectionRef {
+    return firestore.collection(collectionPath);
+  }
 
   @override
   Future<DocumentId> create({required T value, DocumentId? docId}) async {
@@ -49,6 +42,12 @@ abstract class FirefuelCollection<T extends Serializable>
 
     return null;
   }
+
+  /// Converts a [DocumentSnapshot] to a [T?]
+  T? fromFirestore(
+    DocumentSnapshot<Map<String, dynamic>> snapshot,
+    SnapshotOptions? options,
+  );
 
   Future<T> getOrCreate({
     required DocumentId docId,
@@ -97,11 +96,11 @@ abstract class FirefuelCollection<T extends Serializable>
     return snapshots.map((documentSnapshot) => documentSnapshot.data());
   }
 
-  CollectionReference<Map<String, dynamic>> untypedCollectionRef(
-    FirebaseFirestore instance,
-  ) {
-    return instance.collection(collectionName);
-  }
+  /// Converts a [T?] to a [Map<String, Object?>] to upload to Firestore.
+  Map<String, Object?> toFirestore(
+    T? model,
+    SetOptions? options,
+  );
 
   @override
   Future<Null> update({
