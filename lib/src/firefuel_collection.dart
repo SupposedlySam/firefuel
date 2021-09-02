@@ -49,7 +49,7 @@ abstract class FirefuelCollection<T extends Serializable>
     SnapshotOptions? options,
   );
 
-  Future<T> getOrCreate({
+  Future<T> readOrCreate({
     required DocumentId docId,
     required T createValue,
   }) async {
