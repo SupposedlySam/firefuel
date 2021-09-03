@@ -118,9 +118,9 @@ void main() {
 
       expect(stream, emitsInOrder([newUser1, newUser2, newUser3]));
 
-      await testCollection.update(docId: docId, value: newUser1.toJson());
-      await testCollection.update(docId: docId, value: newUser2.toJson());
-      await testCollection.update(docId: docId, value: newUser3.toJson());
+      await testCollection.update(docId: docId, value: newUser1);
+      await testCollection.update(docId: docId, value: newUser2);
+      await testCollection.update(docId: docId, value: newUser3);
     });
 
     test('should output null when doc no longer exists', () async {
@@ -128,7 +128,7 @@ void main() {
 
       expect(stream, emitsInOrder([newUser, null]));
 
-      await testCollection.update(docId: docId, value: newUser.toJson());
+      await testCollection.update(docId: docId, value: newUser);
       await testCollection.delete(docId);
     });
   });
@@ -206,7 +206,7 @@ void main() {
 
       await testCollection.update(
         docId: docId,
-        value: updatedUser.toJson(),
+        value: updatedUser,
       );
     });
 
@@ -224,7 +224,7 @@ void main() {
     test('should fail silently when document does not exist', () async {
       final updateResult = await testCollection.update(
         docId: DocumentId('dodoBird'),
-        value: TestUser('Clark Kent').toJson(),
+        value: TestUser('Clark Kent'),
       );
 
       expect(updateResult, isNull);
@@ -236,35 +236,42 @@ void main() {
 
       await testCollection.update(
         docId: docId,
-        value: updatedDoc.toJson(),
+        value: updatedDoc,
       );
 
       final readResult = await testCollection.read(docId);
 
       expect(readResult, updatedDoc);
     });
+  });
 
-    test('should add new fields', () async {
-      const newField = 'newField';
-      final updatedDoc = TestUser('updateValue');
-      final updatedRawJson = updatedDoc.toJson()
-        ..addAll({newField: 'fieldValue'});
-      final docId = await testCollection.create(defaultUser);
+  group('#updateOrCreate', () {
+    test('should create new document when document does not exist', () async {
+      final originalDocId = DocumentId('originalDocId');
+      final newUser = TestUser('newUser');
 
-      await testCollection.update(
-        docId: docId,
-        value: updatedRawJson,
+      await testCollection.updateOrCreate(
+        docId: originalDocId,
+        value: newUser,
       );
 
-      // Manually get the json from the collection because the new field won't
-      //be parsed into the [TestUser] object since we didn't update the
-      //[TestUser.fromJson] factory
-      final docSnapshot = await instance
-          .collection(_testUsersCollectionName)
-          .doc(docId.docId)
-          .get();
+      final updatedDoc = await testCollection.read(originalDocId);
 
-      expect(docSnapshot.data(), updatedRawJson);
+      expect(updatedDoc, newUser);
+    });
+
+    test('should overwrite existing fields', () async {
+      final updatedDoc = TestUser('updateValue');
+      final docId = await testCollection.create(defaultUser);
+
+      await testCollection.updateOrCreate(
+        docId: docId,
+        value: updatedDoc,
+      );
+
+      final readResult = await testCollection.read(docId);
+
+      expect(readResult, updatedDoc);
     });
   });
 }

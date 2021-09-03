@@ -110,9 +110,19 @@ abstract class FirefuelCollection<T extends Serializable>
   @override
   Future<Null> update({
     required DocumentId docId,
-    required Map<String, Object?> value,
+    required T value,
   }) async {
-    await collectionRef.doc(docId.docId).update(value);
+    await collectionRef.doc(docId.docId).update(value.toJson());
+
+    return null;
+  }
+
+  @override
+  Future<Null> updateOrCreate({
+    required DocumentId docId,
+    required T value,
+  }) async {
+    await collectionRef.doc(docId.docId).set(value, SetOptions(merge: true));
 
     return null;
   }

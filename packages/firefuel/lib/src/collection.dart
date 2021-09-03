@@ -79,6 +79,15 @@ abstract class Collection<T extends Serializable> {
   /// If no document exists yet, the update will fail.
   Future<Null> update({
     required DocumentId docId,
-    required Map<String, Object?> value,
+    required T value,
+  });
+
+  /// Updates data on the document if it exists. Data will be merged with
+  /// any existing document data.
+  ///
+  /// If no document exists, a new document will be created
+  Future<Null> updateOrCreate({
+    required DocumentId docId,
+    required T value,
   });
 }

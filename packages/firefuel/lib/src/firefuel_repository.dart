@@ -39,7 +39,7 @@ abstract class FirefuelRepository<T extends Serializable>
     return guard(() {
       return _collection.update(
         docId: docId,
-        value: value.toJson(),
+        value: value,
       );
     });
   }
