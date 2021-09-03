@@ -220,6 +220,82 @@ void main() {
     });
   });
 
+  group('#replace', () {
+    final originalDocId = DocumentId('originalDocId');
+
+    test('should fail silently when document does not exist', () async {
+      final updateResult = await testCollection.replace(
+        docId: DocumentId('dodoBird'),
+        value: TestUser('Clark Kent'),
+      );
+
+      expect(updateResult, isNull);
+    });
+
+    test('should overwrite all values in document', () async {
+      final newUser = TestUser('newUser');
+      final updatedUser = TestUser('updatedUser');
+
+      await testCollection.createById(value: newUser, docId: originalDocId);
+
+      await testCollection.replace(
+        value: updatedUser,
+        docId: originalDocId,
+      );
+
+      final readUser = await testCollection.read(originalDocId);
+
+      expect(updatedUser, readUser);
+    });
+  });
+
+  group('#replaceFields', () {
+    late DocumentId docId;
+    const replacementName = 'someNewValue';
+    final replacement = TestUser(replacementName);
+
+    setUp(() async {
+      docId = await testCollection.create(defaultUser);
+    });
+
+    test('should fail silently when document does not exist', () async {
+      final updateResult = await testCollection.replaceFields(
+        docId: DocumentId('dodoBird'),
+        value: TestUser('Clark Kent'),
+        fieldPaths: [TestUser.fieldName],
+      );
+
+      expect(updateResult, isNull);
+    });
+
+    test('should replace fields in the list', () async {
+      await testCollection.replaceFields(
+        docId: docId,
+        value: replacement,
+        fieldPaths: [TestUser.fieldName],
+      );
+
+      final updatedUser = await testCollection.read(docId);
+
+      expect(updatedUser!.name, replacementName);
+    });
+
+    test('should not replace fields missing from the list', () async {
+      const replacementName = 'someNewValue';
+      final replacement = TestUser(replacementName);
+
+      await testCollection.replaceFields(
+        docId: docId,
+        value: replacement,
+        fieldPaths: ['fakeField'],
+      );
+
+      final unchangedUser = await testCollection.read(docId);
+
+      expect(unchangedUser!.name, isNot(replacementName));
+    });
+  });
+
   group('#update', () {
     test('should fail silently when document does not exist', () async {
       final updateResult = await testCollection.update(

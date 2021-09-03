@@ -39,15 +39,6 @@ abstract class Collection<T extends Serializable> {
   /// Deletes the current document from the collection.
   Future<Null> delete(DocumentId docId);
 
-  /// Get the document by id, or create a new one
-  ///
-  /// If the documentId returns a snapshot that does not exist, or `data()`
-  /// returns `null`, create a new document with the [docId] provided.
-  Future<T> readOrCreate({
-    required DocumentId docId,
-    required T createValue,
-  });
-
   /// Get a document from the collection
   ///
   /// Refreshes automatically when new data is added to the document
@@ -73,10 +64,38 @@ abstract class Collection<T extends Serializable> {
   /// Gets a stream of the document requested
   Stream<T?> readAsStream(DocumentId docId);
 
+  /// Get the document by id, or create a new one
+  ///
+  /// If the documentId returns a snapshot that does not exist, or `data()`
+  /// returns `null`, create a new document with the [docId] provided.
+  Future<T> readOrCreate({
+    required DocumentId docId,
+    required T createValue,
+  });
+
+  /// Replaces the document at [docId] with [value].
+  ///
+  /// If no document exists yet, the replace will fail.
+  ///
+  /// *Requires 1 read of doc to perform replace*
+  Future<Null> replace({required DocumentId docId, required T value});
+
+  /// Replaces the fields of the document at [docId] with the matching
+  /// [fieldPaths] from [value]
+  ///
+  /// Converts all [fieldPaths] into [FieldPath] objects to compare against
+  ///
+  /// If no document exists yet, the update will fail silently.
+  Future<Null> replaceFields({
+    required DocumentId docId,
+    required T value,
+    required List<String> fieldPaths,
+  });
+
   /// Updates data on the document. Data will be merged with any existing
   /// document data.
   ///
-  /// If no document exists yet, the update will fail.
+  /// If no document exists yet, the update will fail silently.
   Future<Null> update({
     required DocumentId docId,
     required T value,

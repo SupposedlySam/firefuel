@@ -57,21 +57,6 @@ abstract class FirefuelCollection<T extends Serializable>
     SnapshotOptions? options,
   );
 
-  Future<T> readOrCreate({
-    required DocumentId docId,
-    required T createValue,
-  }) async {
-    final maybeData = await read(docId);
-
-    if (maybeData != null) return maybeData;
-
-    await createById(value: createValue, docId: docId);
-
-    final data = await read(docId);
-
-    return data!;
-  }
-
   @override
   Stream<T?> listen<T>(
     CollectionReference<T?> collectionRef,
@@ -99,6 +84,51 @@ abstract class FirefuelCollection<T extends Serializable>
     final snapshots = collectionRef.doc(docId.docId).snapshots();
 
     return snapshots.map((documentSnapshot) => documentSnapshot.data());
+  }
+
+  Future<T> readOrCreate({
+    required DocumentId docId,
+    required T createValue,
+  }) async {
+    final maybeData = await read(docId);
+
+    if (maybeData != null) return maybeData;
+
+    await createById(value: createValue, docId: docId);
+
+    final data = await read(docId);
+
+    return data!;
+  }
+
+  @override
+  Future<Null> replace({
+    required DocumentId docId,
+    required T value,
+  }) async {
+    final existingDoc = await read(docId);
+
+    if (existingDoc == null) return null;
+
+    await collectionRef.doc(docId.docId).set(value);
+
+    return null;
+  }
+
+  @override
+  Future<Null> replaceFields({
+    required DocumentId docId,
+    required T value,
+    required List<String> fieldPaths,
+  }) async {
+    final paths =
+        fieldPaths.map((field) => FieldPath.fromString(field)).toList();
+    final replacement = value.toJson()
+      ..removeWhere((key, _) => !paths.contains(FieldPath.fromString(key)));
+
+    await untypedCollectionRef.doc(docId.docId).update(replacement);
+
+    return null;
   }
 
   /// Converts a [T?] to a [Map<String, Object?>] to upload to Firestore.
