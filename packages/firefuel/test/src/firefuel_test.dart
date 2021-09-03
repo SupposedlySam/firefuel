@@ -4,17 +4,15 @@ import 'package:firefuel/firefuel.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
-  group('$Firefuel', () {
-    group('#firestore', () {
-      test('should throw an exception when not initialized', () {
-        expect(() => Firefuel.firestore, throwsA(isA<AssertionError>()));
-      });
+  group('#firestore', () {
+    test('should throw an exception when not initialized', () {
+      expect(() => Firefuel.firestore, throwsA(isA<AssertionError>()));
+    });
 
-      test('should return a $FirebaseFirestore instance when initialized', () {
-        Firefuel.initialize(FakeFirebaseFirestore());
+    test('should return a $FirebaseFirestore instance when initialized', () {
+      Firefuel.initialize(FakeFirebaseFirestore());
 
-        expect(Firefuel.firestore, isA<FirebaseFirestore>());
-      });
+      expect(Firefuel.firestore, isA<FirebaseFirestore>());
     });
   });
 }
