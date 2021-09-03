@@ -1,5 +1,8 @@
 sort: dart pub global run import_sorter:main
 coverage: # requires `brew install lcov`
-- flutter test --coverage
-- genhtml -o coverage coverage/lcov.info
-- open coverage/index.html
+  - flutter test --coverage
+  - genhtml -o coverage coverage/lcov.info
+  - open coverage/index.html
+cproj:
+  - flutter clean
+  - flutter pub upgrade
