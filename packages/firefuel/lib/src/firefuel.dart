@@ -1,16 +1,14 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class Firefuel {
-  final FirebaseFirestore firestore;
+  const Firefuel._();
 
-  const Firefuel._(this.firestore);
-
-  static Firefuel get instance {
-    assert(_instance != null, 'Firefuel is not initialized');
-    return _instance!;
+  static FirebaseFirestore get firestore {
+    assert(_firestore != null, 'Firefuel is not initialized');
+    return _firestore!;
   }
 
-  static Firefuel? _instance;
+  static FirebaseFirestore? _firestore;
 
   /// Initializes Firefuel with instance of [FirebaseFirestore]
   ///
@@ -18,6 +16,6 @@ class Firefuel {
   ///
   /// All collections will reference [firestore]
   static void initialize(FirebaseFirestore firestore) {
-    _instance = Firefuel._(firestore);
+    _firestore = firestore;
   }
 }

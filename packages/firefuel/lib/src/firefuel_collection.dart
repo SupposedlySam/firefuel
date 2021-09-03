@@ -12,7 +12,7 @@ abstract class FirefuelCollection<T extends Serializable>
 
   FirefuelCollection(this.collectionPath);
 
-  final firestore = Firefuel.instance.firestore;
+  final firestore = Firefuel.firestore;
 
   @override
   CollectionReference<T?> get collectionRef {
