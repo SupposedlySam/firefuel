@@ -15,7 +15,7 @@ dependencies:
   dartz: ^0.10.0
   equatable: ^2.0.3
   firefuel_core:
-    git: 
+    git:
       url: https://github.com/SupposedlySam/firefuel.git
       path: packages/firefuel_core
   stack_trace: ^1.10.0
@@ -25,8 +25,8 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   mocktail: ^0.1.4
-  
+
 import_sorter:
   comments: false
 
-scripts: derry.yaml
+scripts: ../../derry.yaml

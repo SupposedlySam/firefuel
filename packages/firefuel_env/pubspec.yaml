@@ -13,3 +13,8 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
+
+import_sorter:
+  comments: false
+
+scripts: ../../derry.yaml
