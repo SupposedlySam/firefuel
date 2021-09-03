@@ -4,13 +4,15 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firefuel_core/firefuel_core.dart';
 
 import 'package:firefuel/src/collection.dart';
+import 'package:firefuel/src/firefuel.dart';
 
 abstract class FirefuelCollection<T extends Serializable>
     implements Collection<T> {
   final String collectionPath;
-  final FirebaseFirestore firestore;
 
-  const FirefuelCollection(this.collectionPath, {required this.firestore});
+  FirefuelCollection(this.collectionPath);
+
+  final firestore = Firefuel.firestore;
 
   @override
   CollectionReference<T?> get collectionRef {
