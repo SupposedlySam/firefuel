@@ -8,13 +8,13 @@ import '../utils/test_user.dart';
 const _testUsersCollectionName = 'testUsers';
 
 void main() {
-  late FirebaseFirestore instance;
   late TestCollection testCollection;
   final defaultUser = TestUser('testName');
 
   setUp(() {
-    instance = FakeFirebaseFirestore();
-    testCollection = TestCollection(instance);
+    final instance = FakeFirebaseFirestore();
+    Firefuel.inititialize(instance);
+    testCollection = TestCollection();
   });
 
   group('#create', () {
@@ -353,8 +353,7 @@ void main() {
 }
 
 class TestCollection extends FirefuelCollection<TestUser> {
-  TestCollection(FirebaseFirestore firestore)
-      : super(_testUsersCollectionName, firestore: firestore);
+  TestCollection() : super(_testUsersCollectionName);
 
   @override
   TestUser? fromFirestore(DocumentSnapshot<Map<String, dynamic>> snapshot,
