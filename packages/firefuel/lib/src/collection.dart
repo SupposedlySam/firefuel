@@ -27,10 +27,13 @@ abstract class Collection<T extends Serializable> {
   /// ```
   Stream<List<T>> get stream;
 
-  /// Overwrite existing data or create a new record if it doesn't exist
-  Future<DocumentId> create({
+  /// Create a new document with an auto-generated [DocumentId]
+  Future<DocumentId> create(T value);
+
+  /// Create a new document with the provided [docId]
+  Future<Null> createById({
     required T value,
-    DocumentId? docId,
+    required DocumentId docId,
   });
 
   /// Deletes the current document from the collection.

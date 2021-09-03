@@ -18,7 +18,7 @@ abstract class FirefuelRepository<T extends Serializable>
     required T value,
     DocumentId? docId,
   }) {
-    return guard(() => _collection.create(docId: docId, value: value));
+    return guard(() => _collection.create(value));
   }
 
   @override

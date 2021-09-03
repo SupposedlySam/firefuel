@@ -18,50 +18,50 @@ void main() {
   });
 
   group('#create', () {
-    late DocumentId originalDocId;
+    test('should return a new document', () async {
+      final originalDocId = await testCollection.create(defaultUser);
+      final secondDocId = await testCollection.create(defaultUser);
 
-    setUp(() async {
-      originalDocId = await testCollection.create(value: defaultUser);
+      expect(originalDocId, isNot(secondDocId));
     });
 
-    group('when docId is provided', () {
-      test('should return the same document', () async {
-        final createResult = await testCollection.create(
-          value: defaultUser,
-          docId: originalDocId,
-        );
+    test('should create a new document with the values provided', () async {
+      final newUser = TestUser('overwrittenUser');
+      final createdDocId = await testCollection.create(newUser);
 
-        expect(originalDocId, createResult);
-      });
+      final updatedUser = await testCollection.read(createdDocId);
 
-      test('should overwrite the document with the values provided', () async {
-        final newUser = TestUser('overwrittenUser');
-        final createdDocId = await testCollection.create(
-          value: newUser,
-          docId: originalDocId,
-        );
+      expect(updatedUser, newUser);
+    });
+  });
 
-        final updatedUser = await testCollection.read(createdDocId);
+  group('#createById', () {
+    final originalDocId = DocumentId('originalDocId');
 
-        expect(updatedUser, newUser);
-      });
+    test('should create the document with provided id', () async {
+      await testCollection.createById(
+        value: defaultUser,
+        docId: originalDocId,
+      );
+
+      final readResult = await testCollection.read(originalDocId);
+
+      expect(defaultUser, readResult);
     });
 
-    group('when docId is not provided', () {
-      test('should return a new document', () async {
-        final secondDocId = await testCollection.create(value: defaultUser);
+    test('should overwrite the document with the values provided', () async {
+      final newUser = TestUser('newUser');
+      final createdDocId = await testCollection.create(newUser);
 
-        expect(originalDocId, isNot(secondDocId));
-      });
+      final updatedUser = TestUser('updatedUser');
+      await testCollection.createById(
+        value: updatedUser,
+        docId: createdDocId,
+      );
 
-      test('should create a new document with the values provided', () async {
-        final newUser = TestUser('overwrittenUser');
-        final createdDocId = await testCollection.create(value: newUser);
+      final overwrittenUser = await testCollection.read(createdDocId);
 
-        final updatedUser = await testCollection.read(createdDocId);
-
-        expect(updatedUser, newUser);
-      });
+      expect(updatedUser, overwrittenUser);
     });
   });
 
@@ -69,7 +69,7 @@ void main() {
     late DocumentId defaultDocId;
 
     setUp(() async {
-      defaultDocId = await testCollection.create(value: defaultUser);
+      defaultDocId = await testCollection.create(defaultUser);
     });
 
     test('should remove the document', () async {
@@ -92,7 +92,7 @@ void main() {
     });
 
     test('should get doc when it exists', () async {
-      final docId = await testCollection.create(value: defaultUser);
+      final docId = await testCollection.create(defaultUser);
 
       final testUser = await testCollection.readOrCreate(
           docId: docId, createValue: defaultUser);
@@ -106,7 +106,7 @@ void main() {
     late DocumentId docId;
 
     setUp(() async {
-      docId = await testCollection.create(value: defaultUser);
+      docId = await testCollection.create(defaultUser);
 
       stream = testCollection.listen(testCollection.collectionRef, docId);
     });
@@ -140,8 +140,8 @@ void main() {
     final newUser2 = TestUser('newUser2');
 
     setUp(() async {
-      docId = await testCollection.create(value: defaultUser);
-      await testCollection.create(value: newUser1);
+      docId = await testCollection.create(defaultUser);
+      await testCollection.create(newUser1);
 
       stream = testCollection.listenAll(testCollection.collectionRef);
     });
@@ -155,7 +155,7 @@ void main() {
         ]),
       );
 
-      await testCollection.create(value: newUser2);
+      await testCollection.create(newUser2);
     });
 
     test('should update when an item is deleted', () async {
@@ -172,7 +172,7 @@ void main() {
 
   group('#read', () {
     test('should return the Type when docId exists', () async {
-      final docId = await testCollection.create(value: defaultUser);
+      final docId = await testCollection.create(defaultUser);
 
       final readResult = await testCollection.read(docId);
 
@@ -191,7 +191,7 @@ void main() {
     late DocumentId docId;
 
     setUp(() async {
-      docId = await testCollection.create(value: defaultUser);
+      docId = await testCollection.create(defaultUser);
 
       docStream = testCollection.readAsStream(docId);
     });
@@ -232,7 +232,7 @@ void main() {
 
     test('should overwrite existing fields', () async {
       final updatedDoc = TestUser('updateValue');
-      final docId = await testCollection.create(value: defaultUser);
+      final docId = await testCollection.create(defaultUser);
 
       await testCollection.update(
         docId: docId,
@@ -249,7 +249,7 @@ void main() {
       final updatedDoc = TestUser('updateValue');
       final updatedRawJson = updatedDoc.toJson()
         ..addAll({newField: 'fieldValue'});
-      final docId = await testCollection.create(value: defaultUser);
+      final docId = await testCollection.create(defaultUser);
 
       await testCollection.update(
         docId: docId,

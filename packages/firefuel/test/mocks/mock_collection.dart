@@ -21,9 +21,7 @@ extension MockCollectionX<T extends Serializable> on MockCollection<T> {
     registerFallbackValue<Serializable>(TestUser('fallbackValue'));
 
     if (onCreate != null) {
-      when(
-        () => create(docId: any(named: 'docId'), value: any(named: 'value')),
-      ).thenAnswer((_) => Future.value(onCreate()));
+      when(() => create(any())).thenAnswer((_) => Future.value(onCreate()));
     }
 
     if (onRead != null) {

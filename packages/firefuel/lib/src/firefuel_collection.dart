@@ -28,12 +28,20 @@ abstract class FirefuelCollection<T extends Serializable>
   }
 
   @override
-  Future<DocumentId> create({required T value, DocumentId? docId}) async {
-    final documentRef = docId != null
-        ? (collectionRef.doc(docId.docId)..set(value))
-        : await collectionRef.add(value);
+  Future<DocumentId> create(T value) async {
+    final documentRef = await collectionRef.add(value);
 
     return DocumentId(documentRef.id);
+  }
+
+  @override
+  Future<Null> createById({
+    required T value,
+    required DocumentId docId,
+  }) async {
+    await collectionRef.doc(docId.docId).set(value);
+
+    return null;
   }
 
   @override
@@ -57,10 +65,7 @@ abstract class FirefuelCollection<T extends Serializable>
 
     if (maybeData != null) return maybeData;
 
-    await create(
-      value: createValue,
-      docId: docId,
-    );
+    await createById(value: createValue, docId: docId);
 
     final data = await read(docId);
 
