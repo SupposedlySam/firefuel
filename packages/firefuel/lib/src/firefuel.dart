@@ -17,7 +17,7 @@ class Firefuel {
   /// This method must be called before any other method of Firefuel
   ///
   /// All collections will reference [firestore]
-  static void inititialize(FirebaseFirestore firestore) {
+  static void initialize(FirebaseFirestore firestore) {
     _instance = Firefuel._(firestore);
   }
 }
