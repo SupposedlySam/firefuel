@@ -12,8 +12,7 @@ void main() {
   final defaultUser = TestUser('testName');
 
   setUp(() {
-    final instance = FakeFirebaseFirestore();
-    Firefuel.inititialize(instance);
+    Firefuel.initialize(FakeFirebaseFirestore());
     testCollection = TestCollection();
   });
 
