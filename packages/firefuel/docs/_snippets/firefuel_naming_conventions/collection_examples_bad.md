@@ -1,0 +1,4 @@
+`UsersCollection`
+`MessagesCollection`
+`ProductsCollection`
+`PostsCollection`

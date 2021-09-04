@@ -1,0 +1,1 @@
+`DocumentType(singular form)` + Collection
