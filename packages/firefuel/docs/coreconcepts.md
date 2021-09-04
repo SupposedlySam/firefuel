@@ -20,6 +20,12 @@ To make your Documents type safe, you'll want to convert then from a `Map` to a 
 
 ## Streamlining Type Safety with Collections
 
+### Quick Reference
+
+You'll create a new Collection that extends FirefuelCollection for each top level collection, and subcollection in your Firebase project.
+
+### Collection Detail
+
 As developers, we always want to work with type safe code. This is why Firefuel makes all Firebase interactions type safe by default. Firefuel Collections require you to define `fromFirestore` and `toFirestore` methods that are used to automatically convert your data from a `DocumentSnapshot` (what's returned from Firebase) to type `T` (your model) on every interaction. 
 
 
@@ -27,6 +33,23 @@ As developers, we always want to work with type safe code. This is why Firefuel 
 
 ?> Note: snapshots are included so you can get access to all parts of the `DocumentSnapshot`, but `snapshot.data()` is what you'll use to access the `Map` needed to call your `fromJson` method on your model.
 
-You'll create a new Collection that extends FirefuelCollection for each top level collection, or subcollection in your Firebase project.
 
 ## Repositories
+
+### Quick Reference
+
+You'll create a new Repository that extends FirefuelRepository for each top level collection in your Firestore project.
+
+### Repository Detail
+
+A Repository in Firefuel is equivalent to a top level collection (TLC) in your Firebase project. The Repository is responsible for containing the subcollections within the TLC and any specific behavior on the TLC the repository represents. All FirefuelRepositories are required to provide a Collection to be used as the TLC.
+
+[repository.dart](_snippets/architecture/repository.dart.md ':include')
+
+### Subcollections
+
+As mentioned previously, Firestore has the ability to contain subcollections. Subcollections have all the same functionality as a top level collection, but are nested inside of a top level collection (TLC). 
+
+[repository_subcollections.dart](_snippets/architecture/repository_subcollections.dart.md ':include')
+
+As seen in the previous snippet, you can provide methods or getters to access your subcollections directly from the Repository.
