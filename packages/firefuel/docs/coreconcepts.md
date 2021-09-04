@@ -53,3 +53,27 @@ As mentioned previously, Firestore has the ability to contain subcollections. Su
 [repository_subcollections.dart](_snippets/architecture/repository_subcollections.dart.md ':include')
 
 As seen in the previous snippet, you can provide methods or getters to access your subcollections directly from the Repository.
+
+### Handling Errors
+
+Firefuel is opinionated on how you should handle errors. Firefuel exposes the [dartz pacakge](https://pub.dev/packages/dartz) [Either type](https://pub.dev/documentation/dartz/latest/dartz/Either-class.html), and requires that Repositories handle any error from the Collection and return "Either" a `Failure` or the success type for the function. 
+
+
+Before we get too far ahead of ourselves, all methods inherited from the `FirefuelRepository` already take care of returning the `Either` type for you. 
+
+## Either Types
+
+For every `Either` type you must provide a Type you expect if the method fails (`Left`) and a Type you expect if the method succeeds (`Right`). For example, the following defines an `Either` type where a failure would return a `Failure` class and a success would return a `String`:
+
+```dart
+Either<Failure, String>
+```
+
+### Failures
+
+As stated above, a failure should be returned as a `Left`. The `Left` class
+
+
+
+
+### Successes
