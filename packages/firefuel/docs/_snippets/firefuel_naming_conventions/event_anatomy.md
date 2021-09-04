@@ -1,1 +1,0 @@
-`FirefuelSubject` + `Noun (optional)` + `Verb (event)`
