@@ -1,0 +1,1 @@
+`FirefuelSubject` + `Verb (action)` + `State`
