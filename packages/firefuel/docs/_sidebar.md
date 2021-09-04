@@ -5,7 +5,6 @@
   - Core Concepts
     - [package:firefuel](coreconcepts.md)
   - [Architecture](architecture.md)
-  - [Testing](testing.md)
   - [Naming Conventions](firefuelnamingconventions.md)
   - [FAQs](faqs.md)
 
