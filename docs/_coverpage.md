@@ -1,5 +1,6 @@
 <img src="https://raw.githubusercontent.com/SupposedlySam/firefuel/main/docs/assets/firefuel_logo_full.png" height="100" alt="Firefuel" /><br/><small>v0.0.1</small>
 
+<!-- 
 [![build](https://github.com/SupposedlySam/firefuel/workflows/build/badge.svg)](https://github.com/SupposedlySam/firefuel/actions)
 [![codecov](https://codecov.io/gh/SupposedlySam/Firefuel/branch/main/graph/badge.svg)](https://codecov.io/gh/SupposedlySam/firefuel)
 [![Star on GitHub](https://img.shields.io/github/stars/SupposedlySam/firefuel.svg?style=flat&logo=github&colorB=deeppink&label=stars)](https://github.com/SupposedlySam/firefuel)
@@ -8,7 +9,7 @@
 [![Awesome Flutter](https://img.shields.io/badge/awesome-flutter-blue.svg?longCache=true)](https://github.com/Solido/awesome-flutter#standard)
 [![Flutter Samples](https://img.shields.io/badge/flutter-samples-teal.svg?longCache=true)](http://fluttersamples.com)
 [![Discord](https://img.shields.io/discord/649708778631200778.svg?logo=discord&color=blue)](https://discord.gg/firefuel)
-[![License: MIT](https://img.shields.io/badge/license-MIT-purple.svg)](https://opensource.org/licenses/MIT)
+[![License: MIT](https://img.shields.io/badge/license-MIT-purple.svg)](https://opensource.org/licenses/MIT) -->
 
 > A Firebase Cloud Firestore library to fuel your application's growth!
 
