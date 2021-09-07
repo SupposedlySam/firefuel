@@ -1,6 +1,6 @@
 # Getting Started
 
-?> In order to start using firefuel you must have the [Dart SDK](https://dart.dev/get-dart) installed on your machine.
+?> In order to start using firefuel you must have Firebase configured for your application. See the [FlutterFire Docs](https://firebase.flutter.dev/docs/overview/) before you continue.
 
 ## Overview
 
