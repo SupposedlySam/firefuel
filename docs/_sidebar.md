@@ -15,4 +15,4 @@
 
 - API Reference
   - [firefuel](https://pub.dev/documentation/firefuel/latest/firefuel/firefuel.html)
-  - [flutter_firefuel](https://pub.dev/documentation/flutter_firefuel/latest/flutter_firefuel/flutter_firefuel-library.html)
+  
