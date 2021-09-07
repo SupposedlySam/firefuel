@@ -13,8 +13,9 @@
 
 > A Firebase Cloud Firestore library to fuel your application's growth!
 
-- Simple & Lightweight
-- Highly Testable
+- Simple
+- Intuitive
+- Consistent
 - For Flutter and Cloud Firestore
 
 <p class="buttons">    
