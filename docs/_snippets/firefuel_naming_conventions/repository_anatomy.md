@@ -1,1 +1,0 @@
-`DocumentType(singular form)` + Repository
