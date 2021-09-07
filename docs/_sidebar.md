@@ -6,7 +6,6 @@
     - [package:firefuel](coreconcepts.md)
   - [Architecture](architecture.md)
   - [Naming Conventions](firefuelnamingconventions.md)
-  - [FAQs](faqs.md)
 
 - Tutorials
 
