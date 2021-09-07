@@ -8,9 +8,9 @@ import 'package:firefuel/src/firefuel.dart';
 
 abstract class FirefuelCollection<T extends Serializable>
     implements Collection<T> {
-  final String collectionPath;
+  final String path;
 
-  FirefuelCollection(this.collectionPath);
+  FirefuelCollection(this.path);
 
   final firestore = Firefuel.firestore;
 
@@ -26,7 +26,7 @@ abstract class FirefuelCollection<T extends Serializable>
   Stream<List<T>> get stream => listenAll(ref);
 
   CollectionReference<Map<String, dynamic>> get untypedCollectionRef {
-    return firestore.collection(collectionPath);
+    return firestore.collection(path);
   }
 
   @override
