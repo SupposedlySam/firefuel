@@ -15,7 +15,7 @@
 
 - Simple & Lightweight
 - Highly Testable
-- For Dart, Flutter, and Cloud Firestore
+- For Flutter and Cloud Firestore
 
 <p class="buttons">    
     <a href="https://github.com/SupposedlySam/firefuel/" target="_blank" rel="noopener">GitHub</a>
