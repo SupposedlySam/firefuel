@@ -16,7 +16,7 @@ abstract class FirefuelCollection<T extends Serializable>
 
   @override
   CollectionReference<T?> get ref {
-    return untypedCollectionRef.withConverter(
+    return untypedRef.withConverter(
       fromFirestore: fromFirestore,
       toFirestore: toFirestore,
     );
@@ -25,7 +25,7 @@ abstract class FirefuelCollection<T extends Serializable>
   @override
   Stream<List<T>> get stream => listenAll(ref);
 
-  CollectionReference<Map<String, dynamic>> get untypedCollectionRef {
+  CollectionReference<Map<String, dynamic>> get untypedRef {
     return firestore.collection(path);
   }
 
@@ -128,7 +128,7 @@ abstract class FirefuelCollection<T extends Serializable>
     final replacement = value.toJson()
       ..removeWhere((key, _) => !paths.contains(FieldPath.fromString(key)));
 
-    await untypedCollectionRef.doc(docId.docId).update(replacement);
+    await untypedRef.doc(docId.docId).update(replacement);
 
     return null;
   }
