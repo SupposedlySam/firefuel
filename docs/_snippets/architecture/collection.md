@@ -11,9 +11,11 @@ class YourCollection extends FirefuelCollection<YourModel> {
 
     if(data == null) return null;
 
-    // If you want your model to contain the DocumentId, make your `fromJson` 
-    // function accept the `snapshot.id` and assign it as a property on your model!
-    return YourModel.fromJson(snapshot.data()!, snapshot.id); 
+    // Optional: You can add the document Id directly to the data your
+    // Model is accepting.
+    final dataWithId = { ...data, 'id': snapshot.id };
+
+    return YourModel.fromJson(dataWithId);
   }
 
   @override
