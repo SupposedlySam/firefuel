@@ -10,7 +10,7 @@
 [![Discord](https://img.shields.io/discord/649708778631200778.svg?logo=discord&color=blue)](https://discord.gg/firefuel)
 [![License: MIT](https://img.shields.io/badge/license-MIT-purple.svg)](https://opensource.org/licenses/MIT)
 
-> A Firebase Cloud Firestore framework to fuel your application's growth!.
+> A Firebase Cloud Firestore library to fuel your application's growth!.
 
 - Simple & Lightweight
 - Highly Testable

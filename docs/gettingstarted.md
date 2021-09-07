@@ -6,7 +6,7 @@
 
 Firefuel consists of several pub packages:
 
-- [firefuel](https://pub.dev/packages/firefuel) - Core firefuel framework.
+- [firefuel](https://pub.dev/packages/firefuel) - Core firefuel library.
 - [firefuel_core](https://pub.dev/packages/firefuel_core) - The core files required for firefuel to function. Core can be used on its own to provide DocumentId, UID, Serializable, and Failure to your app.
 - [firefuel_env](https://pub.dev/packages/firefuel_env) - A standalone Firebase environment organizer for your application.
 
