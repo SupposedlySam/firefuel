@@ -8,30 +8,30 @@ import 'package:firefuel/src/firefuel.dart';
 
 abstract class FirefuelCollection<T extends Serializable>
     implements Collection<T> {
-  final String collectionPath;
+  final String path;
 
-  FirefuelCollection(this.collectionPath);
+  FirefuelCollection(this.path);
 
   final firestore = Firefuel.firestore;
 
   @override
-  CollectionReference<T?> get collectionRef {
-    return untypedCollectionRef.withConverter(
+  CollectionReference<T?> get ref {
+    return untypedRef.withConverter(
       fromFirestore: fromFirestore,
       toFirestore: toFirestore,
     );
   }
 
   @override
-  Stream<List<T>> get stream => listenAll(collectionRef);
+  Stream<List<T>> get stream => listenAll(ref);
 
-  CollectionReference<Map<String, dynamic>> get untypedCollectionRef {
-    return firestore.collection(collectionPath);
+  CollectionReference<Map<String, dynamic>> get untypedRef {
+    return firestore.collection(path);
   }
 
   @override
   Future<DocumentId> create(T value) async {
-    final documentRef = await collectionRef.add(value);
+    final documentRef = await ref.add(value);
 
     return DocumentId(documentRef.id);
   }
@@ -41,14 +41,14 @@ abstract class FirefuelCollection<T extends Serializable>
     required T value,
     required DocumentId docId,
   }) async {
-    await collectionRef.doc(docId.docId).set(value);
+    await ref.doc(docId.docId).set(value);
 
     return null;
   }
 
   @override
   Future<Null> delete(DocumentId docId) async {
-    await collectionRef.doc(docId.docId).delete();
+    await ref.doc(docId.docId).delete();
 
     return null;
   }
@@ -61,29 +61,29 @@ abstract class FirefuelCollection<T extends Serializable>
 
   @override
   Stream<T?> listen<T>(
-    CollectionReference<T?> collectionRef,
+    CollectionReference<T?> ref,
     DocumentId docId,
   ) {
-    return collectionRef.doc(docId.docId).snapshots().map(
+    return ref.doc(docId.docId).snapshots().map(
           (snapshot) => snapshot.data(),
         );
   }
 
   @override
-  Stream<List<T>> listenAll<T>(CollectionReference<T?> collectionRef) {
-    return collectionRef.snapshots().map(
+  Stream<List<T>> listenAll<T>(CollectionReference<T?> ref) {
+    return ref.snapshots().map(
           (collection) =>
               collection.docs.map((doc) => doc.data()).whereType<T>().toList(),
         );
   }
 
   Future<T?> read(DocumentId docId) async {
-    final snapshot = await collectionRef.doc(docId.docId).get();
+    final snapshot = await ref.doc(docId.docId).get();
     return snapshot.data();
   }
 
   Stream<T?> readAsStream(DocumentId docId) {
-    final snapshots = collectionRef.doc(docId.docId).snapshots();
+    final snapshots = ref.doc(docId.docId).snapshots();
 
     return snapshots.map((documentSnapshot) => documentSnapshot.data());
   }
@@ -112,7 +112,7 @@ abstract class FirefuelCollection<T extends Serializable>
 
     if (existingDoc == null) return null;
 
-    await collectionRef.doc(docId.docId).set(value);
+    await ref.doc(docId.docId).set(value);
 
     return null;
   }
@@ -128,7 +128,7 @@ abstract class FirefuelCollection<T extends Serializable>
     final replacement = value.toJson()
       ..removeWhere((key, _) => !paths.contains(FieldPath.fromString(key)));
 
-    await untypedCollectionRef.doc(docId.docId).update(replacement);
+    await untypedRef.doc(docId.docId).update(replacement);
 
     return null;
   }
@@ -144,7 +144,7 @@ abstract class FirefuelCollection<T extends Serializable>
     required DocumentId docId,
     required T value,
   }) async {
-    await collectionRef.doc(docId.docId).update(value.toJson());
+    await ref.doc(docId.docId).update(value.toJson());
 
     return null;
   }
@@ -154,7 +154,7 @@ abstract class FirefuelCollection<T extends Serializable>
     required DocumentId docId,
     required T value,
   }) async {
-    await collectionRef.doc(docId.docId).set(value, SetOptions(merge: true));
+    await ref.doc(docId.docId).set(value, SetOptions(merge: true));
 
     return null;
   }

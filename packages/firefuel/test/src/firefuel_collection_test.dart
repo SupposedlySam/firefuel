@@ -107,7 +107,7 @@ void main() {
     setUp(() async {
       docId = await testCollection.create(defaultUser);
 
-      stream = testCollection.listen(testCollection.collectionRef, docId);
+      stream = testCollection.listen(testCollection.ref, docId);
     });
 
     test('should output new value when doc updates', () async {
@@ -142,7 +142,7 @@ void main() {
       docId = await testCollection.create(defaultUser);
       await testCollection.create(newUser1);
 
-      stream = testCollection.listenAll(testCollection.collectionRef);
+      stream = testCollection.listenAll(testCollection.ref);
     });
 
     test('should update when an item is added', () async {

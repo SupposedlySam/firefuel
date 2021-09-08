@@ -6,7 +6,7 @@ import 'package:firefuel_core/firefuel_core.dart';
 abstract class Collection<T extends Serializable> {
   const Collection();
 
-  CollectionReference<T?> get collectionRef;
+  CollectionReference<T?> get ref;
 
   /// Exposes the Typed Stream from the Collection
   ///
@@ -15,14 +15,14 @@ abstract class Collection<T extends Serializable> {
   ///### Example
   ///#### Stream a top level collection
   /// ```
-  /// Stream<List<YourType>> get stream => listen(collectionRef);
+  /// Stream<List<YourType>> get stream => listen(ref);
   /// ```
   ///
   /// #### Stream a subcollection
   ///
   /// ```
-  /// Stream<List<T>> streamSubcollection<T>(CollectionReference<T> collectionReference) {
-  ///   return listen<T>(collectionReference);
+  /// Stream<List<T>> streamSubcollection<T>(CollectionReference<T> reference) {
+  ///   return listen<T>(reference);
   /// }
   /// ```
   Stream<List<T>> get stream;
@@ -45,7 +45,7 @@ abstract class Collection<T extends Serializable> {
   ///
   /// See: StreamBuilder
   Stream<T?> listen<T>(
-    CollectionReference<T> collectionRef,
+    CollectionReference<T> ref,
     DocumentId docId,
   );
 
@@ -54,7 +54,7 @@ abstract class Collection<T extends Serializable> {
   /// Refreshes automatically when new data is added to the collection
   ///
   /// See: StreamBuilder
-  Stream<List<T>> listenAll<T>(CollectionReference<T> collectionRef);
+  Stream<List<T>> listenAll<T>(CollectionReference<T> ref);
 
   /// Gets a single document from the collection
   ///
