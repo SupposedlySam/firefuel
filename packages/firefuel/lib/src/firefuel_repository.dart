@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dartz/dartz.dart';
 import 'package:firefuel_core/firefuel_core.dart';
 
@@ -5,7 +6,7 @@ import 'package:firefuel/firefuel.dart';
 import 'package:firefuel/src/collection.dart';
 import 'package:firefuel/src/repository.dart';
 
-abstract class FirefuelRepository<T extends Serializable>
+abstract class FirefuelRepository<inout T extends Serializable>
     with FirefuelFetchMixin
     implements Repository<T> {
   final Collection<T> _collection;
@@ -14,11 +15,31 @@ abstract class FirefuelRepository<T extends Serializable>
       : _collection = collection;
 
   @override
-  Future<Either<Failure, DocumentId>> create({
-    required T value,
-    DocumentId? docId,
-  }) {
+  Future<Either<Failure, DocumentId>> create(T value) {
     return guard(() => _collection.create(value));
+  }
+
+  @override
+  Future<Either<Failure, DocumentId>> createById({
+    required T value,
+    required DocumentId docId,
+  }) {
+    return guard(() => _collection.createById(docId: docId, value: value));
+  }
+
+  @override
+  Future<Either<Failure, Null>> delete(DocumentId docId) {
+    return guard(() => _collection.delete(docId));
+  }
+
+  @override
+  Stream<Either<Failure, T?>> listen(DocumentId docId) {
+    return guardStream(() => _collection.listen(docId));
+  }
+
+  @override
+  Stream<Either<Failure, List<T>>> listenAll(CollectionReference<T> ref) {
+    return guardStream(() => _collection.listenAll(ref));
   }
 
   @override
@@ -27,8 +48,18 @@ abstract class FirefuelRepository<T extends Serializable>
   }
 
   @override
-  Stream<Either<Failure, T?>> readAsStream(DocumentId docId) {
-    return guardStream(() => _collection.readAsStream(docId));
+  Future<Either<Failure, T>> readOrCreate({required DocumentId docId, required T createValue}) {
+    return guard(() => _collection.readOrCreate(docId: docId, createValue: createValue));
+  }
+
+  @override
+  Future<Either<Failure, Null>> replace({required DocumentId docId, required T value}) {
+    return guard(() => _collection.replace(docId: docId, value: value));
+  }
+
+  @override
+  Future<Either<Failure, Null>> replaceFields({required DocumentId docId, required T value, required List<String> fieldPaths}) {
+    return guard(() => _collection.replaceFields(docId: docId, value: value, fieldPaths: fieldPaths));
   }
 
   @override
@@ -45,7 +76,7 @@ abstract class FirefuelRepository<T extends Serializable>
   }
 
   @override
-  Future<Either<Failure, Null>> delete(DocumentId docId) {
-    return guard(() => _collection.delete(docId));
+  Future<Either<Failure, T>> updateOrCreate({required DocumentId docId, required T value}) {
+    return guard(() => _collection.updateOrCreate(docId: docId, value: value));
   }
 }
