@@ -6,7 +6,7 @@ import 'package:firefuel_core/firefuel_core.dart';
 import 'package:firefuel/src/collection.dart';
 import 'package:firefuel/src/firefuel.dart';
 
-abstract class FirefuelCollection<inout T extends Serializable>
+abstract class FirefuelCollection<T extends Serializable>
     implements Collection<T> {
   final String path;
 

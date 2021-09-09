@@ -3,7 +3,7 @@ import 'package:firefuel_core/firefuel_core.dart';
 
 import 'package:firefuel/src/rules.dart';
 
-abstract class Repository<inout T extends Serializable>
+abstract class Repository<T extends Serializable>
     implements
         CollectionRead<Either<Failure, List<T>>, T>,
         DocCreate<Either<Failure, DocumentId>, T>,

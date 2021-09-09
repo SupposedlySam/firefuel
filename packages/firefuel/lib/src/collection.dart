@@ -3,7 +3,7 @@ import 'package:firefuel_core/firefuel_core.dart';
 
 import 'package:firefuel/src/rules.dart';
 
-abstract class Collection<inout T extends Serializable>
+abstract class Collection<T extends Serializable>
     implements
         CollectionRead<List<T>, T>,
         DocCreate<DocumentId, T>,
@@ -17,4 +17,4 @@ abstract class Collection<inout T extends Serializable>
   CollectionReference<T?> get ref;
 
   Stream<List<T>> get stream;
-        }
+}
