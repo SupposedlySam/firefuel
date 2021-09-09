@@ -18,7 +18,7 @@ void main() {
       mockCollection.initialize(onCreate: () => throw ExpectedFailure());
     },
     methodCallback: (testRepository) {
-      return testRepository.create(value: defaultUser);
+      return testRepository.create(defaultUser);
     },
   );
 
@@ -48,7 +48,7 @@ void main() {
       mockCollection.initialize(onReadAsStream: () => throw ExpectedFailure());
     },
     streamCallback: (testRepository) {
-      return testRepository.readAsStream(docId);
+      return testRepository.listen(docId);
     },
   );
 

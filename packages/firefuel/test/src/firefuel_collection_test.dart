@@ -107,7 +107,7 @@ void main() {
     setUp(() async {
       docId = await testCollection.create(defaultUser);
 
-      stream = testCollection.listen(testCollection.ref, docId);
+      stream = testCollection.listen(docId);
     });
 
     test('should output new value when doc updates', () async {
