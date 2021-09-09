@@ -6,7 +6,7 @@ import 'package:firefuel/firefuel.dart';
 import 'package:firefuel/src/collection.dart';
 import '../utils/test_user.dart';
 
-class MockCollection<T extends Serializable> extends Mock
+class MockCollection<inout T extends Serializable> extends Mock
     implements Collection<T> {}
 
 extension MockCollectionX<T extends Serializable> on MockCollection<T> {
@@ -29,7 +29,7 @@ extension MockCollectionX<T extends Serializable> on MockCollection<T> {
     }
 
     if (onReadAsStream != null) {
-      when(() => readAsStream(any())).thenAnswer((_) => onReadAsStream());
+      when(() => listen(any())).thenAnswer((_) => onReadAsStream());
     }
 
     if (onUpdate != null) {
