@@ -1,7 +1,5 @@
 # Architecture
 
-![Firefuel Architecture](assets/firefuel_architecture_full.png)
-
 Using the Firefuel library allows you to get started with Cloud Firestore quickly. Build out your data layer by extending the our Repositories and Collections
 
 - Data

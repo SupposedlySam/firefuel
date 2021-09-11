@@ -1,4 +1,4 @@
-<img src="https://raw.githubusercontent.com/SupposedlySam/firefuel/main/docs/assets/firefuel_logo_full.png" height="100" alt="Firefuel" /><br/><small>v0.0.1</small>
+<img src="https://raw.githubusercontent.com/SupposedlySam/firefuel/main/docs/assets/firefuel_logo.png" height="200" alt="Firefuel" /><br/><small>v0.0.1</small>
 
 <!-- 
 [![build](https://github.com/SupposedlySam/firefuel/workflows/build/badge.svg)](https://github.com/SupposedlySam/firefuel/actions)

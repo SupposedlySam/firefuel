@@ -4,8 +4,6 @@
 
 > In the following tutorial, we're going to build a Counter in Flutter using the Firefuel library.
 
-![demo](./assets/gifs/flutter_counter.gif)
-
 ## Key Topics
 
 - Observe state changes with [FirefuelObserver](/coreconcepts?id=firefuelobserver).

@@ -4,8 +4,6 @@
 
 > In this tutorial, we're going to build a Weather app in Flutter which demonstrates how to manage multiple firefuels to implement dynamic theming, pull-to-refresh, and much more. Our weather app will pull real data from an API and demonstrate how to separate our application into layers (data, repository, business logic, and presentation).
 
-![demo](./assets/gifs/flutter_weather.gif)
-
 ## Project Requirements
 
 - User can search for cities on the search page
