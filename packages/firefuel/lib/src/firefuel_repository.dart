@@ -48,25 +48,39 @@ abstract class FirefuelRepository<T extends Serializable>
   }
 
   @override
-  Future<Either<Failure, T>> readOrCreate(
-      {required DocumentId docId, required T createValue}) {
-    return guard(
-        () => _collection.readOrCreate(docId: docId, createValue: createValue));
+  Future<Either<Failure, T>> readOrCreate({
+    required DocumentId docId,
+    required T createValue,
+  }) {
+    return guard(() {
+      return _collection.readOrCreate(
+        docId: docId,
+        createValue: createValue,
+      );
+    });
   }
 
   @override
-  Future<Either<Failure, Null>> replace(
-      {required DocumentId docId, required T value}) {
+  Future<Either<Failure, Null>> replace({
+    required DocumentId docId,
+    required T value,
+  }) {
     return guard(() => _collection.replace(docId: docId, value: value));
   }
 
   @override
-  Future<Either<Failure, Null>> replaceFields(
-      {required DocumentId docId,
-      required T value,
-      required List<String> fieldPaths}) {
-    return guard(() => _collection.replaceFields(
-        docId: docId, value: value, fieldPaths: fieldPaths));
+  Future<Either<Failure, Null>> replaceFields({
+    required DocumentId docId,
+    required T value,
+    required List<String> fieldPaths,
+  }) {
+    return guard(() {
+      return _collection.replaceFields(
+        docId: docId,
+        value: value,
+        fieldPaths: fieldPaths,
+      );
+    });
   }
 
   @override
@@ -83,8 +97,10 @@ abstract class FirefuelRepository<T extends Serializable>
   }
 
   @override
-  Future<Either<Failure, T>> updateOrCreate(
-      {required DocumentId docId, required T value}) {
+  Future<Either<Failure, T>> updateOrCreate({
+    required DocumentId docId,
+    required T value,
+  }) {
     return guard(() => _collection.updateOrCreate(docId: docId, value: value));
   }
 }
