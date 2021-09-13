@@ -153,6 +153,6 @@ abstract class FirefuelCollection<T extends Serializable>
   }) async {
     await ref.doc(docId.docId).set(value, SetOptions(merge: true));
 
-    return (await read(docId))!;
+    return value;
   }
 }

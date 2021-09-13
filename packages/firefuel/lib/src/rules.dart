@@ -62,7 +62,7 @@ abstract class DocCreateIfNotExist<R, T extends Serializable> {
   ///
   /// If no document exists, a new document will be created
   ///
-  /// *Requires 1 read of doc to retrieve the new document*
+  /// The value returned is the value passed in, a read is not performed
   Future<R> updateOrCreate({
     required DocumentId docId,
     required T value,
