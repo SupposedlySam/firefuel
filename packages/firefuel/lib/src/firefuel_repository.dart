@@ -1,9 +1,4 @@
-import 'package:dartz/dartz.dart';
-import 'package:firefuel_core/firefuel_core.dart';
-
 import 'package:firefuel/firefuel.dart';
-import 'package:firefuel/src/collection.dart';
-import 'package:firefuel/src/repository.dart';
 
 abstract class FirefuelRepository<T extends Serializable>
     with FirefuelFetchMixin
