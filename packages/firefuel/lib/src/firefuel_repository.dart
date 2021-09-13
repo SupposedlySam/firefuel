@@ -37,6 +37,11 @@ abstract class FirefuelRepository<T extends Serializable>
   }
 
   @override
+  Stream<Either<Failure, List<T>>> listenWhere(Iterable<Clause> clauses) {
+    return guardStream(() => _collection.listenWhere(clauses));
+  }
+
+  @override
   Future<Either<Failure, T?>> read(DocumentId docId) async {
     return guard(() => _collection.read(docId));
   }
@@ -96,5 +101,10 @@ abstract class FirefuelRepository<T extends Serializable>
     required T value,
   }) {
     return guard(() => _collection.updateOrCreate(docId: docId, value: value));
+  }
+
+  @override
+  Future<Either<Failure, List<T>>> where(Iterable<Clause> clauses) {
+    return guard(() => _collection.where(clauses));
   }
 }

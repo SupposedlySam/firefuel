@@ -1,10 +1,6 @@
 import 'dart:async';
 
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firefuel_core/firefuel_core.dart';
-
-import 'package:firefuel/src/collection.dart';
-import 'package:firefuel/src/firefuel.dart';
+import 'package:firefuel/firefuel.dart';
 
 abstract class FirefuelCollection<T extends Serializable>
     implements Collection<T> {
@@ -61,17 +57,16 @@ abstract class FirefuelCollection<T extends Serializable>
 
   @override
   Stream<T?> listen(DocumentId docId) {
-    return ref.doc(docId.docId).snapshots().map(
-          (snapshot) => snapshot.data(),
-        );
+    return ref.doc(docId.docId).snapshots().toMaybeT();
   }
 
   @override
   Stream<List<T>> listenAll() {
-    return ref.snapshots().map(
-          (collection) =>
-              collection.docs.map((doc) => doc.data()).whereType<T>().toList(),
-        );
+    return ref.snapshots().toListT();
+  }
+
+  Stream<List<T>> listenWhere(Iterable<Clause> clauses) {
+    return _queryFromClauses(clauses).snapshots().toListT();
   }
 
   @override
@@ -150,5 +145,31 @@ abstract class FirefuelCollection<T extends Serializable>
     await ref.doc(docId.docId).set(value, SetOptions(merge: true));
 
     return value;
+  }
+
+  Future<List<T>> where(Iterable<Clause> clauses) async {
+    final snapshot = await _queryFromClauses(clauses).get();
+
+    return snapshot.docs.toListT();
+  }
+
+  Query<T?> _queryFromClauses(Iterable<Clause> clauses) {
+    if (clauses.isEmpty) throw MissingValueException(Clause);
+
+    return clauses.fold(ref, (result, clause) {
+      return result.where(
+        clause.field,
+        isEqualTo: clause.isEqualTo,
+        isNotEqualTo: clause.isNotEqualTo,
+        isLessThan: clause.isLessThan,
+        isLessThanOrEqualTo: clause.isLessThanOrEqualTo,
+        isGreaterThan: clause.isGreaterThan,
+        isGreaterThanOrEqualTo: clause.isGreaterThanOrEqualTo,
+        arrayContains: clause.arrayContains,
+        whereIn: clause.whereIn,
+        whereNotIn: clause.whereNotIn,
+        isNull: clause.isNull,
+      );
+    });
   }
 }

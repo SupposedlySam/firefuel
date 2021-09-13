@@ -80,26 +80,6 @@ void main() {
     });
   });
 
-  group('#readOrCreate', () {
-    final documentId = DocumentId('testName');
-
-    test('should create the doc when it does not exist', () async {
-      final result = await testCollection.readOrCreate(
-          docId: documentId, createValue: defaultUser);
-
-      expect(result, defaultUser);
-    });
-
-    test('should get doc when it exists', () async {
-      final docId = await testCollection.create(defaultUser);
-
-      final testUser = await testCollection.readOrCreate(
-          docId: docId, createValue: defaultUser);
-
-      expect(docId.docId, testUser.docId);
-    });
-  });
-
   group('#listen', () {
     late Stream<TestUser?> stream;
     late DocumentId docId;
@@ -169,6 +149,55 @@ void main() {
     });
   });
 
+  group('#listenWhere', () {
+    const String expectedName = 'expectedName',
+        unexpectedName1 = 'unexpectedName1',
+        unexpectedName2 = 'unexpectedName2';
+    final expectedUser = TestUser(expectedName);
+
+    setUp(() async {
+      await testCollection.create(TestUser(unexpectedName1));
+      await testCollection.create(expectedUser);
+      await testCollection.create(TestUser(unexpectedName2));
+    });
+
+    test('should return a subset of the existing list', () {
+      final filteredStream = testCollection.listenWhere(
+        [Clause(TestUser.fieldName, isEqualTo: expectedName)],
+      );
+
+      expect(
+        filteredStream,
+        emitsInOrder([
+          [expectedUser],
+        ]),
+      );
+    });
+
+    test('should return a subset based on multiple clauses', () {
+      final filteredStream = testCollection.listenWhere(
+        [
+          Clause(TestUser.fieldName, isNotEqualTo: unexpectedName1),
+          Clause(TestUser.fieldName, isNotEqualTo: unexpectedName2),
+        ],
+      );
+
+      expect(
+        filteredStream,
+        emitsInOrder([
+          [expectedUser],
+        ]),
+      );
+    });
+
+    test('should throw when no clauses are given', () {
+      expect(
+        () => testCollection.listenWhere([]),
+        throwsA(isA<MissingValueException>()),
+      );
+    });
+  });
+
   group('#read', () {
     test('should return the Type when docId exists', () async {
       final docId = await testCollection.create(defaultUser);
@@ -182,6 +211,26 @@ void main() {
       final readResult = await testCollection.read(DocumentId('dodoBird'));
 
       expect(readResult, isNull);
+    });
+  });
+
+  group('#readOrCreate', () {
+    final documentId = DocumentId('testName');
+
+    test('should create the doc when it does not exist', () async {
+      final result = await testCollection.readOrCreate(
+          docId: documentId, createValue: defaultUser);
+
+      expect(result, defaultUser);
+    });
+
+    test('should get doc when it exists', () async {
+      final docId = await testCollection.create(defaultUser);
+
+      final testUser = await testCollection.readOrCreate(
+          docId: docId, createValue: defaultUser);
+
+      expect(docId.docId, testUser.docId);
     });
   });
 
@@ -347,6 +396,60 @@ void main() {
       final readResult = await testCollection.read(docId);
 
       expect(readResult, updatedDoc);
+    });
+  });
+
+  group('#where', () {
+    const String expectedName = 'expectedName',
+        unexpectedName1 = 'unexpectedName1',
+        unexpectedName2 = 'unexpectedName2';
+    final expectedUser = TestUser(expectedName);
+
+    setUp(() async {
+      await testCollection.create(TestUser(unexpectedName1));
+      await testCollection.create(expectedUser);
+      await testCollection.create(TestUser(unexpectedName2));
+    });
+
+    test('should return a subset of the existing list', () async {
+      final filteredList = await testCollection.where(
+        [Clause(TestUser.fieldName, isEqualTo: expectedName)],
+      );
+
+      expect(filteredList, [expectedUser]);
+    });
+
+    test('should return a subset based on multiple clauses', () async {
+      final filteredList = await testCollection.where(
+        [
+          Clause(TestUser.fieldName, isNotEqualTo: unexpectedName1),
+          Clause(TestUser.fieldName, isNotEqualTo: unexpectedName2),
+        ],
+      );
+
+      expect(filteredList, [expectedUser]);
+    });
+
+    test('should return an empty list when more than one option is chosen',
+        () async {
+      final filteredList = await testCollection.where(
+        [
+          Clause(
+            TestUser.fieldName,
+            isNotEqualTo: unexpectedName1,
+            isEqualTo: expectedUser,
+          ),
+        ],
+      );
+
+      expect(filteredList, []);
+    });
+
+    test('should throw when no clauses are given', () async {
+      expect(
+        () async => await testCollection.where([]),
+        throwsA(isA<MissingValueException>()),
+      );
     });
   });
 }
