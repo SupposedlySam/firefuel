@@ -1,4 +1,3 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dartz/dartz.dart';
 import 'package:firefuel_core/firefuel_core.dart';
 
@@ -38,8 +37,8 @@ abstract class FirefuelRepository<T extends Serializable>
   }
 
   @override
-  Stream<Either<Failure, List<T>>> listenAll(CollectionReference<T> ref) {
-    return guardStream(() => _collection.listenAll(ref));
+  Stream<Either<Failure, List<T>>> listenAll() {
+    return guardStream(() => _collection.listenAll());
   }
 
   @override

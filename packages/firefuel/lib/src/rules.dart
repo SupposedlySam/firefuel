@@ -19,7 +19,7 @@ abstract class CollectionRead<R, T extends Serializable> {
   /// Refreshes automatically when new data is added to the collection
   ///
   /// See: StreamBuilder
-  Stream<R> listenAll(CollectionReference<T> ref);
+  Stream<R> listenAll();
 }
 
 /// Create a new Document

@@ -142,7 +142,7 @@ void main() {
       docId = await testCollection.create(defaultUser);
       await testCollection.create(newUser1);
 
-      stream = testCollection.listenAll(testCollection.ref);
+      stream = testCollection.listenAll();
     });
 
     test('should update when an item is added', () async {

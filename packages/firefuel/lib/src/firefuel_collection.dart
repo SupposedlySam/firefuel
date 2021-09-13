@@ -23,7 +23,7 @@ abstract class FirefuelCollection<T extends Serializable>
   }
 
   @override
-  Stream<List<T>> get stream => listenAll(ref);
+  Stream<List<T>> get stream => listenAll();
 
   CollectionReference<Map<String, dynamic>> get untypedRef {
     return firestore.collection(path);
@@ -67,7 +67,7 @@ abstract class FirefuelCollection<T extends Serializable>
   }
 
   @override
-  Stream<List<T>> listenAll(CollectionReference<T?> ref) {
+  Stream<List<T>> listenAll() {
     return ref.snapshots().map(
           (collection) =>
               collection.docs.map((doc) => doc.data()).whereType<T>().toList(),
