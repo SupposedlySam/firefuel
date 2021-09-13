@@ -23,7 +23,7 @@ abstract class FirefuelCollection<T extends Serializable>
   }
 
   @override
-  Stream<List<T>> get stream => listenAll(ref);
+  Stream<List<T>> get stream => listenAll();
 
   CollectionReference<Map<String, dynamic>> get untypedRef {
     return firestore.collection(path);
@@ -37,13 +37,13 @@ abstract class FirefuelCollection<T extends Serializable>
   }
 
   @override
-  Future<Null> createById({
+  Future<DocumentId> createById({
     required T value,
     required DocumentId docId,
   }) async {
     await ref.doc(docId.docId).set(value);
 
-    return null;
+    return docId;
   }
 
   @override
@@ -60,17 +60,14 @@ abstract class FirefuelCollection<T extends Serializable>
   );
 
   @override
-  Stream<T?> listen<T>(
-    CollectionReference<T?> ref,
-    DocumentId docId,
-  ) {
+  Stream<T?> listen(DocumentId docId) {
     return ref.doc(docId.docId).snapshots().map(
           (snapshot) => snapshot.data(),
         );
   }
 
   @override
-  Stream<List<T>> listenAll<T>(CollectionReference<T?> ref) {
+  Stream<List<T>> listenAll() {
     return ref.snapshots().map(
           (collection) =>
               collection.docs.map((doc) => doc.data()).whereType<T>().toList(),
@@ -150,12 +147,12 @@ abstract class FirefuelCollection<T extends Serializable>
   }
 
   @override
-  Future<Null> updateOrCreate({
+  Future<T> updateOrCreate({
     required DocumentId docId,
     required T value,
   }) async {
     await ref.doc(docId.docId).set(value, SetOptions(merge: true));
 
-    return null;
+    return value;
   }
 }

@@ -29,7 +29,7 @@ extension MockCollectionX<T extends Serializable> on MockCollection<T> {
     }
 
     if (onReadAsStream != null) {
-      when(() => readAsStream(any())).thenAnswer((_) => onReadAsStream());
+      when(() => listen(any())).thenAnswer((_) => onReadAsStream());
     }
 
     if (onUpdate != null) {
