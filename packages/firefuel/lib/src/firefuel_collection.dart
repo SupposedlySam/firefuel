@@ -74,17 +74,13 @@ abstract class FirefuelCollection<T extends Serializable>
         );
   }
 
+  @override
   Future<T?> read(DocumentId docId) async {
     final snapshot = await ref.doc(docId.docId).get();
     return snapshot.data();
   }
 
-  Stream<T?> readAsStream(DocumentId docId) {
-    final snapshots = ref.doc(docId.docId).snapshots();
-
-    return snapshots.map((documentSnapshot) => documentSnapshot.data());
-  }
-
+  @override
   Future<T> readOrCreate({
     required DocumentId docId,
     required T createValue,

@@ -185,14 +185,14 @@ void main() {
     });
   });
 
-  group('#readAsStream', () {
+  group('#listen', () {
     late Stream<TestUser?> docStream;
     late DocumentId docId;
 
     setUp(() async {
       docId = await testCollection.create(defaultUser);
 
-      docStream = testCollection.readAsStream(docId);
+      docStream = testCollection.listen(docId);
     });
 
     test('should update when a field changes', () async {
