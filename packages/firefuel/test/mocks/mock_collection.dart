@@ -13,12 +13,13 @@ extension MockCollectionX<T extends Serializable> on MockCollection<T> {
   void initialize({
     DocumentId Function()? onCreate,
     DocumentId Function()? onCreateById,
-    T? Function()? onRead,
-    T Function()? onReadOrCreate,
+    Null Function()? onDelete,
     Stream<T?> Function()? onListen,
     Stream<List<T>> Function()? onListenAll,
+    T? Function()? onRead,
+    T Function()? onReadOrCreate,
+    Null Function()? onReplace,
     Null Function()? onUpdate,
-    Null Function()? onDelete,
   }) {
     registerFallbackValue(DocumentId('fallbackValue'));
     registerFallbackValue<Serializable>(TestUser('fallbackValue'));
@@ -28,12 +29,12 @@ extension MockCollectionX<T extends Serializable> on MockCollection<T> {
     }
 
     if (onCreateById != null) {
-      when(
-        () => createById(
+      when(() {
+        return createById(
           docId: any(named: 'docId'),
           value: any(named: 'value'),
-        ),
-      ).thenAnswer((_) => Future.value(onCreateById()));
+        );
+      }).thenAnswer((_) => Future.value(onCreateById()));
     }
 
     if (onDelete != null) {
@@ -53,12 +54,21 @@ extension MockCollectionX<T extends Serializable> on MockCollection<T> {
     }
 
     if (onReadOrCreate != null) {
-      when(
-        () => readOrCreate(
+      when(() {
+        return readOrCreate(
           createValue: any(named: 'value'),
           docId: any(named: 'docId'),
-        ),
-      ).thenAnswer((_) => Future.value(onReadOrCreate()));
+        );
+      }).thenAnswer((_) => Future.value(onReadOrCreate()));
+    }
+
+    if (onReplace != null) {
+      when(() {
+        return replace(
+          docId: any(named: 'docId'),
+          value: any(named: 'value'),
+        );
+      }).thenAnswer((_) => Future.value(onReplace()));
     }
 
     if (onUpdate != null) {

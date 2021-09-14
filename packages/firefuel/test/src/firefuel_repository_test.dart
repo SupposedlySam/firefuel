@@ -107,6 +107,21 @@ void main() {
   );
 
   RepositoryTestUtil.runTests<Null, TestUser>(
+    methodName: 'replace',
+    mockCollection: MockCollection(),
+    initHappyPath: (mockCollection) async {
+      mockCollection.initialize(onReplace: () => null);
+    },
+    initSadPath: (mockCollection) async {
+      mockCollection.initialize(onReplace: () => throw ExpectedFailure());
+    },
+    methodCallback: (testRepository) => testRepository.replace(
+      docId: docId,
+      value: TestUser('replacedUser'),
+    ),
+  );
+
+  RepositoryTestUtil.runTests<Null, TestUser>(
     methodName: 'update',
     mockCollection: MockCollection(),
     initHappyPath: (mockCollection) async {
