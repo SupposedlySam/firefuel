@@ -94,6 +94,18 @@ void main() {
     methodCallback: (testRepository) => testRepository.read(docId),
   );
 
+  RepositoryTestUtil.runTests<TestUser?, TestUser>(
+    methodName: 'readOrCreate',
+    mockCollection: MockCollection(),
+    initHappyPath: (mockCollection) async {
+      mockCollection.initialize(onRead: () => defaultUser);
+    },
+    initSadPath: (mockCollection) async {
+      mockCollection.initialize(onRead: () => throw ExpectedFailure());
+    },
+    methodCallback: (testRepository) => testRepository.read(docId),
+  );
+
   RepositoryTestUtil.runTests<Null, TestUser>(
     methodName: 'update',
     mockCollection: MockCollection(),

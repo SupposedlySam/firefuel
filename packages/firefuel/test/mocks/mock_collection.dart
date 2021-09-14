@@ -14,6 +14,7 @@ extension MockCollectionX<T extends Serializable> on MockCollection<T> {
     DocumentId Function()? onCreate,
     DocumentId Function()? onCreateById,
     T? Function()? onRead,
+    T Function()? onReadOrCreate,
     Stream<T?> Function()? onListen,
     Stream<List<T>> Function()? onListenAll,
     Null Function()? onUpdate,
@@ -35,8 +36,8 @@ extension MockCollectionX<T extends Serializable> on MockCollection<T> {
       ).thenAnswer((_) => Future.value(onCreateById()));
     }
 
-    if (onRead != null) {
-      when(() => read(any())).thenAnswer((_) => Future.value(onRead()));
+    if (onDelete != null) {
+      when(() => delete(any())).thenAnswer((_) => Future.value(onDelete()));
     }
 
     if (onListen != null) {
@@ -47,13 +48,22 @@ extension MockCollectionX<T extends Serializable> on MockCollection<T> {
       when(() => listenAll()).thenAnswer((_) => onListenAll());
     }
 
+    if (onRead != null) {
+      when(() => read(any())).thenAnswer((_) => Future.value(onRead()));
+    }
+
+    if (onReadOrCreate != null) {
+      when(
+        () => readOrCreate(
+          createValue: any(named: 'value'),
+          docId: any(named: 'docId'),
+        ),
+      ).thenAnswer((_) => Future.value(onReadOrCreate()));
+    }
+
     if (onUpdate != null) {
       when(() => update(docId: any(named: 'docId'), value: any(named: 'value')))
           .thenAnswer((_) => Future.value(onUpdate()));
-    }
-
-    if (onDelete != null) {
-      when(() => delete(any())).thenAnswer((_) => Future.value(onDelete()));
     }
   }
 }
