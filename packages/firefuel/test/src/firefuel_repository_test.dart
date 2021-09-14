@@ -66,6 +66,22 @@ void main() {
     },
   );
 
+  RepositoryTestUtil.runStreamTests<List<TestUser>, TestUser>(
+    methodName: 'listenAll',
+    mockCollection: MockCollection(),
+    initHappyPath: (mockCollection) async {
+      mockCollection.initialize(
+        onListenAll: () => Stream.fromIterable([
+          [TestUser('streamUser')]
+        ]),
+      );
+    },
+    initSadPath: (mockCollection) async {
+      mockCollection.initialize(onListenAll: () => throw ExpectedFailure());
+    },
+    streamCallback: (testRepository) => testRepository.listenAll(),
+  );
+
   RepositoryTestUtil.runTests<TestUser?, TestUser>(
     methodName: 'read',
     mockCollection: MockCollection(),
