@@ -36,16 +36,16 @@ void main() {
     },
   );
 
-  RepositoryTestUtil.runTests<TestUser?, TestUser>(
-    methodName: 'read',
+  RepositoryTestUtil.runTests<Null, TestUser>(
+    methodName: 'delete',
     mockCollection: MockCollection(),
     initHappyPath: (mockCollection) async {
-      mockCollection.initialize(onRead: () => defaultUser);
+      mockCollection.initialize(onDelete: () => null);
     },
     initSadPath: (mockCollection) async {
-      mockCollection.initialize(onRead: () => throw ExpectedFailure());
+      mockCollection.initialize(onDelete: () => throw ExpectedFailure());
     },
-    methodCallback: (testRepository) => testRepository.read(docId),
+    methodCallback: (testRepository) => testRepository.delete(docId),
   );
 
   RepositoryTestUtil.runStreamTests<TestUser?, TestUser>(
@@ -66,6 +66,18 @@ void main() {
     },
   );
 
+  RepositoryTestUtil.runTests<TestUser?, TestUser>(
+    methodName: 'read',
+    mockCollection: MockCollection(),
+    initHappyPath: (mockCollection) async {
+      mockCollection.initialize(onRead: () => defaultUser);
+    },
+    initSadPath: (mockCollection) async {
+      mockCollection.initialize(onRead: () => throw ExpectedFailure());
+    },
+    methodCallback: (testRepository) => testRepository.read(docId),
+  );
+
   RepositoryTestUtil.runTests<Null, TestUser>(
     methodName: 'update',
     mockCollection: MockCollection(),
@@ -81,17 +93,5 @@ void main() {
         value: TestUser('updatedUser'),
       );
     },
-  );
-
-  RepositoryTestUtil.runTests<Null, TestUser>(
-    methodName: 'delete',
-    mockCollection: MockCollection(),
-    initHappyPath: (mockCollection) async {
-      mockCollection.initialize(onDelete: () => null);
-    },
-    initSadPath: (mockCollection) async {
-      mockCollection.initialize(onDelete: () => throw ExpectedFailure());
-    },
-    methodCallback: (testRepository) => testRepository.delete(docId),
   );
 }
