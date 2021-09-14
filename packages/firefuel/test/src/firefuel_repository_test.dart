@@ -122,6 +122,22 @@ void main() {
   );
 
   RepositoryTestUtil.runTests<Null, TestUser>(
+    methodName: 'replaceFields',
+    mockCollection: MockCollection(),
+    initHappyPath: (mockCollection) async {
+      mockCollection.initialize(onReplaceFields: () => null);
+    },
+    initSadPath: (mockCollection) async {
+      mockCollection.initialize(onReplaceFields: () => throw ExpectedFailure());
+    },
+    methodCallback: (testRepository) => testRepository.replaceFields(
+      docId: docId,
+      value: TestUser('replacedUserField'),
+      fieldPaths: [TestUser.fieldName],
+    ),
+  );
+
+  RepositoryTestUtil.runTests<Null, TestUser>(
     methodName: 'update',
     mockCollection: MockCollection(),
     initHappyPath: (mockCollection) async {
