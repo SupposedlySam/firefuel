@@ -12,6 +12,7 @@ class MockCollection<T extends Serializable> extends Mock
 extension MockCollectionX<T extends Serializable> on MockCollection<T> {
   void initialize({
     DocumentId Function()? onCreate,
+    DocumentId Function()? onCreateById,
     T? Function()? onRead,
     Stream<T?> Function()? onListen,
     Null Function()? onUpdate,
@@ -22,6 +23,15 @@ extension MockCollectionX<T extends Serializable> on MockCollection<T> {
 
     if (onCreate != null) {
       when(() => create(any())).thenAnswer((_) => Future.value(onCreate()));
+    }
+
+    if (onCreateById != null) {
+      when(
+        () => createById(
+          docId: any(named: 'docId'),
+          value: any(named: 'value'),
+        ),
+      ).thenAnswer((_) => Future.value(onCreateById()));
     }
 
     if (onRead != null) {

@@ -22,6 +22,20 @@ void main() {
     },
   );
 
+  RepositoryTestUtil.runTests<DocumentId, TestUser>(
+    methodName: 'createById',
+    mockCollection: MockCollection(),
+    initHappyPath: (mockCollection) async {
+      mockCollection.initialize(onCreateById: () => docId);
+    },
+    initSadPath: (mockCollection) async {
+      mockCollection.initialize(onCreateById: () => throw ExpectedFailure());
+    },
+    methodCallback: (testRepository) {
+      return testRepository.createById(value: defaultUser, docId: docId);
+    },
+  );
+
   RepositoryTestUtil.runTests<TestUser?, TestUser>(
     methodName: 'read',
     mockCollection: MockCollection(),
