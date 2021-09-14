@@ -106,4 +106,26 @@ void main() {
     },
     methodCallback: (testRepository) => testRepository.delete(docId),
   );
+
+  RepositoryTestUtil.runTests<List<TestUser>, TestUser>(
+    methodName: 'where',
+    mockCollection: MockCollection(),
+    initHappyPath: (mockCollection) async {
+      mockCollection.initialize(
+        onWhere: () => [
+          TestUser('unexpectedUser1'),
+          TestUser('expectedUser'),
+          TestUser('unexpectedUser2'),
+        ],
+      );
+    },
+    initSadPath: (mockCollection) async {
+      mockCollection.initialize(onWhere: () => throw ExpectedFailure());
+    },
+    methodCallback: (testRepository) {
+      return testRepository.where([
+        Clause(TestUser.fieldName, isEqualTo: 'expectedUser'),
+      ]);
+    },
+  );
 }
