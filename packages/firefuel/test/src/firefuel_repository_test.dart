@@ -35,20 +35,46 @@ void main() {
   );
 
   RepositoryTestUtil.runStreamTests<TestUser?, TestUser>(
-    methodName: 'readAsStream',
+    methodName: 'listen',
     mockCollection: MockCollection(),
     initHappyPath: (mockCollection) async {
       mockCollection.initialize(
-        onReadAsStream: () => Stream.fromIterable(
+        onListen: () => Stream.fromIterable(
           [TestUser('streamUser')],
         ),
       );
     },
     initSadPath: (mockCollection) async {
-      mockCollection.initialize(onReadAsStream: () => throw ExpectedFailure());
+      mockCollection.initialize(onListen: () => throw ExpectedFailure());
     },
     streamCallback: (testRepository) {
       return testRepository.listen(docId);
+    },
+  );
+
+  RepositoryTestUtil.runStreamTests<List<TestUser>, TestUser>(
+    methodName: 'listenWhere',
+    mockCollection: MockCollection(),
+    initHappyPath: (mockCollection) async {
+      mockCollection.initialize(
+        onListenWhere: () => Stream.fromIterable(
+          [
+            [
+              TestUser('unexpectedUser1'),
+              TestUser('expectedUser'),
+              TestUser('unexpectedUser2'),
+            ]
+          ],
+        ),
+      );
+    },
+    initSadPath: (mockCollection) async {
+      mockCollection.initialize(onListenWhere: () => throw ExpectedFailure());
+    },
+    streamCallback: (testRepository) {
+      return testRepository.listenWhere([
+        Clause(TestUser.fieldName, isEqualTo: 'expectedUser'),
+      ]);
     },
   );
 

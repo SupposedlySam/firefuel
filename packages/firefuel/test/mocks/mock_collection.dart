@@ -13,7 +13,8 @@ extension MockCollectionX<T extends Serializable> on MockCollection<T> {
   void initialize({
     DocumentId Function()? onCreate,
     T? Function()? onRead,
-    Stream<T?> Function()? onReadAsStream,
+    Stream<T?> Function()? onListen,
+    Stream<List<T>> Function()? onListenWhere,
     Null Function()? onUpdate,
     Null Function()? onDelete,
   }) {
@@ -28,8 +29,14 @@ extension MockCollectionX<T extends Serializable> on MockCollection<T> {
       when(() => read(any())).thenAnswer((_) => Future.value(onRead()));
     }
 
-    if (onReadAsStream != null) {
-      when(() => listen(any())).thenAnswer((_) => onReadAsStream());
+    if (onListen != null) {
+      when(() => listen(any())).thenAnswer((_) => onListen());
+    }
+
+    if (onListenWhere != null) {
+      when(() => listenWhere(any())).thenAnswer(
+        (_) => onListenWhere(),
+      );
     }
 
     if (onUpdate != null) {
