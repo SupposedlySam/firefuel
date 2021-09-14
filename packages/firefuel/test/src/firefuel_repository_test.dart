@@ -153,4 +153,22 @@ void main() {
       );
     },
   );
+
+  RepositoryTestUtil.runTests<TestUser, TestUser>(
+    methodName: 'updateOrCreate',
+    mockCollection: MockCollection(),
+    initHappyPath: (mockCollection) async {
+      mockCollection.initialize(onUpdateOrCreate: () => defaultUser);
+    },
+    initSadPath: (mockCollection) async {
+      mockCollection.initialize(
+          onUpdateOrCreate: () => throw ExpectedFailure());
+    },
+    methodCallback: (testRepository) {
+      return testRepository.updateOrCreate(
+        docId: docId,
+        value: TestUser('updatedUser'),
+      );
+    },
+  );
 }
