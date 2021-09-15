@@ -53,7 +53,7 @@ void main() {
   );
 
   RepositoryTestUtil.runStreamTests<List<TestUser>, TestUser>(
-    methodName: 'listenWhere',
+    methodName: 'listenWhere(limit:null)',
     mockCollection: MockCollection(),
     initHappyPath: (mockCollection) async {
       mockCollection.initialize(
@@ -75,6 +75,34 @@ void main() {
       return testRepository.listenWhere([
         Clause(TestUser.fieldName, isEqualTo: 'expectedUser'),
       ]);
+    },
+  );
+
+  RepositoryTestUtil.runStreamTests<List<TestUser>, TestUser>(
+    methodName: 'listenWhere(limit:1)',
+    mockCollection: MockCollection(),
+    initHappyPath: (mockCollection) async {
+      mockCollection.initialize(
+        onListenWhere: () => Stream.fromIterable(
+          [
+            [
+              TestUser('unexpectedUser1'),
+              TestUser('expectedUser'),
+              TestUser('expectedUser'),
+              TestUser('unexpectedUser2'),
+            ]
+          ],
+        ),
+      );
+    },
+    initSadPath: (mockCollection) async {
+      mockCollection.initialize(onListenWhere: () => throw ExpectedFailure());
+    },
+    streamCallback: (testRepository) {
+      return testRepository.listenWhere(
+        [Clause(TestUser.fieldName, isEqualTo: 'expectedUser')],
+        limit: 1,
+      );
     },
   );
 
@@ -108,7 +136,7 @@ void main() {
   );
 
   RepositoryTestUtil.runTests<List<TestUser>, TestUser>(
-    methodName: 'where',
+    methodName: 'where(limit:null)',
     mockCollection: MockCollection(),
     initHappyPath: (mockCollection) async {
       mockCollection.initialize(
@@ -126,6 +154,30 @@ void main() {
       return testRepository.where([
         Clause(TestUser.fieldName, isEqualTo: 'expectedUser'),
       ]);
+    },
+  );
+
+  RepositoryTestUtil.runTests<List<TestUser>, TestUser>(
+    methodName: 'where(limit:1)',
+    mockCollection: MockCollection(),
+    initHappyPath: (mockCollection) async {
+      mockCollection.initialize(
+        onWhere: () => [
+          TestUser('unexpectedUser1'),
+          TestUser('expectedUser'),
+          TestUser('expectedUser'),
+          TestUser('unexpectedUser2'),
+        ],
+      );
+    },
+    initSadPath: (mockCollection) async {
+      mockCollection.initialize(onWhere: () => throw ExpectedFailure());
+    },
+    methodCallback: (testRepository) {
+      return testRepository.where(
+        [Clause(TestUser.fieldName, isEqualTo: 'expectedUser')],
+        limit: 1,
+      );
     },
   );
 }

@@ -35,7 +35,9 @@ extension MockCollectionX<T extends Serializable> on MockCollection<T> {
     }
 
     if (onListenWhere != null) {
-      when(() => listenWhere(any())).thenAnswer(
+      when(() {
+        return listenWhere(any(), limit: any(named: 'limit'));
+      }).thenAnswer(
         (_) => onListenWhere(),
       );
     }
@@ -50,7 +52,9 @@ extension MockCollectionX<T extends Serializable> on MockCollection<T> {
     }
 
     if (onWhere != null) {
-      when(() => where(any())).thenAnswer((_) => Future.value(onWhere()));
+      when(() {
+        return where(any(), limit: any(named: 'limit'));
+      }).thenAnswer((_) => Future.value(onWhere()));
     }
   }
 }

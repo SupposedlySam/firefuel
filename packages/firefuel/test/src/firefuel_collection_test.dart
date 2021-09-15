@@ -400,56 +400,72 @@ void main() {
   });
 
   group('#where', () {
-    const String expectedName = 'expectedName',
-        unexpectedName1 = 'unexpectedName1',
-        unexpectedName2 = 'unexpectedName2';
+    const String expectedName = 'expectedName';
     final expectedUser = TestUser(expectedName);
 
-    setUp(() async {
-      await testCollection.create(TestUser(unexpectedName1));
-      await testCollection.create(expectedUser);
-      await testCollection.create(TestUser(unexpectedName2));
+    group('without limit', () {
+      const String unexpectedName1 = 'unexpectedName1',
+          unexpectedName2 = 'unexpectedName2';
+
+      setUp(() async {
+        await testCollection.create(TestUser(unexpectedName1));
+        await testCollection.create(expectedUser);
+        await testCollection.create(TestUser(unexpectedName2));
+      });
+      test('should return a subset of the existing list', () async {
+        final filteredList = await testCollection.where(
+          [Clause(TestUser.fieldName, isEqualTo: expectedName)],
+        );
+
+        expect(filteredList, [expectedUser]);
+      });
+
+      test('should return a subset based on multiple clauses', () async {
+        final filteredList = await testCollection.where(
+          [
+            Clause(TestUser.fieldName, isNotEqualTo: unexpectedName1),
+            Clause(TestUser.fieldName, isNotEqualTo: unexpectedName2),
+          ],
+        );
+
+        expect(filteredList, [expectedUser]);
+      });
+
+      test('should return an empty list when more than one option is chosen',
+          () async {
+        final filteredList = await testCollection.where(
+          [
+            Clause(
+              TestUser.fieldName,
+              isNotEqualTo: unexpectedName1,
+              isEqualTo: expectedUser,
+            ),
+          ],
+        );
+
+        expect(filteredList, []);
+      });
+
+      test('should throw when no clauses are given', () async {
+        expect(
+          () async => await testCollection.where([]),
+          throwsA(isA<MissingValueException>()),
+        );
+      });
     });
 
-    test('should return a subset of the existing list', () async {
-      final filteredList = await testCollection.where(
-        [Clause(TestUser.fieldName, isEqualTo: expectedName)],
-      );
+    group('with limit', () {
+      test('should set the max value of items to return', () async {
+        await testCollection.create(expectedUser);
+        await testCollection.create(expectedUser);
 
-      expect(filteredList, [expectedUser]);
-    });
+        final filteredList = await testCollection.where(
+          [Clause(TestUser.fieldName, isEqualTo: expectedName)],
+          limit: 1,
+        );
 
-    test('should return a subset based on multiple clauses', () async {
-      final filteredList = await testCollection.where(
-        [
-          Clause(TestUser.fieldName, isNotEqualTo: unexpectedName1),
-          Clause(TestUser.fieldName, isNotEqualTo: unexpectedName2),
-        ],
-      );
-
-      expect(filteredList, [expectedUser]);
-    });
-
-    test('should return an empty list when more than one option is chosen',
-        () async {
-      final filteredList = await testCollection.where(
-        [
-          Clause(
-            TestUser.fieldName,
-            isNotEqualTo: unexpectedName1,
-            isEqualTo: expectedUser,
-          ),
-        ],
-      );
-
-      expect(filteredList, []);
-    });
-
-    test('should throw when no clauses are given', () async {
-      expect(
-        () async => await testCollection.where([]),
-        throwsA(isA<MissingValueException>()),
-      );
+        expect(filteredList, [expectedUser]);
+      });
     });
   });
 }
