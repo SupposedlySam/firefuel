@@ -165,6 +165,24 @@ void main() {
     },
   );
 
+  RepositoryTestUtil.runTests<Chunk<TestUser>, TestUser>(
+    methodName: 'paginate',
+    mockCollection: MockCollection(),
+    initHappyPath: (mockCollection) async {
+      mockCollection.initialize(onPaginate: () {
+        return Chunk<TestUser>(orderByField: TestUser.fieldName);
+      });
+    },
+    initSadPath: (mockCollection) async {
+      mockCollection.initialize(onPaginate: () => throw ExpectedFailure());
+    },
+    methodCallback: (testRepository) {
+      return testRepository.paginate(
+        Chunk<TestUser>(orderByField: TestUser.fieldName),
+      );
+    },
+  );
+
   RepositoryTestUtil.runTests<TestUser?, TestUser>(
     methodName: 'read',
     mockCollection: MockCollection(),
