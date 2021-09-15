@@ -55,6 +55,11 @@ abstract class FirefuelRepository<T extends Serializable>
   }
 
   @override
+  Future<Either<Failure, Chunk<T>>> paginate(Chunk<T> chunk) {
+    return guard(() => _collection.paginate(chunk));
+  }
+
+  @override
   Future<Either<Failure, T?>> read(DocumentId docId) async {
     return guard(() => _collection.read(docId));
   }
