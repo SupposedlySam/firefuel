@@ -16,12 +16,14 @@ extension MockCollectionX<T extends Serializable> on MockCollection<T> {
     Null Function()? onDelete,
     Stream<T?> Function()? onListen,
     Stream<List<T>> Function()? onListenAll,
+    Stream<List<T>> Function()? onListenWhere,
     T? Function()? onRead,
     T Function()? onReadOrCreate,
     Null Function()? onReplace,
     Null Function()? onReplaceFields,
     Null Function()? onUpdate,
     T Function()? onUpdateOrCreate,
+    List<T> Function()? onWhere,
   }) {
     registerFallbackValue(DocumentId('fallbackValue'));
     registerFallbackValue<Serializable>(TestUser('fallbackValue'));
@@ -49,6 +51,12 @@ extension MockCollectionX<T extends Serializable> on MockCollection<T> {
 
     if (onListenAll != null) {
       when(() => listenAll()).thenAnswer((_) => onListenAll());
+    }
+
+    if (onListenWhere != null) {
+      when(() => listenWhere(any())).thenAnswer(
+        (_) => onListenWhere(),
+      );
     }
 
     if (onRead != null) {
@@ -95,6 +103,10 @@ extension MockCollectionX<T extends Serializable> on MockCollection<T> {
           value: any(named: 'value'),
         );
       }).thenAnswer((_) => Future.value(onUpdateOrCreate()));
+    }
+
+    if (onWhere != null) {
+      when(() => where(any())).thenAnswer((_) => Future.value(onWhere()));
     }
   }
 }

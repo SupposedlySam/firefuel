@@ -1,9 +1,4 @@
-import 'package:dartz/dartz.dart';
-import 'package:firefuel_core/firefuel_core.dart';
-
 import 'package:firefuel/firefuel.dart';
-import 'package:firefuel/src/collection.dart';
-import 'package:firefuel/src/repository.dart';
 
 abstract class FirefuelRepository<T extends Serializable>
     with FirefuelFetchMixin
@@ -39,6 +34,11 @@ abstract class FirefuelRepository<T extends Serializable>
   @override
   Stream<Either<Failure, List<T>>> listenAll() {
     return guardStream(() => _collection.listenAll());
+  }
+
+  @override
+  Stream<Either<Failure, List<T>>> listenWhere(List<Clause> clauses) {
+    return guardStream(() => _collection.listenWhere(clauses));
   }
 
   @override
@@ -101,5 +101,10 @@ abstract class FirefuelRepository<T extends Serializable>
     required T value,
   }) {
     return guard(() => _collection.updateOrCreate(docId: docId, value: value));
+  }
+
+  @override
+  Future<Either<Failure, List<T>>> where(List<Clause> clauses) {
+    return guard(() => _collection.where(clauses));
   }
 }

@@ -8,3 +8,5 @@ class MissingValueException implements Exception {
     return '$MissingValueException:$type';
   }
 }
+
+class TooManyArgumentsException implements Exception {}

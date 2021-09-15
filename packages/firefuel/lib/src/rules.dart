@@ -16,10 +16,23 @@ import 'package:firefuel/firefuel.dart';
 abstract class CollectionRead<R, T extends Serializable> {
   /// Get a list of all documents from the collection as a list
   ///
-  /// Refreshes automatically when new data is added to the collection
+  /// Refreshes automatically when new data is added/removed from the collection
   ///
   /// See: StreamBuilder
   Stream<R> listenAll();
+
+  /// Get a list of documents matching all clauses
+  ///
+  /// throws a [MissingValueException] when no [Clause]s are given
+  Future<R> where(List<Clause> clauses);
+
+  /// Get a list of documents matching all clauses
+  ///
+  /// Refreshes automatically when new matching data is added/removed from the
+  /// collection
+  ///
+  /// throws a [MissingValueException] when no [Clause]s are given
+  Stream<R> listenWhere(List<Clause> clauses);
 }
 
 /// Create a new Document
