@@ -34,6 +34,8 @@ abstract class CollectionRead<R, T extends Serializable> {
 
   /// Get a list of documents matching all clauses
   ///
+  /// limit: optionally provide a maximum value of items to be returned
+  ///
   /// throws a [MissingValueException] when no [Clause]s are given
   Future<R> where(List<Clause> clauses, {int? limit});
 
@@ -41,6 +43,8 @@ abstract class CollectionRead<R, T extends Serializable> {
   ///
   /// Refreshes automatically when new matching data is added/removed from the
   /// collection
+  ///
+  /// limit: optionally provide a maximum value of items to be returned
   ///
   /// throws a [MissingValueException] when no [Clause]s are given
   Stream<R> listenWhere(List<Clause> clauses, {int? limit});
