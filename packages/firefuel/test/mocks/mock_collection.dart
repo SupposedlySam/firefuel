@@ -12,12 +12,18 @@ class MockCollection<T extends Serializable> extends Mock
 extension MockCollectionX<T extends Serializable> on MockCollection<T> {
   void initialize({
     DocumentId Function()? onCreate,
-    T? Function()? onRead,
+    DocumentId Function()? onCreateById,
+    Null Function()? onDelete,
     Stream<T?> Function()? onListen,
+    Stream<List<T>> Function()? onListenAll,
     Stream<List<T>> Function()? onListenLimited,
     Stream<List<T>> Function()? onListenWhere,
+    T? Function()? onRead,
+    T Function()? onReadOrCreate,
+    Null Function()? onReplace,
+    Null Function()? onReplaceFields,
     Null Function()? onUpdate,
-    Null Function()? onDelete,
+    T Function()? onUpdateOrCreate,
     List<T> Function()? onWhere,
   }) {
     registerFallbackValue(DocumentId('fallbackValue'));
@@ -27,12 +33,25 @@ extension MockCollectionX<T extends Serializable> on MockCollection<T> {
       when(() => create(any())).thenAnswer((_) => Future.value(onCreate()));
     }
 
-    if (onRead != null) {
-      when(() => read(any())).thenAnswer((_) => Future.value(onRead()));
+    if (onCreateById != null) {
+      when(() {
+        return createById(
+          docId: any(named: 'docId'),
+          value: any(named: 'value'),
+        );
+      }).thenAnswer((_) => Future.value(onCreateById()));
+    }
+
+    if (onDelete != null) {
+      when(() => delete(any())).thenAnswer((_) => Future.value(onDelete()));
     }
 
     if (onListen != null) {
       when(() => listen(any())).thenAnswer((_) => onListen());
+    }
+
+    if (onListenAll != null) {
+      when(() => listenAll()).thenAnswer((_) => onListenAll());
     }
 
     if (onListenLimited != null) {
@@ -47,13 +66,50 @@ extension MockCollectionX<T extends Serializable> on MockCollection<T> {
       );
     }
 
+    if (onRead != null) {
+      when(() => read(any())).thenAnswer((_) => Future.value(onRead()));
+    }
+
+    if (onReadOrCreate != null) {
+      when(() {
+        return readOrCreate(
+          createValue: any(named: 'value'),
+          docId: any(named: 'docId'),
+        );
+      }).thenAnswer((_) => Future.value(onReadOrCreate()));
+    }
+
+    if (onReplace != null) {
+      when(() {
+        return replace(
+          docId: any(named: 'docId'),
+          value: any(named: 'value'),
+        );
+      }).thenAnswer((_) => Future.value(onReplace()));
+    }
+
+    if (onReplaceFields != null) {
+      when(() {
+        return replaceFields(
+          docId: any(named: 'docId'),
+          value: any(named: 'value'),
+          fieldPaths: any(named: 'fieldPaths'),
+        );
+      }).thenAnswer((_) => Future.value(onReplaceFields()));
+    }
+
     if (onUpdate != null) {
       when(() => update(docId: any(named: 'docId'), value: any(named: 'value')))
           .thenAnswer((_) => Future.value(onUpdate()));
     }
 
-    if (onDelete != null) {
-      when(() => delete(any())).thenAnswer((_) => Future.value(onDelete()));
+    if (onUpdateOrCreate != null) {
+      when(() {
+        return updateOrCreate(
+          docId: any(named: 'docId'),
+          value: any(named: 'value'),
+        );
+      }).thenAnswer((_) => Future.value(onUpdateOrCreate()));
     }
 
     if (onWhere != null) {

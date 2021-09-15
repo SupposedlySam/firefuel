@@ -22,19 +22,21 @@ void main() {
     },
   );
 
-  RepositoryTestUtil.runTests<TestUser?, TestUser>(
-    methodName: 'read',
+  RepositoryTestUtil.runTests<DocumentId, TestUser>(
+    methodName: 'createById',
     mockCollection: MockCollection(),
     initHappyPath: (mockCollection) async {
-      mockCollection.initialize(onRead: () => defaultUser);
+      mockCollection.initialize(onCreateById: () => docId);
     },
     initSadPath: (mockCollection) async {
-      mockCollection.initialize(onRead: () => throw ExpectedFailure());
+      mockCollection.initialize(onCreateById: () => throw ExpectedFailure());
     },
-    methodCallback: (testRepository) => testRepository.read(docId),
+    methodCallback: (testRepository) {
+      return testRepository.createById(value: defaultUser, docId: docId);
+    },
   );
 
-  RepositoryTestUtil.runStreamTests<List<TestUser>, TestUser>(
+  RepositoryTestUtil.runStreamTests<TestUser?, TestUser>(
     methodName: 'listen',
     mockCollection: MockCollection(),
     initHappyPath: (mockCollection) async {
@@ -43,28 +45,28 @@ void main() {
       );
     },
     initSadPath: (mockCollection) async {
-      mockCollection.initialize(onListenLimited: () => throw ExpectedFailure());
-    },
-    streamCallback: (testRepository) {
-      return testRepository.listenLimited(1);
-    },
-  );
-
-  RepositoryTestUtil.runStreamTests<TestUser?, TestUser>(
-    methodName: 'listenLimited',
-    mockCollection: MockCollection(),
-    initHappyPath: (mockCollection) async {
-      mockCollection.initialize(
-        onListen: () => Stream.fromIterable(
-          [TestUser('streamUser')],
-        ),
-      );
-    },
-    initSadPath: (mockCollection) async {
       mockCollection.initialize(onListen: () => throw ExpectedFailure());
     },
     streamCallback: (testRepository) {
       return testRepository.listen(docId);
+    },
+  );
+
+  RepositoryTestUtil.runStreamTests<List<TestUser>, TestUser>(
+    methodName: 'listenLimited',
+    mockCollection: MockCollection(),
+    initHappyPath: (mockCollection) async {
+      mockCollection.initialize(
+        onListenLimited: () => Stream.fromIterable([
+          [TestUser('streamUser')]
+        ]),
+      );
+    },
+    initSadPath: (mockCollection) async {
+      mockCollection.initialize(onListenLimited: () => throw ExpectedFailure());
+    },
+    streamCallback: (testRepository) {
+      return testRepository.listenLimited(1);
     },
   );
 
@@ -123,6 +125,37 @@ void main() {
   );
 
   RepositoryTestUtil.runTests<Null, TestUser>(
+    methodName: 'replace',
+    mockCollection: MockCollection(),
+    initHappyPath: (mockCollection) async {
+      mockCollection.initialize(onReplace: () => null);
+    },
+    initSadPath: (mockCollection) async {
+      mockCollection.initialize(onReplace: () => throw ExpectedFailure());
+    },
+    methodCallback: (testRepository) => testRepository.replace(
+      docId: docId,
+      value: TestUser('replacedUser'),
+    ),
+  );
+
+  RepositoryTestUtil.runTests<Null, TestUser>(
+    methodName: 'replaceFields',
+    mockCollection: MockCollection(),
+    initHappyPath: (mockCollection) async {
+      mockCollection.initialize(onReplaceFields: () => null);
+    },
+    initSadPath: (mockCollection) async {
+      mockCollection.initialize(onReplaceFields: () => throw ExpectedFailure());
+    },
+    methodCallback: (testRepository) => testRepository.replaceFields(
+      docId: docId,
+      value: TestUser('replacedUserField'),
+      fieldPaths: [TestUser.fieldName],
+    ),
+  );
+
+  RepositoryTestUtil.runTests<Null, TestUser>(
     methodName: 'update',
     mockCollection: MockCollection(),
     initHappyPath: (mockCollection) async {
@@ -139,16 +172,22 @@ void main() {
     },
   );
 
-  RepositoryTestUtil.runTests<Null, TestUser>(
-    methodName: 'delete',
+  RepositoryTestUtil.runTests<TestUser, TestUser>(
+    methodName: 'updateOrCreate',
     mockCollection: MockCollection(),
     initHappyPath: (mockCollection) async {
-      mockCollection.initialize(onDelete: () => null);
+      mockCollection.initialize(onUpdateOrCreate: () => defaultUser);
     },
     initSadPath: (mockCollection) async {
-      mockCollection.initialize(onDelete: () => throw ExpectedFailure());
+      mockCollection.initialize(
+          onUpdateOrCreate: () => throw ExpectedFailure());
     },
-    methodCallback: (testRepository) => testRepository.delete(docId),
+    methodCallback: (testRepository) {
+      return testRepository.updateOrCreate(
+        docId: docId,
+        value: TestUser('updatedUser'),
+      );
+    },
   );
 
   RepositoryTestUtil.runTests<List<TestUser>, TestUser>(
