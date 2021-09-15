@@ -53,4 +53,18 @@ void main() {
       expect(identityHashCode(result), isNot(identityHashCode(ref)));
     });
   });
+
+  group('#orderIfNotNull', () {
+    test('should return the original query when null', () {
+      final result = ref.filterIfNotNull(null);
+
+      expect(identityHashCode(result), identityHashCode(ref));
+    });
+
+    test('should return a new query when not null', () async {
+      final result = ref.orderIfNotNull(TestUser.fieldName);
+
+      expect(identityHashCode(result), isNot(identityHashCode(ref)));
+    });
+  });
 }
