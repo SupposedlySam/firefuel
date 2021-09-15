@@ -77,11 +77,40 @@ abstract class FirefuelCollection<T extends Serializable>
     return ref.limit(limit).snapshots().toListT();
   }
 
+  @override
   Stream<List<T>> listenWhere(List<Clause> clauses, {int? limit}) {
     final filteredQuery = _queryFromClauses(clauses);
     final query = limit == null ? filteredQuery : filteredQuery.limit(limit);
 
     return query.snapshots().toListT();
+  }
+
+  Future<Chunk<T>> paginate(Chunk<T> chunk) async {
+    final snapshot = await _buildPaginationSnapshot(chunk);
+
+    final data = snapshot.docs.toListT();
+    final cursor = snapshot.docs.last;
+
+    final snapshotLength = snapshot.docs.length;
+    final isNotLast = snapshotLength == chunk.limit;
+
+    return isNotLast
+        ? Chunk<T>.next(data: data, cursor: cursor)
+        : Chunk<T>.last(data: data, cursor: cursor);
+  }
+
+  /// Get the Documents used to create a [Chunk] when paginating data from a
+  /// Collection
+  ///
+  /// Orders and limits the [ref] and returns the [QuerySnapshot]
+  Future<QuerySnapshot<T?>> _buildPaginationSnapshot(Chunk<T> chunk) async {
+    final needsOrdering = chunk.orderByField != null;
+
+    final query = needsOrdering
+        ? ref.orderBy(chunk.orderByField!).limit(chunk.limit)
+        : ref.limit(chunk.limit);
+
+    return query.get();
   }
 
   @override
@@ -162,6 +191,7 @@ abstract class FirefuelCollection<T extends Serializable>
     return value;
   }
 
+  @override
   Future<List<T>> where(List<Clause> clauses, {int? limit}) async {
     final filteredQuery = _queryFromClauses(clauses);
     final query = limit == null ? filteredQuery : filteredQuery.limit(limit);
