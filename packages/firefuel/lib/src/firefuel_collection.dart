@@ -106,11 +106,18 @@ abstract class FirefuelCollection<T extends Serializable>
   Future<QuerySnapshot<T?>> _buildPaginationSnapshot(Chunk<T> chunk) async {
     final needsOrdering = chunk.orderByField != null;
 
-    final query = needsOrdering
-        ? ref.orderBy(chunk.orderByField!).limit(chunk.limit)
-        : ref.limit(chunk.limit);
+    var query = ref
+        .filterIfNotNull(chunk.clauses)
+        .orderIfNotNull(chunk.orderByField)
+        .limitIfNotNull(chunk.limit);
 
     return query.get();
+  }
+
+  Query<T?> filterRef(Chunk<T> chunk, List<Clause>? clauses) {
+    if (clauses == null) return ref;
+
+    return _queryFromClauses(chunk.clauses!);
   }
 
   @override
