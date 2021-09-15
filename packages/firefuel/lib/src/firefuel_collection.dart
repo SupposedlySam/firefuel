@@ -77,7 +77,7 @@ abstract class FirefuelCollection<T extends Serializable>
     return ref.limit(limit).snapshots().toListT();
   }
 
-  Stream<List<T>> listenWhere(Iterable<Clause> clauses, {int? limit}) {
+  Stream<List<T>> listenWhere(List<Clause> clauses, {int? limit}) {
     final filteredQuery = _queryFromClauses(clauses);
     final query = limit == null ? filteredQuery : filteredQuery.limit(limit);
 
@@ -162,7 +162,7 @@ abstract class FirefuelCollection<T extends Serializable>
     return value;
   }
 
-  Future<List<T>> where(Iterable<Clause> clauses, {int? limit}) async {
+  Future<List<T>> where(List<Clause> clauses, {int? limit}) async {
     final filteredQuery = _queryFromClauses(clauses);
     final query = limit == null ? filteredQuery : filteredQuery.limit(limit);
     final snapshot = await query.get();
@@ -170,7 +170,7 @@ abstract class FirefuelCollection<T extends Serializable>
     return snapshot.docs.toListT();
   }
 
-  Query<T?> _queryFromClauses(Iterable<Clause> clauses) {
+  Query<T?> _queryFromClauses(List<Clause> clauses) {
     if (clauses.isEmpty) throw MissingValueException(Clause);
 
     return clauses.fold(ref, (result, clause) {
