@@ -85,6 +85,7 @@ abstract class FirefuelCollection<T extends Serializable>
     return query.snapshots().toListT();
   }
 
+  @override
   Future<Chunk<T>> paginate(Chunk<T> chunk) async {
     final snapshot = await _buildPaginationSnapshot(chunk);
 
