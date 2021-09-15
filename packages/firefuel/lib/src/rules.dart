@@ -24,7 +24,7 @@ abstract class CollectionRead<R, T extends Serializable> {
   /// Get a list of documents matching all clauses
   ///
   /// throws a [MissingValueException] when no [Clause]s are given
-  Future<R> where(Iterable<Clause> clauses);
+  Future<R> where(List<Clause> clauses);
 
   /// Get a list of documents matching all clauses
   ///
@@ -32,7 +32,7 @@ abstract class CollectionRead<R, T extends Serializable> {
   /// collection
   ///
   /// throws a [MissingValueException] when no [Clause]s are given
-  Stream<R> listenWhere(Iterable<Clause> clauses);
+  Stream<R> listenWhere(List<Clause> clauses);
 }
 
 /// Create a new Document
