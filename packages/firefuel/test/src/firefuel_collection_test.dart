@@ -308,6 +308,87 @@ void main() {
     });
   });
 
+  group('#paginate', () {
+    setUp(() async {
+      final scenarioCount = ChunkStatus.values.length;
+      final seedCount = Chunk.defaultLimit * scenarioCount - 1;
+
+      await Future.wait(
+        List.generate(
+            seedCount, (i) => testCollection.create(TestUser('User$i'))),
+      );
+    });
+
+    test('should use the Chunk.defaultLimit', () async {
+      final startingChunk = await testCollection.paginate(
+        Chunk(orderByField: TestUser.fieldName),
+      );
+
+      expect(startingChunk.data.length, Chunk.defaultLimit);
+    });
+
+    test(
+      'should have status of $ChunkStatus.nextAvailable when receiving the middle chunk',
+      () async {
+        final middleChunk = await testCollection.paginate(
+          Chunk(orderByField: TestUser.fieldName),
+        );
+
+        expect(middleChunk.status, ChunkStatus.nextAvailable);
+      },
+    );
+
+    test(
+      'should have status of $ChunkStatus.last when receiving the last chunk',
+      () async {
+        final middleChunk = await testCollection.paginate(
+          Chunk(orderByField: TestUser.fieldName),
+        );
+        final lastChunk = await testCollection.paginate(middleChunk);
+
+        expect(lastChunk.status, ChunkStatus.last);
+      },
+    );
+
+    test(
+      'should return empty data when the last chunk is passed back in',
+      () async {
+        final middleChunk = await testCollection.paginate(
+          Chunk(orderByField: TestUser.fieldName),
+        );
+        final lastChunk = await testCollection.paginate(middleChunk);
+
+        assert(lastChunk.status == ChunkStatus.last);
+
+        final emptyLastChunk2 = await testCollection.paginate(lastChunk);
+
+        expect(emptyLastChunk2.status, ChunkStatus.last);
+        expect(emptyLastChunk2.data.isEmpty, isTrue);
+        expect(emptyLastChunk2.cursor, isNull);
+      },
+    );
+
+    test(
+      'should return empty data when last chunk contains nothing',
+      () async {
+        // We're starting with minus document to make a full chunk so adding one
+        // more user will allow two full chunks
+        await testCollection.create(TestUser('LastUser'));
+
+        final middleChunk = await testCollection.paginate(
+          Chunk(orderByField: TestUser.fieldName),
+        );
+        final lastFullChunk = await testCollection.paginate(middleChunk);
+
+        final emptyLastChunk = await testCollection.paginate(lastFullChunk);
+
+        expect(emptyLastChunk.status, ChunkStatus.last);
+        expect(emptyLastChunk.data.isEmpty, isTrue);
+        expect(emptyLastChunk.cursor, isNull);
+      },
+    );
+  });
+
   group('#read', () {
     test('should return the Type when docId exists', () async {
       final docId = await testCollection.create(defaultUser);

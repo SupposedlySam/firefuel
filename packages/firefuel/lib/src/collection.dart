@@ -1,11 +1,9 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firefuel_core/firefuel_core.dart';
-
-import 'package:firefuel/src/rules.dart';
+import 'package:firefuel/firefuel.dart';
 
 abstract class Collection<T extends Serializable>
     implements
         CollectionRead<List<T>, T>,
+        CollectionPaginate<Chunk<T>, T>,
         DocCreate<DocumentId, T>,
         DocCreateIfNotExist<T, T>,
         DocDelete<Null>,

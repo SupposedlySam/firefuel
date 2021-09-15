@@ -11,6 +11,7 @@ export 'package:cloud_firestore/cloud_firestore.dart'
         SetOptions,
         SnapshotOptions;
 export 'package:dartz/dartz.dart' show Either, Left, left, Right, right;
+export 'package:firefuel/src/chunk.dart';
 export 'package:firefuel/src/clause.dart';
 export 'package:firefuel/src/collection.dart';
 export 'package:firefuel/src/repository.dart';
@@ -23,4 +24,5 @@ export 'package:firefuel/src/rules.dart';
 export 'package:firefuel/src/snapshot_conversion_mixin.dart';
 export 'package:firefuel/src/utils/either_extensions.dart';
 export 'package:firefuel/src/utils/exceptions.dart';
+export 'package:firefuel/src/utils/query_extensions.dart';
 export 'package:firefuel_core/firefuel_core.dart';
