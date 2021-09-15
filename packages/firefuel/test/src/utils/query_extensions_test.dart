@@ -6,11 +6,13 @@ import '../../utils/test_user.dart';
 import '../firefuel_collection_test.dart';
 
 void main() {
+  late TestCollection testCollection;
   late CollectionReference<TestUser?> ref;
 
   setUp(() {
     Firefuel.initialize(FakeFirebaseFirestore());
-    ref = TestCollection().ref;
+    testCollection = TestCollection();
+    ref = testCollection.ref;
   });
 
   group('#filterIfNotNull', () {
@@ -30,6 +32,23 @@ void main() {
       final result = ref.filterIfNotNull(
         [Clause(TestUser.fieldName, isEqualTo: 'testUser')],
       );
+
+      expect(identityHashCode(result), isNot(identityHashCode(ref)));
+    });
+  });
+
+  group('#startAfterIfNotNull', () {
+    test('should return the original query when null', () {
+      final result = ref.filterIfNotNull(null);
+
+      expect(identityHashCode(result), identityHashCode(ref));
+    });
+
+    test('should return a new query when not null', () async {
+      final defaultUser = TestUser('testUser');
+      final docId = await testCollection.create(defaultUser);
+      final documentSnapshot = await testCollection.ref.doc(docId.docId).get();
+      final result = ref.startAfterIfNotNull(documentSnapshot);
 
       expect(identityHashCode(result), isNot(identityHashCode(ref)));
     });
