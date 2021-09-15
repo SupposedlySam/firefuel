@@ -17,9 +17,7 @@ void main() {
     initSadPath: (mockCollection) async {
       mockCollection.initialize(onCreate: () => throw ExpectedFailure());
     },
-    methodCallback: (testRepository) {
-      return testRepository.create(defaultUser);
-    },
+    methodCallback: (testRepository) => testRepository.create(defaultUser),
   );
 
   RepositoryTestUtil.runTests<DocumentId, TestUser>(
@@ -45,9 +43,7 @@ void main() {
     initSadPath: (mockCollection) async {
       mockCollection.initialize(onDelete: () => throw ExpectedFailure());
     },
-    methodCallback: (testRepository) {
-      return testRepository.delete(docId);
-    },
+    methodCallback: (testRepository) => testRepository.delete(docId),
   );
 
   RepositoryTestUtil.runTests<List<TestUser>, TestUser>(
@@ -80,9 +76,7 @@ void main() {
     initSadPath: (mockCollection) async {
       mockCollection.initialize(onListen: () => throw ExpectedFailure());
     },
-    streamCallback: (testRepository) {
-      return testRepository.listen(docId);
-    },
+    streamCallback: (testRepository) => testRepository.listen(docId),
   );
 
   RepositoryTestUtil.runStreamTests<List<TestUser>, TestUser>(
@@ -98,9 +92,7 @@ void main() {
     initSadPath: (mockCollection) async {
       mockCollection.initialize(onListenAll: () => throw ExpectedFailure());
     },
-    streamCallback: (testRepository) {
-      return testRepository.listenAll();
-    },
+    streamCallback: (testRepository) => testRepository.listenAll(),
   );
 
   RepositoryTestUtil.runStreamTests<List<TestUser>, TestUser>(
@@ -116,9 +108,7 @@ void main() {
     initSadPath: (mockCollection) async {
       mockCollection.initialize(onListenLimited: () => throw ExpectedFailure());
     },
-    streamCallback: (testRepository) {
-      return testRepository.listenLimited(1);
-    },
+    streamCallback: (testRepository) => testRepository.listenLimited(1),
   );
 
   RepositoryTestUtil.runStreamTests<List<TestUser>, TestUser>(
@@ -184,9 +174,7 @@ void main() {
     initSadPath: (mockCollection) async {
       mockCollection.initialize(onRead: () => throw ExpectedFailure());
     },
-    methodCallback: (testRepository) {
-      return testRepository.read(docId);
-    },
+    methodCallback: (testRepository) => testRepository.read(docId),
   );
 
   RepositoryTestUtil.runTests<TestUser, TestUser>(
