@@ -70,13 +70,13 @@ void main() {
 
   group('#limitIfNotNull', () {
     test('should return the original query when null', () {
-      final result = ref.filterIfNotNull(null);
+      final result = ref.limitIfNotNull(null);
 
       expect(identityHashCode(result), identityHashCode(ref));
     });
 
     test('should return a new query when not null', () async {
-      final result = ref.orderIfNotNull(TestUser.fieldName);
+      final result = ref.limitIfNotNull(10);
 
       expect(identityHashCode(result), isNot(identityHashCode(ref)));
     });
