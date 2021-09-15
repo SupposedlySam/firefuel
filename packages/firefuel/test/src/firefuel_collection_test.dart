@@ -430,20 +430,23 @@ void main() {
       expect(filteredList, [expectedUser]);
     });
 
-    test('should return an empty list when more than one option is chosen',
-        () async {
-      final filteredList = await testCollection.where(
-        [
-          Clause(
-            TestUser.fieldName,
-            isNotEqualTo: unexpectedName1,
-            isEqualTo: expectedUser,
+    test(
+      'should throw a $TooManyArgumentsException when more than one option is chosen',
+      () {
+        expect(
+          () async => await testCollection.where(
+            [
+              Clause(
+                TestUser.fieldName,
+                isNotEqualTo: unexpectedName1,
+                isEqualTo: expectedUser,
+              ),
+            ],
           ),
-        ],
-      );
-
-      expect(filteredList, []);
-    });
+          throwsA(isA<TooManyArgumentsException>()),
+        );
+      },
+    );
 
     test('should throw when no clauses are given', () async {
       expect(
