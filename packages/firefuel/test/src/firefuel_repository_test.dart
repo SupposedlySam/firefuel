@@ -34,8 +34,24 @@ void main() {
     methodCallback: (testRepository) => testRepository.read(docId),
   );
 
-  RepositoryTestUtil.runStreamTests<TestUser?, TestUser>(
+  RepositoryTestUtil.runStreamTests<List<TestUser>, TestUser>(
     methodName: 'listen',
+    mockCollection: MockCollection(),
+    initHappyPath: (mockCollection) async {
+      mockCollection.initialize(
+        onListen: () => Stream.fromIterable([TestUser('streamUser')]),
+      );
+    },
+    initSadPath: (mockCollection) async {
+      mockCollection.initialize(onListenLimited: () => throw ExpectedFailure());
+    },
+    streamCallback: (testRepository) {
+      return testRepository.listenLimited(1);
+    },
+  );
+
+  RepositoryTestUtil.runStreamTests<TestUser?, TestUser>(
+    methodName: 'listenLimited',
     mockCollection: MockCollection(),
     initHappyPath: (mockCollection) async {
       mockCollection.initialize(

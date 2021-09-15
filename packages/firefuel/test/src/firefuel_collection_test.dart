@@ -234,6 +234,47 @@ void main() {
     });
   });
 
+  group('#limit', () {
+    setUp(() async {
+      await testCollection.create(defaultUser);
+      await testCollection.create(defaultUser);
+      await testCollection.create(defaultUser);
+    });
+
+    test('when items are less than limit, should return all items', () async {
+      final result = await testCollection.limit(4);
+
+      expect(
+        result,
+        [defaultUser, defaultUser, defaultUser],
+      );
+    });
+
+    test(
+      'when items are greater than limit, should return items up to limit',
+      () async {
+        final result = await testCollection.limit(2);
+
+        expect(
+          result,
+          [defaultUser, defaultUser],
+        );
+      },
+    );
+
+    test(
+      'when items are equal to limit, should return all items',
+      () async {
+        final result = await testCollection.limit(3);
+
+        expect(
+          result,
+          [defaultUser, defaultUser, defaultUser],
+        );
+      },
+    );
+  });
+
   group('#listen', () {
     late Stream<TestUser?> docStream;
     late DocumentId docId;
@@ -266,6 +307,53 @@ void main() {
 
       await testCollection.delete(docId);
     });
+  });
+
+  group('#listenLimited', () {
+    setUp(() async {
+      await testCollection.create(defaultUser);
+      await testCollection.create(defaultUser);
+      await testCollection.create(defaultUser);
+    });
+
+    test('when items are less than limit, should return all items', () {
+      final stream = testCollection.listenLimited(4);
+
+      expect(
+        stream,
+        emitsInOrder([
+          [defaultUser, defaultUser, defaultUser]
+        ]),
+      );
+    });
+
+    test(
+      'when items are greater than limit, should return items up to limit',
+      () {
+        final stream = testCollection.listenLimited(2);
+
+        expect(
+          stream,
+          emitsInOrder([
+            [defaultUser, defaultUser]
+          ]),
+        );
+      },
+    );
+
+    test(
+      'when items are equal to limit, should return all items',
+      () {
+        final stream = testCollection.listenLimited(3);
+
+        expect(
+          stream,
+          emitsInOrder([
+            [defaultUser, defaultUser, defaultUser]
+          ]),
+        );
+      },
+    );
   });
 
   group('#replace', () {
