@@ -80,6 +80,47 @@ void main() {
     });
   });
 
+  group('#limit', () {
+    setUp(() async {
+      await testCollection.create(defaultUser);
+      await testCollection.create(defaultUser);
+      await testCollection.create(defaultUser);
+    });
+
+    test('when items are less than limit, should return all items', () async {
+      final result = await testCollection.limit(4);
+
+      expect(
+        result,
+        [defaultUser, defaultUser, defaultUser],
+      );
+    });
+
+    test(
+      'when items are greater than limit, should return items up to limit',
+      () async {
+        final result = await testCollection.limit(2);
+
+        expect(
+          result,
+          [defaultUser, defaultUser],
+        );
+      },
+    );
+
+    test(
+      'when items are equal to limit, should return all items',
+      () async {
+        final result = await testCollection.limit(3);
+
+        expect(
+          result,
+          [defaultUser, defaultUser, defaultUser],
+        );
+      },
+    );
+  });
+
   group('#listen', () {
     late Stream<TestUser?> stream;
     late DocumentId docId;
@@ -149,166 +190,6 @@ void main() {
     });
   });
 
-  group('#listenWhere', () {
-    const String expectedName = 'expectedName',
-        unexpectedName1 = 'unexpectedName1',
-        unexpectedName2 = 'unexpectedName2';
-    final expectedUser = TestUser(expectedName);
-
-    setUp(() async {
-      await testCollection.create(TestUser(unexpectedName1));
-      await testCollection.create(expectedUser);
-      await testCollection.create(TestUser(unexpectedName2));
-    });
-
-    test('should return a subset of the existing list', () {
-      final filteredStream = testCollection.listenWhere(
-        [Clause(TestUser.fieldName, isEqualTo: expectedName)],
-      );
-
-      expect(
-        filteredStream,
-        emitsInOrder([
-          [expectedUser],
-        ]),
-      );
-    });
-
-    test('should return a subset based on multiple clauses', () {
-      final filteredStream = testCollection.listenWhere(
-        [
-          Clause(TestUser.fieldName, isNotEqualTo: unexpectedName1),
-          Clause(TestUser.fieldName, isNotEqualTo: unexpectedName2),
-        ],
-      );
-
-      expect(
-        filteredStream,
-        emitsInOrder([
-          [expectedUser],
-        ]),
-      );
-    });
-
-    test('should throw when no clauses are given', () {
-      expect(
-        () => testCollection.listenWhere([]),
-        throwsA(isA<MissingValueException>()),
-      );
-    });
-  });
-
-  group('#read', () {
-    test('should return the Type when docId exists', () async {
-      final docId = await testCollection.create(defaultUser);
-
-      final readResult = await testCollection.read(docId);
-
-      expect(readResult, defaultUser);
-    });
-
-    test('should return null when docId does not exist', () async {
-      final readResult = await testCollection.read(DocumentId('dodoBird'));
-
-      expect(readResult, isNull);
-    });
-  });
-
-  group('#readOrCreate', () {
-    final documentId = DocumentId('testName');
-
-    test('should create the doc when it does not exist', () async {
-      final result = await testCollection.readOrCreate(
-          docId: documentId, createValue: defaultUser);
-
-      expect(result, defaultUser);
-    });
-
-    test('should get doc when it exists', () async {
-      final docId = await testCollection.create(defaultUser);
-
-      final testUser = await testCollection.readOrCreate(
-          docId: docId, createValue: defaultUser);
-
-      expect(docId.docId, testUser.docId);
-    });
-  });
-
-  group('#limit', () {
-    setUp(() async {
-      await testCollection.create(defaultUser);
-      await testCollection.create(defaultUser);
-      await testCollection.create(defaultUser);
-    });
-
-    test('when items are less than limit, should return all items', () async {
-      final result = await testCollection.limit(4);
-
-      expect(
-        result,
-        [defaultUser, defaultUser, defaultUser],
-      );
-    });
-
-    test(
-      'when items are greater than limit, should return items up to limit',
-      () async {
-        final result = await testCollection.limit(2);
-
-        expect(
-          result,
-          [defaultUser, defaultUser],
-        );
-      },
-    );
-
-    test(
-      'when items are equal to limit, should return all items',
-      () async {
-        final result = await testCollection.limit(3);
-
-        expect(
-          result,
-          [defaultUser, defaultUser, defaultUser],
-        );
-      },
-    );
-  });
-
-  group('#listen', () {
-    late Stream<TestUser?> docStream;
-    late DocumentId docId;
-
-    setUp(() async {
-      docId = await testCollection.create(defaultUser);
-
-      docStream = testCollection.listen(docId);
-    });
-
-    test('should update when a field changes', () async {
-      final updatedUser = TestUser('updatedValue');
-
-      expect(
-        docStream,
-        emitsInOrder([updatedUser]),
-      );
-
-      await testCollection.update(
-        docId: docId,
-        value: updatedUser,
-      );
-    });
-
-    test('should update when document is deleted', () async {
-      expect(
-        docStream,
-        emitsInOrder([null]),
-      );
-
-      await testCollection.delete(docId);
-    });
-  });
-
   group('#listenLimited', () {
     setUp(() async {
       await testCollection.create(defaultUser);
@@ -354,6 +235,113 @@ void main() {
         );
       },
     );
+  });
+
+  group('#listenWhere', () {
+    const String expectedName = 'expectedName';
+    final expectedUser = TestUser(expectedName);
+
+    group('without limit', () {
+      const String unexpectedName1 = 'unexpectedName1',
+          unexpectedName2 = 'unexpectedName2';
+
+      setUp(() async {
+        await testCollection.create(TestUser(unexpectedName1));
+        await testCollection.create(expectedUser);
+        await testCollection.create(TestUser(unexpectedName2));
+      });
+
+      test('should return a subset of the existing list', () {
+        final filteredStream = testCollection.listenWhere(
+          [Clause(TestUser.fieldName, isEqualTo: expectedName)],
+        );
+
+        expect(
+          filteredStream,
+          emitsInOrder([
+            [expectedUser],
+          ]),
+        );
+      });
+
+      test('should return a subset based on multiple clauses', () {
+        final filteredStream = testCollection.listenWhere(
+          [
+            Clause(TestUser.fieldName, isNotEqualTo: unexpectedName1),
+            Clause(TestUser.fieldName, isNotEqualTo: unexpectedName2),
+          ],
+        );
+
+        expect(
+          filteredStream,
+          emitsInOrder([
+            [expectedUser],
+          ]),
+        );
+      });
+
+      test('should throw when no clauses are given', () {
+        expect(
+          () => testCollection.listenWhere([]),
+          throwsA(isA<MissingValueException>()),
+        );
+      });
+    });
+
+    group('with limit', () {
+      test('should set the max value of items to return', () async {
+        await testCollection.create(expectedUser);
+        await testCollection.create(expectedUser);
+
+        final limitedStream = testCollection.listenWhere(
+          [Clause(TestUser.fieldName, isEqualTo: expectedName)],
+          limit: 1,
+        );
+
+        expect(
+          limitedStream,
+          emitsInOrder([
+            [expectedUser],
+          ]),
+        );
+      });
+    });
+  });
+
+  group('#read', () {
+    test('should return the Type when docId exists', () async {
+      final docId = await testCollection.create(defaultUser);
+
+      final readResult = await testCollection.read(docId);
+
+      expect(readResult, defaultUser);
+    });
+
+    test('should return null when docId does not exist', () async {
+      final readResult = await testCollection.read(DocumentId('dodoBird'));
+
+      expect(readResult, isNull);
+    });
+  });
+
+  group('#readOrCreate', () {
+    final documentId = DocumentId('testName');
+
+    test('should create the doc when it does not exist', () async {
+      final result = await testCollection.readOrCreate(
+          docId: documentId, createValue: defaultUser);
+
+      expect(result, defaultUser);
+    });
+
+    test('should get doc when it exists', () async {
+      final docId = await testCollection.create(defaultUser);
+
+      final testUser = await testCollection.readOrCreate(
+          docId: docId, createValue: defaultUser);
+
+      expect(docId.docId, testUser.docId);
+    });
   });
 
   group('#replace', () {

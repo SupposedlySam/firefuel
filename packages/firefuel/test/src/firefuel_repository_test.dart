@@ -36,6 +36,39 @@ void main() {
     },
   );
 
+  RepositoryTestUtil.runTests<Null, TestUser>(
+    methodName: 'delete',
+    mockCollection: MockCollection(),
+    initHappyPath: (mockCollection) async {
+      mockCollection.initialize(onDelete: () => null);
+    },
+    initSadPath: (mockCollection) async {
+      mockCollection.initialize(onDelete: () => throw ExpectedFailure());
+    },
+    methodCallback: (testRepository) {
+      return testRepository.delete(docId);
+    },
+  );
+
+  RepositoryTestUtil.runTests<List<TestUser>, TestUser>(
+    methodName: 'limit',
+    mockCollection: MockCollection(),
+    initHappyPath: (mockCollection) async {
+      mockCollection.initialize(
+        onLimit: () => [
+          TestUser('unexpectedUser1'),
+          TestUser('expectedUser'),
+          TestUser('expectedUser'),
+          TestUser('unexpectedUser2'),
+        ],
+      );
+    },
+    initSadPath: (mockCollection) async {
+      mockCollection.initialize(onLimit: () => throw ExpectedFailure());
+    },
+    methodCallback: (testRepository) => testRepository.limit(1),
+  );
+
   RepositoryTestUtil.runStreamTests<TestUser?, TestUser>(
     methodName: 'listen',
     mockCollection: MockCollection(),
@@ -49,6 +82,24 @@ void main() {
     },
     streamCallback: (testRepository) {
       return testRepository.listen(docId);
+    },
+  );
+
+  RepositoryTestUtil.runStreamTests<List<TestUser>, TestUser>(
+    methodName: 'listenAll',
+    mockCollection: MockCollection(),
+    initHappyPath: (mockCollection) async {
+      mockCollection.initialize(
+        onListenAll: () => Stream.fromIterable([
+          [TestUser('streamUser')]
+        ]),
+      );
+    },
+    initSadPath: (mockCollection) async {
+      mockCollection.initialize(onListenAll: () => throw ExpectedFailure());
+    },
+    streamCallback: (testRepository) {
+      return testRepository.listenAll();
     },
   );
 
@@ -120,6 +171,37 @@ void main() {
       return testRepository.listenWhere(
         [Clause(TestUser.fieldName, isEqualTo: 'expectedUser')],
         limit: 1,
+      );
+    },
+  );
+
+  RepositoryTestUtil.runTests<TestUser?, TestUser>(
+    methodName: 'read',
+    mockCollection: MockCollection(),
+    initHappyPath: (mockCollection) async {
+      mockCollection.initialize(onRead: () => defaultUser);
+    },
+    initSadPath: (mockCollection) async {
+      mockCollection.initialize(onRead: () => throw ExpectedFailure());
+    },
+    methodCallback: (testRepository) {
+      return testRepository.read(docId);
+    },
+  );
+
+  RepositoryTestUtil.runTests<TestUser, TestUser>(
+    methodName: 'readOrCreate',
+    mockCollection: MockCollection(),
+    initHappyPath: (mockCollection) async {
+      mockCollection.initialize(onReadOrCreate: () => defaultUser);
+    },
+    initSadPath: (mockCollection) async {
+      mockCollection.initialize(onReadOrCreate: () => throw ExpectedFailure());
+    },
+    methodCallback: (testRepository) {
+      return testRepository.readOrCreate(
+        docId: docId,
+        createValue: defaultUser,
       );
     },
   );
