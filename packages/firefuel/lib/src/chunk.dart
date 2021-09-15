@@ -1,30 +1,30 @@
 import 'package:firefuel/firefuel.dart';
 
-enum ChunkStatus { starting, nextAvailable, last }
+enum ChunkStatus { nextAvailable, last }
 
 /// Used to keep track of state when paginating
 class Chunk<T> {
   static const int defaultLimit = 25;
 
-  final DocumentSnapshot? cursor;
+  final DocumentSnapshot<T?>? cursor;
   final List<T> data;
   final int limit;
-  final String? orderByField;
+  final String orderByField;
   final List<Clause>? clauses;
   final ChunkStatus status;
 
   Chunk({
-    this.orderByField,
+    required this.orderByField,
     this.clauses,
     this.limit = defaultLimit,
   })  : data = [],
         cursor = null,
-        status = ChunkStatus.starting;
+        status = ChunkStatus.nextAvailable;
 
   Chunk.next({
     required this.data,
     required this.cursor,
-    this.orderByField,
+    required this.orderByField,
     this.clauses,
     this.limit = defaultLimit,
   }) : status = ChunkStatus.nextAvailable;
@@ -32,7 +32,7 @@ class Chunk<T> {
   Chunk.last({
     required this.data,
     required this.cursor,
-    this.orderByField,
+    required this.orderByField,
     this.clauses,
     this.limit = defaultLimit,
   }) : status = ChunkStatus.last;

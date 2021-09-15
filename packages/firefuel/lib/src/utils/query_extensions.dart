@@ -21,6 +21,12 @@ extension QueryX<T> on Query<T?> {
     });
   }
 
+  Query<T?> startAfterIfNotNull(DocumentSnapshot<T?>? cursor) {
+    if (cursor == null) return this;
+
+    return startAfterDocument(cursor);
+  }
+
   Query<T?> orderIfNotNull(String? field) {
     if (field == null) return this;
 

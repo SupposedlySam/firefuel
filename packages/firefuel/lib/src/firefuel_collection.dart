@@ -89,14 +89,22 @@ abstract class FirefuelCollection<T extends Serializable>
     final snapshot = await _buildPaginationSnapshot(chunk);
 
     final data = snapshot.docs.toListT();
-    final cursor = snapshot.docs.last;
+    final cursor = snapshot.size == 0 ? null : snapshot.docs.last;
 
     final snapshotLength = snapshot.docs.length;
     final isNotLast = snapshotLength == chunk.limit;
 
     return isNotLast
-        ? Chunk<T>.next(data: data, cursor: cursor)
-        : Chunk<T>.last(data: data, cursor: cursor);
+        ? Chunk<T>.next(
+            data: data,
+            cursor: cursor,
+            orderByField: chunk.orderByField,
+          )
+        : Chunk<T>.last(
+            data: data,
+            cursor: cursor,
+            orderByField: chunk.orderByField,
+          );
   }
 
   /// Get the Documents used to create a [Chunk] when paginating data from a
@@ -104,11 +112,10 @@ abstract class FirefuelCollection<T extends Serializable>
   ///
   /// Orders and limits the [ref] and returns the [QuerySnapshot]
   Future<QuerySnapshot<T?>> _buildPaginationSnapshot(Chunk<T> chunk) async {
-    final needsOrdering = chunk.orderByField != null;
-
     var query = ref
         .filterIfNotNull(chunk.clauses)
         .orderIfNotNull(chunk.orderByField)
+        .startAfterIfNotNull(chunk.cursor)
         .limitIfNotNull(chunk.limit);
 
     return query.get();
