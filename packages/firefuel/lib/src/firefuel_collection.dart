@@ -6,9 +6,9 @@ abstract class FirefuelCollection<T extends Serializable>
     implements Collection<T> {
   final String path;
 
-  FirefuelCollection(this.path);
-
   final firestore = Firefuel.firestore;
+
+  FirefuelCollection(this.path);
 
   @override
   CollectionReference<T?> get ref {
@@ -56,6 +56,13 @@ abstract class FirefuelCollection<T extends Serializable>
   );
 
   @override
+  Future<List<T>> limit(int limit) async {
+    final snapshot = await ref.limit(limit).get();
+
+    return snapshot.docs.toListT();
+  }
+
+  @override
   Stream<T?> listen(DocumentId docId) {
     return ref.doc(docId.docId).snapshots().toMaybeT();
   }
@@ -66,8 +73,15 @@ abstract class FirefuelCollection<T extends Serializable>
   }
 
   @override
-  Stream<List<T>> listenWhere(List<Clause> clauses) {
-    return _queryFromClauses(clauses).snapshots().toListT();
+  Stream<List<T>> listenLimited(int limit) {
+    return ref.limit(limit).snapshots().toListT();
+  }
+
+  Stream<List<T>> listenWhere(List<Clause> clauses, {int? limit}) {
+    final filteredQuery = _queryFromClauses(clauses);
+    final query = limit == null ? filteredQuery : filteredQuery.limit(limit);
+
+    return query.snapshots().toListT();
   }
 
   @override
@@ -148,9 +162,10 @@ abstract class FirefuelCollection<T extends Serializable>
     return value;
   }
 
-  @override
-  Future<List<T>> where(List<Clause> clauses) async {
-    final snapshot = await _queryFromClauses(clauses).get();
+  Future<List<T>> where(List<Clause> clauses, {int? limit}) async {
+    final filteredQuery = _queryFromClauses(clauses);
+    final query = limit == null ? filteredQuery : filteredQuery.limit(limit);
+    final snapshot = await query.get();
 
     return snapshot.docs.toListT();
   }

@@ -21,18 +21,33 @@ abstract class CollectionRead<R, T extends Serializable> {
   /// See: StreamBuilder
   Stream<R> listenAll();
 
+  /// Get up to the maximum number of documents specified by the [limit]
+  ///
+  /// Returns 0 to [limit]
+  Future<R> limit(int limit);
+
+  /// Get up to the maximum number of documents specified by the [limit]
+  ///
+  /// Refreshes automatically when new data is added/removed from the
+  /// collection
+  Stream<R> listenLimited(int limit);
+
   /// Get a list of documents matching all clauses
   ///
+  /// limit: optionally provide a maximum value of items to be returned
+  ///
   /// throws a [MissingValueException] when no [Clause]s are given
-  Future<R> where(List<Clause> clauses);
+  Future<R> where(List<Clause> clauses, {int? limit});
 
   /// Get a list of documents matching all clauses
   ///
   /// Refreshes automatically when new matching data is added/removed from the
   /// collection
   ///
+  /// limit: optionally provide a maximum value of items to be returned
+  ///
   /// throws a [MissingValueException] when no [Clause]s are given
-  Stream<R> listenWhere(List<Clause> clauses);
+  Stream<R> listenWhere(List<Clause> clauses, {int? limit});
 }
 
 /// Create a new Document

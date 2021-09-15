@@ -17,9 +17,7 @@ void main() {
     initSadPath: (mockCollection) async {
       mockCollection.initialize(onCreate: () => throw ExpectedFailure());
     },
-    methodCallback: (testRepository) {
-      return testRepository.create(defaultUser);
-    },
+    methodCallback: (testRepository) => testRepository.create(defaultUser),
   );
 
   RepositoryTestUtil.runTests<DocumentId, TestUser>(
@@ -48,22 +46,37 @@ void main() {
     methodCallback: (testRepository) => testRepository.delete(docId),
   );
 
+  RepositoryTestUtil.runTests<List<TestUser>, TestUser>(
+    methodName: 'limit',
+    mockCollection: MockCollection(),
+    initHappyPath: (mockCollection) async {
+      mockCollection.initialize(
+        onLimit: () => [
+          TestUser('unexpectedUser1'),
+          TestUser('expectedUser'),
+          TestUser('expectedUser'),
+          TestUser('unexpectedUser2'),
+        ],
+      );
+    },
+    initSadPath: (mockCollection) async {
+      mockCollection.initialize(onLimit: () => throw ExpectedFailure());
+    },
+    methodCallback: (testRepository) => testRepository.limit(1),
+  );
+
   RepositoryTestUtil.runStreamTests<TestUser?, TestUser>(
     methodName: 'listen',
     mockCollection: MockCollection(),
     initHappyPath: (mockCollection) async {
       mockCollection.initialize(
-        onListen: () => Stream.fromIterable(
-          [TestUser('streamUser')],
-        ),
+        onListen: () => Stream.fromIterable([TestUser('streamUser')]),
       );
     },
     initSadPath: (mockCollection) async {
       mockCollection.initialize(onListen: () => throw ExpectedFailure());
     },
-    streamCallback: (testRepository) {
-      return testRepository.listen(docId);
-    },
+    streamCallback: (testRepository) => testRepository.listen(docId),
   );
 
   RepositoryTestUtil.runStreamTests<List<TestUser>, TestUser>(
@@ -81,9 +94,25 @@ void main() {
     },
     streamCallback: (testRepository) => testRepository.listenAll(),
   );
-  
+
   RepositoryTestUtil.runStreamTests<List<TestUser>, TestUser>(
-    methodName: 'listenWhere',
+    methodName: 'listenLimited',
+    mockCollection: MockCollection(),
+    initHappyPath: (mockCollection) async {
+      mockCollection.initialize(
+        onListenLimited: () => Stream.fromIterable([
+          [TestUser('streamUser')]
+        ]),
+      );
+    },
+    initSadPath: (mockCollection) async {
+      mockCollection.initialize(onListenLimited: () => throw ExpectedFailure());
+    },
+    streamCallback: (testRepository) => testRepository.listenLimited(1),
+  );
+
+  RepositoryTestUtil.runStreamTests<List<TestUser>, TestUser>(
+    methodName: 'listenWhere(limit:null)',
     mockCollection: MockCollection(),
     initHappyPath: (mockCollection) async {
       mockCollection.initialize(
@@ -108,6 +137,34 @@ void main() {
     },
   );
 
+  RepositoryTestUtil.runStreamTests<List<TestUser>, TestUser>(
+    methodName: 'listenWhere(limit:1)',
+    mockCollection: MockCollection(),
+    initHappyPath: (mockCollection) async {
+      mockCollection.initialize(
+        onListenWhere: () => Stream.fromIterable(
+          [
+            [
+              TestUser('unexpectedUser1'),
+              TestUser('expectedUser'),
+              TestUser('expectedUser'),
+              TestUser('unexpectedUser2'),
+            ]
+          ],
+        ),
+      );
+    },
+    initSadPath: (mockCollection) async {
+      mockCollection.initialize(onListenWhere: () => throw ExpectedFailure());
+    },
+    streamCallback: (testRepository) {
+      return testRepository.listenWhere(
+        [Clause(TestUser.fieldName, isEqualTo: 'expectedUser')],
+        limit: 1,
+      );
+    },
+  );
+
   RepositoryTestUtil.runTests<TestUser?, TestUser>(
     methodName: 'read',
     mockCollection: MockCollection(),
@@ -120,16 +177,21 @@ void main() {
     methodCallback: (testRepository) => testRepository.read(docId),
   );
 
-  RepositoryTestUtil.runTests<TestUser?, TestUser>(
+  RepositoryTestUtil.runTests<TestUser, TestUser>(
     methodName: 'readOrCreate',
     mockCollection: MockCollection(),
     initHappyPath: (mockCollection) async {
-      mockCollection.initialize(onRead: () => defaultUser);
+      mockCollection.initialize(onReadOrCreate: () => defaultUser);
     },
     initSadPath: (mockCollection) async {
-      mockCollection.initialize(onRead: () => throw ExpectedFailure());
+      mockCollection.initialize(onReadOrCreate: () => throw ExpectedFailure());
     },
-    methodCallback: (testRepository) => testRepository.read(docId),
+    methodCallback: (testRepository) {
+      return testRepository.readOrCreate(
+        docId: docId,
+        createValue: defaultUser,
+      );
+    },
   );
 
   RepositoryTestUtil.runTests<Null, TestUser>(
@@ -199,7 +261,7 @@ void main() {
   );
 
   RepositoryTestUtil.runTests<List<TestUser>, TestUser>(
-    methodName: 'where',
+    methodName: 'where(limit:null)',
     mockCollection: MockCollection(),
     initHappyPath: (mockCollection) async {
       mockCollection.initialize(
@@ -217,6 +279,30 @@ void main() {
       return testRepository.where([
         Clause(TestUser.fieldName, isEqualTo: 'expectedUser'),
       ]);
+    },
+  );
+
+  RepositoryTestUtil.runTests<List<TestUser>, TestUser>(
+    methodName: 'where(limit:1)',
+    mockCollection: MockCollection(),
+    initHappyPath: (mockCollection) async {
+      mockCollection.initialize(
+        onWhere: () => [
+          TestUser('unexpectedUser1'),
+          TestUser('expectedUser'),
+          TestUser('expectedUser'),
+          TestUser('unexpectedUser2'),
+        ],
+      );
+    },
+    initSadPath: (mockCollection) async {
+      mockCollection.initialize(onWhere: () => throw ExpectedFailure());
+    },
+    methodCallback: (testRepository) {
+      return testRepository.where(
+        [Clause(TestUser.fieldName, isEqualTo: 'expectedUser')],
+        limit: 1,
+      );
     },
   );
 }

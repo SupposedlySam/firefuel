@@ -80,6 +80,47 @@ void main() {
     });
   });
 
+  group('#limit', () {
+    setUp(() async {
+      await testCollection.create(defaultUser);
+      await testCollection.create(defaultUser);
+      await testCollection.create(defaultUser);
+    });
+
+    test('when items are less than limit, should return all items', () async {
+      final result = await testCollection.limit(4);
+
+      expect(
+        result,
+        [defaultUser, defaultUser, defaultUser],
+      );
+    });
+
+    test(
+      'when items are greater than limit, should return items up to limit',
+      () async {
+        final result = await testCollection.limit(2);
+
+        expect(
+          result,
+          [defaultUser, defaultUser],
+        );
+      },
+    );
+
+    test(
+      'when items are equal to limit, should return all items',
+      () async {
+        final result = await testCollection.limit(3);
+
+        expect(
+          result,
+          [defaultUser, defaultUser, defaultUser],
+        );
+      },
+    );
+  });
+
   group('#listen', () {
     late Stream<TestUser?> stream;
     late DocumentId docId;
@@ -149,52 +190,121 @@ void main() {
     });
   });
 
+  group('#listenLimited', () {
+    setUp(() async {
+      await testCollection.create(defaultUser);
+      await testCollection.create(defaultUser);
+      await testCollection.create(defaultUser);
+    });
+
+    test('when items are less than limit, should return all items', () {
+      final stream = testCollection.listenLimited(4);
+
+      expect(
+        stream,
+        emitsInOrder([
+          [defaultUser, defaultUser, defaultUser]
+        ]),
+      );
+    });
+
+    test(
+      'when items are greater than limit, should return items up to limit',
+      () {
+        final stream = testCollection.listenLimited(2);
+
+        expect(
+          stream,
+          emitsInOrder([
+            [defaultUser, defaultUser]
+          ]),
+        );
+      },
+    );
+
+    test(
+      'when items are equal to limit, should return all items',
+      () {
+        final stream = testCollection.listenLimited(3);
+
+        expect(
+          stream,
+          emitsInOrder([
+            [defaultUser, defaultUser, defaultUser]
+          ]),
+        );
+      },
+    );
+  });
+
   group('#listenWhere', () {
-    const String expectedName = 'expectedName',
-        unexpectedName1 = 'unexpectedName1',
-        unexpectedName2 = 'unexpectedName2';
+    const String expectedName = 'expectedName';
     final expectedUser = TestUser(expectedName);
 
-    setUp(() async {
-      await testCollection.create(TestUser(unexpectedName1));
-      await testCollection.create(expectedUser);
-      await testCollection.create(TestUser(unexpectedName2));
+    group('without limit', () {
+      const String unexpectedName1 = 'unexpectedName1',
+          unexpectedName2 = 'unexpectedName2';
+
+      setUp(() async {
+        await testCollection.create(TestUser(unexpectedName1));
+        await testCollection.create(expectedUser);
+        await testCollection.create(TestUser(unexpectedName2));
+      });
+
+      test('should return a subset of the existing list', () {
+        final filteredStream = testCollection.listenWhere(
+          [Clause(TestUser.fieldName, isEqualTo: expectedName)],
+        );
+
+        expect(
+          filteredStream,
+          emitsInOrder([
+            [expectedUser],
+          ]),
+        );
+      });
+
+      test('should return a subset based on multiple clauses', () {
+        final filteredStream = testCollection.listenWhere(
+          [
+            Clause(TestUser.fieldName, isNotEqualTo: unexpectedName1),
+            Clause(TestUser.fieldName, isNotEqualTo: unexpectedName2),
+          ],
+        );
+
+        expect(
+          filteredStream,
+          emitsInOrder([
+            [expectedUser],
+          ]),
+        );
+      });
+
+      test('should throw when no clauses are given', () {
+        expect(
+          () => testCollection.listenWhere([]),
+          throwsA(isA<MissingValueException>()),
+        );
+      });
     });
 
-    test('should return a subset of the existing list', () {
-      final filteredStream = testCollection.listenWhere(
-        [Clause(TestUser.fieldName, isEqualTo: expectedName)],
-      );
+    group('with limit', () {
+      test('should set the max value of items to return', () async {
+        await testCollection.create(expectedUser);
+        await testCollection.create(expectedUser);
 
-      expect(
-        filteredStream,
-        emitsInOrder([
-          [expectedUser],
-        ]),
-      );
-    });
+        final limitedStream = testCollection.listenWhere(
+          [Clause(TestUser.fieldName, isEqualTo: expectedName)],
+          limit: 1,
+        );
 
-    test('should return a subset based on multiple clauses', () {
-      final filteredStream = testCollection.listenWhere(
-        [
-          Clause(TestUser.fieldName, isNotEqualTo: unexpectedName1),
-          Clause(TestUser.fieldName, isNotEqualTo: unexpectedName2),
-        ],
-      );
-
-      expect(
-        filteredStream,
-        emitsInOrder([
-          [expectedUser],
-        ]),
-      );
-    });
-
-    test('should throw when no clauses are given', () {
-      expect(
-        () => testCollection.listenWhere([]),
-        throwsA(isA<MissingValueException>()),
-      );
+        expect(
+          limitedStream,
+          emitsInOrder([
+            [expectedUser],
+          ]),
+        );
+      });
     });
   });
 
@@ -231,40 +341,6 @@ void main() {
           docId: docId, createValue: defaultUser);
 
       expect(docId.docId, testUser.docId);
-    });
-  });
-
-  group('#listen', () {
-    late Stream<TestUser?> docStream;
-    late DocumentId docId;
-
-    setUp(() async {
-      docId = await testCollection.create(defaultUser);
-
-      docStream = testCollection.listen(docId);
-    });
-
-    test('should update when a field changes', () async {
-      final updatedUser = TestUser('updatedValue');
-
-      expect(
-        docStream,
-        emitsInOrder([updatedUser]),
-      );
-
-      await testCollection.update(
-        docId: docId,
-        value: updatedUser,
-      );
-    });
-
-    test('should update when document is deleted', () async {
-      expect(
-        docStream,
-        emitsInOrder([null]),
-      );
-
-      await testCollection.delete(docId);
     });
   });
 
@@ -400,59 +476,75 @@ void main() {
   });
 
   group('#where', () {
-    const String expectedName = 'expectedName',
-        unexpectedName1 = 'unexpectedName1',
-        unexpectedName2 = 'unexpectedName2';
+    const String expectedName = 'expectedName';
     final expectedUser = TestUser(expectedName);
 
-    setUp(() async {
-      await testCollection.create(TestUser(unexpectedName1));
-      await testCollection.create(expectedUser);
-      await testCollection.create(TestUser(unexpectedName2));
-    });
+    group('without limit', () {
+      const String unexpectedName1 = 'unexpectedName1',
+          unexpectedName2 = 'unexpectedName2';
 
-    test('should return a subset of the existing list', () async {
-      final filteredList = await testCollection.where(
-        [Clause(TestUser.fieldName, isEqualTo: expectedName)],
-      );
-
-      expect(filteredList, [expectedUser]);
-    });
-
-    test('should return a subset based on multiple clauses', () async {
-      final filteredList = await testCollection.where(
-        [
-          Clause(TestUser.fieldName, isNotEqualTo: unexpectedName1),
-          Clause(TestUser.fieldName, isNotEqualTo: unexpectedName2),
-        ],
-      );
-
-      expect(filteredList, [expectedUser]);
-    });
-
-    test(
-      'should throw a $TooManyArgumentsException when more than one option is chosen',
-      () {
-        expect(
-          () async => await testCollection.where(
-            [
-              Clause(
-                TestUser.fieldName,
-                isNotEqualTo: unexpectedName1,
-                isEqualTo: expectedUser,
-              ),
-            ],
-          ),
-          throwsA(isA<TooManyArgumentsException>()),
+      setUp(() async {
+        await testCollection.create(TestUser(unexpectedName1));
+        await testCollection.create(expectedUser);
+        await testCollection.create(TestUser(unexpectedName2));
+      });
+      test('should return a subset of the existing list', () async {
+        final filteredList = await testCollection.where(
+          [Clause(TestUser.fieldName, isEqualTo: expectedName)],
         );
-      },
-    );
 
-    test('should throw when no clauses are given', () async {
-      expect(
-        () async => await testCollection.where([]),
-        throwsA(isA<MissingValueException>()),
+        expect(filteredList, [expectedUser]);
+      });
+
+      test('should return a subset based on multiple clauses', () async {
+        final filteredList = await testCollection.where(
+          [
+            Clause(TestUser.fieldName, isNotEqualTo: unexpectedName1),
+            Clause(TestUser.fieldName, isNotEqualTo: unexpectedName2),
+          ],
+        );
+
+        expect(filteredList, [expectedUser]);
+      });
+
+      test(
+        'should throw a $TooManyArgumentsException when more than one option is chosen',
+        () {
+          expect(
+            () async => await testCollection.where(
+              [
+                Clause(
+                  TestUser.fieldName,
+                  isNotEqualTo: unexpectedName1,
+                  isEqualTo: expectedUser,
+                ),
+              ],
+            ),
+            throwsA(isA<TooManyArgumentsException>()),
+          );
+        },
       );
+
+      test('should throw when no clauses are given', () async {
+        expect(
+          () async => await testCollection.where([]),
+          throwsA(isA<MissingValueException>()),
+        );
+      });
+    });
+
+    group('with limit', () {
+      test('should set the max value of items to return', () async {
+        await testCollection.create(expectedUser);
+        await testCollection.create(expectedUser);
+
+        final filteredList = await testCollection.where(
+          [Clause(TestUser.fieldName, isEqualTo: expectedName)],
+          limit: 1,
+        );
+
+        expect(filteredList, [expectedUser]);
+      });
     });
   });
 }
