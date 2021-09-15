@@ -6,9 +6,9 @@ abstract class FirefuelCollection<T extends Serializable>
     implements Collection<T> {
   final String path;
 
-  FirefuelCollection(this.path);
-
   final firestore = Firefuel.firestore;
+
+  FirefuelCollection(this.path);
 
   @override
   CollectionReference<T?> get ref {
@@ -56,6 +56,13 @@ abstract class FirefuelCollection<T extends Serializable>
   );
 
   @override
+  Future<List<T>> limit(int limit) async {
+    final snapshot = await ref.limit(limit).get();
+
+    return snapshot.docs.toListT();
+  }
+
+  @override
   Stream<T?> listen(DocumentId docId) {
     return ref.doc(docId.docId).snapshots().toMaybeT();
   }
@@ -63,6 +70,11 @@ abstract class FirefuelCollection<T extends Serializable>
   @override
   Stream<List<T>> listenAll() {
     return ref.snapshots().toListT();
+  }
+
+  @override
+  Stream<List<T>> listenLimited(int limit) {
+    return ref.limit(limit).snapshots().toListT();
   }
 
   Stream<List<T>> listenWhere(Iterable<Clause> clauses, {int? limit}) {

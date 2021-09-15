@@ -21,6 +21,17 @@ abstract class CollectionRead<R, T extends Serializable> {
   /// See: StreamBuilder
   Stream<R> listenAll();
 
+  /// Get up to the maximum number of documents specified by the [limit]
+  ///
+  /// Returns 0 to [limit]
+  Future<R> limit(int limit);
+
+  /// Get up to the maximum number of documents specified by the [limit]
+  ///
+  /// Refreshes automatically when new data is added/removed from the
+  /// collection
+  Stream<R> listenLimited(int limit);
+
   /// Get a list of documents matching all clauses
   ///
   /// throws a [MissingValueException] when no [Clause]s are given

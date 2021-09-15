@@ -27,6 +27,11 @@ abstract class FirefuelRepository<T extends Serializable>
   }
 
   @override
+  Future<Either<Failure, List<T>>> limit(int limit) {
+    return guard(() => _collection.limit(limit));
+  }
+
+  @override
   Stream<Either<Failure, T?>> listen(DocumentId docId) {
     return guardStream(() => _collection.listen(docId));
   }
@@ -34,6 +39,11 @@ abstract class FirefuelRepository<T extends Serializable>
   @override
   Stream<Either<Failure, List<T>>> listenAll() {
     return guardStream(() => _collection.listenAll());
+  }
+
+  @override
+  Stream<Either<Failure, List<T>>> listenLimited(int limit) {
+    return guardStream(() => _collection.listenLimited(limit));
   }
 
   @override
