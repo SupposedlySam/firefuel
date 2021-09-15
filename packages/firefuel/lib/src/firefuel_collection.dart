@@ -65,6 +65,7 @@ abstract class FirefuelCollection<T extends Serializable>
     return ref.snapshots().toListT();
   }
 
+  @override
   Stream<List<T>> listenWhere(Iterable<Clause> clauses) {
     return _queryFromClauses(clauses).snapshots().toListT();
   }
@@ -147,6 +148,7 @@ abstract class FirefuelCollection<T extends Serializable>
     return value;
   }
 
+  @override
   Future<List<T>> where(Iterable<Clause> clauses) async {
     final snapshot = await _queryFromClauses(clauses).get();
 
