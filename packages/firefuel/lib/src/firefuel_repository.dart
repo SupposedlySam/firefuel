@@ -65,6 +65,11 @@ abstract class FirefuelRepository<T extends Serializable>
   }
 
   @override
+  Future<Either<Failure, List<T>>> readAll() async {
+    return guard(() => _collection.readAll());
+  }
+
+  @override
   Future<Either<Failure, T>> readOrCreate({
     required DocumentId docId,
     required T createValue,

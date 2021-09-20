@@ -135,6 +135,13 @@ abstract class FirefuelCollection<T extends Serializable>
   }
 
   @override
+  Future<List<T>> readAll() async {
+    final snapshot = await ref.get();
+
+    return snapshot.docs.toListT();
+  }
+
+  @override
   Future<T> readOrCreate({
     required DocumentId docId,
     required T createValue,
