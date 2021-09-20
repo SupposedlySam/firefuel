@@ -48,6 +48,9 @@ abstract class CollectionRead<R, T extends Serializable> {
   ///
   /// throws a [MissingValueException] when no [Clause]s are given
   Stream<R> listenWhere(List<Clause> clauses, {int? limit});
+
+  /// Gets a list of all documents from the collection as a list
+  Future<R> readAll();
 }
 
 /// Get a number of Documents from the Collection
