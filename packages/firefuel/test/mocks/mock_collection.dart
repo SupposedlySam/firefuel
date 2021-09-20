@@ -21,6 +21,7 @@ extension MockCollectionX<T extends Serializable> on MockCollection<T> {
     Stream<List<T>> Function()? onListenWhere,
     Chunk<T> Function()? onPaginate,
     T? Function()? onRead,
+    List<T>? Function()? onReadAll,
     T Function()? onReadOrCreate,
     Null Function()? onReplace,
     Null Function()? onReplaceFields,
@@ -79,6 +80,10 @@ extension MockCollectionX<T extends Serializable> on MockCollection<T> {
 
     if (onRead != null) {
       when(() => read(any())).thenAnswer((_) => Future.value(onRead()));
+    }
+
+    if (onReadAll != null) {
+      when(() => readAll()).thenAnswer((_) => Future.value(onReadAll()));
     }
 
     if (onReadOrCreate != null) {

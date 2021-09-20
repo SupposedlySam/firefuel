@@ -405,6 +405,29 @@ void main() {
     });
   });
 
+  group('#readAll', () {
+    final expectedUser1 = TestUser('expectedUser');
+    final expectedUser2 = TestUser('expectedUser');
+    final expectedUser3 = TestUser('expectedUser');
+    final userList = [expectedUser1, expectedUser2, expectedUser3];
+
+    test('should return all items', () async {
+      await testCollection.create(expectedUser1);
+      await testCollection.create(expectedUser2);
+      await testCollection.create(expectedUser3);
+
+      final readResult = await testCollection.readAll();
+
+      expect(readResult, userList);
+    });
+
+    test('should return emtpy list when no items in collection', () async {
+      final readResult = await testCollection.readAll();
+
+      expect(readResult, []);
+    });
+  });
+
   group('#readOrCreate', () {
     final documentId = DocumentId('testName');
 
