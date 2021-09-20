@@ -49,7 +49,14 @@ abstract class CollectionRead<R, T extends Serializable> {
   /// throws a [MissingValueException] when no [Clause]s are given
   Stream<R> listenWhere(List<Clause> clauses, {int? limit});
 
-  /// Gets a list of all documents from the collection as a list
+  /// Gets all documents from the collection
+  ///
+  /// Does NOT refresh automatically
+  ///
+  /// Related: [listenAll]
+  ///
+  /// {@macro firefuel.rules.subclasses}
+  /// {@macro firefuel.rules.implementations}
   Future<R> readAll();
 }
 
