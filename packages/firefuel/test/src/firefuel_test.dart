@@ -39,7 +39,7 @@ void main() {
 
       Firefuel.initialize(firestore, env: env);
 
-      expect(Firefuel.env.startsWith(env), isTrue);
+      expect(Firefuel.env, startsWith(env));
     });
 
     test('should return prefix with "-" when provided', () {
@@ -50,7 +50,7 @@ void main() {
         env: env,
       );
 
-      expect(Firefuel.env, equals('$env-'));
+      expect(Firefuel.env, '$env-');
     });
   });
 }
