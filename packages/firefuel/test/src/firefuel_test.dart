@@ -45,10 +45,7 @@ void main() {
     test('should return prefix with "-" when provided', () {
       const env = 'test';
 
-      Firefuel.initialize(
-        FakeFirebaseFirestore(),
-        env: env,
-      );
+      Firefuel.initialize(firestore, env: env);
 
       expect(Firefuel.env, '$env-');
     });
