@@ -47,7 +47,7 @@ void main() {
         env: env,
       );
 
-      expect(Firefuel.env, equals('$env-'));
+      expect(Firefuel.env, '$env-');
     });
   });
 }
