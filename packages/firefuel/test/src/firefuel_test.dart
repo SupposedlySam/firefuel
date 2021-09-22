@@ -17,37 +17,37 @@ void main() {
     });
   });
 
-  group('#collectionPrefix', () {
+  group('#env', () {
     test('should return an empty string when not initialized', () {
-      expect(Firefuel.collectionPrefix, isEmpty);
+      expect(Firefuel.env, isEmpty);
     });
 
     test('should return an empty string when not provided', () {
       Firefuel.initialize(FakeFirebaseFirestore());
 
-      expect(Firefuel.collectionPrefix, isEmpty);
+      expect(Firefuel.env, isEmpty);
     });
 
     test('should return string starting with prefix when provided', () {
-      const collectionPrefix = 'test';
+      const env = 'test';
 
       Firefuel.initialize(
         FakeFirebaseFirestore(),
-        collectionPrefix: collectionPrefix,
+        env: env,
       );
 
-      expect(Firefuel.collectionPrefix.startsWith(collectionPrefix), isTrue);
+      expect(Firefuel.env.startsWith(env), isTrue);
     });
 
     test('should return prefix with "-" when provided', () {
-      const collectionPrefix = 'test';
+      const env = 'test';
 
       Firefuel.initialize(
         FakeFirebaseFirestore(),
-        collectionPrefix: collectionPrefix,
+        env: env,
       );
 
-      expect(Firefuel.collectionPrefix, equals('$collectionPrefix-'));
+      expect(Firefuel.env, equals('$env-'));
     });
   });
 }

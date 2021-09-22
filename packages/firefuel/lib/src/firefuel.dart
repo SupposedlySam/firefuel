@@ -10,12 +10,12 @@ class Firefuel {
 
   static FirebaseFirestore? _firestore;
 
-  static String get collectionPrefix {
-    if (_collectionPrefix == null) return '';
-    return '$_collectionPrefix-';
+  static String get env {
+    if (_env == null) return '';
+    return '$_env-';
   }
 
-  static String? _collectionPrefix;
+  static String? _env;
 
   /// Initializes Firefuel with instance of [FirebaseFirestore]
   ///
@@ -25,14 +25,14 @@ class Firefuel {
   ///
   /// ---
   ///
-  /// [collectionPrefix] is optional and will be prepended to all collection names
+  /// [env] is optional and will be prepended to all collection names
   ///
   /// Useful for separating collections between app flavors / environments
   static void initialize(
     FirebaseFirestore firestore, {
-    String? collectionPrefix,
+    String? env,
   }) {
     _firestore = firestore;
-    _collectionPrefix = collectionPrefix;
+    _env = env;
   }
 }
