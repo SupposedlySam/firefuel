@@ -8,8 +8,8 @@ abstract class FirefuelCollection<T extends Serializable>
 
   final firestore = Firefuel.firestore;
 
-  FirefuelCollection(String path)
-      : this.path = '${Firefuel.collectionPrefix}$path';
+  FirefuelCollection(String path, {bool useEnv = true})
+      : this.path = '${useEnv ? Firefuel.env : ''}$path';
 
   @override
   CollectionReference<T?> get ref {
