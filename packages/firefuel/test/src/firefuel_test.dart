@@ -18,12 +18,18 @@ void main() {
   });
 
   group('#env', () {
+    late FakeFirebaseFirestore firestore;
+
+    setUp(() {
+      firestore = FakeFirebaseFirestore();
+    });
+
     test('should return an empty string when not initialized', () {
       expect(Firefuel.env, isEmpty);
     });
 
     test('should return an empty string when not provided', () {
-      Firefuel.initialize(FakeFirebaseFirestore());
+      Firefuel.initialize(firestore);
 
       expect(Firefuel.env, isEmpty);
     });
@@ -31,10 +37,7 @@ void main() {
     test('should return string starting with prefix when provided', () {
       const env = 'test';
 
-      Firefuel.initialize(
-        FakeFirebaseFirestore(),
-        env: env,
-      );
+      Firefuel.initialize(firestore, env: env);
 
       expect(Firefuel.env.startsWith(env), isTrue);
     });
