@@ -16,4 +16,38 @@ void main() {
       expect(Firefuel.firestore, isA<FirebaseFirestore>());
     });
   });
+
+  group('#collectionPrefix', () {
+    test('should return an empty string when not initialized', () {
+      expect(Firefuel.collectionPrefix, isEmpty);
+    });
+
+    test('should return an empty string when not provided', () {
+      Firefuel.initialize(FakeFirebaseFirestore());
+
+      expect(Firefuel.collectionPrefix, isEmpty);
+    });
+
+    test('should return string starting with prefix when provided', () {
+      const collectionPrefix = 'test';
+
+      Firefuel.initialize(
+        FakeFirebaseFirestore(),
+        collectionPrefix: collectionPrefix,
+      );
+
+      expect(Firefuel.collectionPrefix.startsWith(collectionPrefix), isTrue);
+    });
+
+    test('should return prefix with "-" when provided', () {
+      const collectionPrefix = 'test';
+
+      Firefuel.initialize(
+        FakeFirebaseFirestore(),
+        collectionPrefix: collectionPrefix,
+      );
+
+      expect(Firefuel.collectionPrefix, equals('$collectionPrefix-'));
+    });
+  });
 }
