@@ -9,12 +9,12 @@ class Chunk<T> {
   final DocumentSnapshot<T?>? cursor;
   final List<T> data;
   final int limit;
-  final String orderByField;
+  final List<OrderBy>? orderBy;
   final List<Clause>? clauses;
   final ChunkStatus status;
 
   Chunk({
-    required this.orderByField,
+    required this.orderBy,
     this.clauses,
     this.limit = defaultLimit,
   })  : data = [],
@@ -24,7 +24,7 @@ class Chunk<T> {
   Chunk.next({
     required this.data,
     required this.cursor,
-    required this.orderByField,
+    required this.orderBy,
     this.clauses,
     this.limit = defaultLimit,
   }) : status = ChunkStatus.nextAvailable;
@@ -32,7 +32,7 @@ class Chunk<T> {
   Chunk.last({
     required this.data,
     required this.cursor,
-    required this.orderByField,
+    required this.orderBy,
     this.clauses,
     this.limit = defaultLimit,
   }) : status = ChunkStatus.last;
