@@ -54,15 +54,16 @@ void main() {
     });
   });
 
-  group('#orderIfNotNull', () {
+  group('#sortIfNotNull', () {
     test('should return the original query when null', () {
-      final result = ref.orderIfNotNull(null);
+      final result = ref.sortIfNotNull(null);
 
       expect(identityHashCode(result), identityHashCode(ref));
     });
 
     test('should return a new query when not null', () async {
-      final result = ref.orderIfNotNull(TestUser.fieldName);
+      final result =
+          ref.sortIfNotNull([OrderBy.string(field: TestUser.fieldName)]);
 
       expect(identityHashCode(result), isNot(identityHashCode(ref)));
     });
