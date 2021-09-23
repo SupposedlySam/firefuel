@@ -78,11 +78,25 @@ abstract class FirefuelCollection<T extends Serializable>
   }
 
   @override
-  Stream<List<T>> listenWhere(List<Clause> clauses, {int? limit}) {
-    final filteredQuery = _queryFromClauses(clauses);
-    final query = limit == null ? filteredQuery : filteredQuery.limit(limit);
+  Stream<List<T>> listenWhere(
+    List<Clause> clauses, {
+    List<OrderBy>? orderBy,
+    int? limit,
+  }) {
+    final allOrderBy = _ensureFirstWhereAndOrderBy(clauses, orderBy);
+
+    final query =
+        ref.filter(clauses).sortIfNotNull(allOrderBy).limitIfNotNull(limit);
 
     return query.snapshots().toListT();
+  }
+
+  @override
+  Future<List<T>> orderBy(List<OrderBy> orderBy, {int? limit}) async {
+    final orderedQuery = ref.sort(orderBy);
+    final query = limit == null ? orderedQuery : orderedQuery.limit(limit);
+
+    return (await query.get()).docs.toListT();
   }
 
   @override
@@ -99,12 +113,12 @@ abstract class FirefuelCollection<T extends Serializable>
         ? Chunk<T>.next(
             data: data,
             cursor: cursor,
-            orderByField: chunk.orderByField,
+            orderBy: chunk.orderBy,
           )
         : Chunk<T>.last(
             data: data,
             cursor: cursor,
-            orderByField: chunk.orderByField,
+            orderBy: chunk.orderBy,
           );
   }
 
@@ -115,17 +129,11 @@ abstract class FirefuelCollection<T extends Serializable>
   Future<QuerySnapshot<T?>> _buildPaginationSnapshot(Chunk<T> chunk) async {
     var query = ref
         .filterIfNotNull(chunk.clauses)
-        .orderIfNotNull(chunk.orderByField)
+        .sortIfNotNull(chunk.orderBy)
         .startAfterIfNotNull(chunk.cursor)
         .limitIfNotNull(chunk.limit);
 
     return query.get();
-  }
-
-  Query<T?> filterRef(Chunk<T> chunk, List<Clause>? clauses) {
-    if (clauses == null) return ref;
-
-    return _queryFromClauses(chunk.clauses!);
   }
 
   @override
@@ -214,31 +222,43 @@ abstract class FirefuelCollection<T extends Serializable>
   }
 
   @override
-  Future<List<T>> where(List<Clause> clauses, {int? limit}) async {
-    final filteredQuery = _queryFromClauses(clauses);
-    final query = limit == null ? filteredQuery : filteredQuery.limit(limit);
+  Future<List<T>> where(
+    List<Clause> clauses, {
+    List<OrderBy>? orderBy,
+    int? limit,
+  }) async {
+    final allOrderBy = _ensureFirstWhereAndOrderBy(clauses, orderBy);
+
+    final query =
+        ref.filter(clauses).sortIfNotNull(allOrderBy).limitIfNotNull(limit);
+
     final snapshot = await query.get();
 
     return snapshot.docs.toListT();
   }
 
-  Query<T?> _queryFromClauses(List<Clause> clauses) {
-    if (clauses.isEmpty) throw MissingValueException(Clause);
+  Query<T?> _queryFromOrderBy(List<OrderBy> orderBy, {Query<T?>? query}) {
+    if (orderBy.isEmpty) throw MissingValueException(OrderBy);
 
-    return clauses.fold(ref, (result, clause) {
-      return result.where(
-        clause.field,
-        isEqualTo: clause.isEqualTo,
-        isNotEqualTo: clause.isNotEqualTo,
-        isLessThan: clause.isLessThan,
-        isLessThanOrEqualTo: clause.isLessThanOrEqualTo,
-        isGreaterThan: clause.isGreaterThan,
-        isGreaterThanOrEqualTo: clause.isGreaterThanOrEqualTo,
-        arrayContains: clause.arrayContains,
-        whereIn: clause.whereIn,
-        whereNotIn: clause.whereNotIn,
-        isNull: clause.isNull,
+    return orderBy.fold(query ?? ref, (result, orderBy) {
+      return result.orderBy(
+        orderBy.path,
+        descending: orderBy.direction == OrderDirection.desc,
       );
     });
+  }
+
+  List<OrderBy>? _ensureFirstWhereAndOrderBy(
+      List<Clause> clauses, List<OrderBy>? orderBy) {
+    final firstOrder = OrderBy.fromFieldPath(
+      path: clauses.first.field,
+      direction: OrderDirection.asc,
+    );
+
+    final requiresFirstOrderByFromWhere = orderBy != null &&
+        orderBy.isNotEmpty &&
+        orderBy.first.path != firstOrder.path;
+
+    return requiresFirstOrderByFromWhere ? [firstOrder, ...orderBy!] : orderBy;
   }
 }
