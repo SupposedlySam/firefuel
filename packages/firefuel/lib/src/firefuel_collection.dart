@@ -79,7 +79,7 @@ abstract class FirefuelCollection<T extends Serializable>
 
   @override
   Stream<List<T>> listenOrdered(List<OrderBy> orderBy) {
-    return ref.orderBy(orderBy).snapshots().toListT();
+    return ref.sort(orderBy).snapshots().toListT();
   }
 
   @override
