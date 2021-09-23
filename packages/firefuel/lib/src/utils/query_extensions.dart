@@ -2,12 +2,14 @@ import 'package:firefuel/firefuel.dart';
 
 extension QueryX<T> on Query<T?> {
   Query<T?> filterIfNotNull(List<Clause>? clauses) {
-    if (clauses?.isEmpty ?? true) return this;
+    if (clauses == null) return this;
 
-    return filter(clauses!);
+    return filter(clauses);
   }
 
   Query<T?> filter(List<Clause> clauses) {
+    if (clauses.isEmpty) return this;
+
     return clauses.fold(this, (result, clause) {
       return result.where(
         clause.field,
@@ -32,12 +34,14 @@ extension QueryX<T> on Query<T?> {
   }
 
   Query<T?> sortIfNotNull(List<OrderBy>? orderBy) {
-    if (orderBy?.isEmpty ?? true) throw MissingValueException(OrderBy);
+    if (orderBy == null) return this;
 
-    return sort(orderBy!);
+    return sort(orderBy);
   }
 
   Query<T?> sort(List<OrderBy> orderBy) {
+    if (orderBy.isEmpty) return this;
+
     return orderBy.fold(this, (result, orderBy) {
       return result.orderBy(
         orderBy.path,

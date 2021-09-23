@@ -37,6 +37,22 @@ void main() {
     });
   });
 
+  group('#filter', () {
+    test('should return the original query when empty', () {
+      final result = ref.filter([]);
+
+      expect(identityHashCode(result), identityHashCode(ref));
+    });
+
+    test('should return a new query', () {
+      final result = ref.filter(
+        [Clause(TestUser.fieldName, isEqualTo: 'testUser')],
+      );
+
+      expect(identityHashCode(result), isNot(identityHashCode(ref)));
+    });
+  });
+
   group('#startAfterIfNotNull', () {
     test('should return the original query when null', () {
       final result = ref.startAfterIfNotNull(null);
@@ -61,9 +77,29 @@ void main() {
       expect(identityHashCode(result), identityHashCode(ref));
     });
 
+    test('should return the original query when empty', () {
+      final result = ref.sortIfNotNull([]);
+
+      expect(identityHashCode(result), identityHashCode(ref));
+    });
+
     test('should return a new query when not null', () async {
       final result =
           ref.sortIfNotNull([OrderBy.string(field: TestUser.fieldName)]);
+
+      expect(identityHashCode(result), isNot(identityHashCode(ref)));
+    });
+  });
+
+  group('#sort', () {
+    test('should return the original query when empty', () {
+      final result = ref.filterIfNotNull([]);
+
+      expect(identityHashCode(result), identityHashCode(ref));
+    });
+
+    test('should return a new query', () {
+      final result = ref.sort([OrderBy.string(field: TestUser.fieldName)]);
 
       expect(identityHashCode(result), isNot(identityHashCode(ref)));
     });
@@ -76,7 +112,7 @@ void main() {
       expect(identityHashCode(result), identityHashCode(ref));
     });
 
-    test('should return a new query when not null', () async {
+    test('should return a new query when not null', () {
       final result = ref.limitIfNotNull(10);
 
       expect(identityHashCode(result), isNot(identityHashCode(ref)));
