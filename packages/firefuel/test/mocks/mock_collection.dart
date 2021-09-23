@@ -18,6 +18,7 @@ extension MockCollectionX<T extends Serializable> on MockCollection<T> {
     Stream<T?> Function()? onListen,
     Stream<List<T>> Function()? onListenAll,
     Stream<List<T>> Function()? onListenLimited,
+    Stream<List<T>> Function()? onListenOrdered,
     Stream<List<T>> Function()? onListenWhere,
     List<T> Function()? onOrderBy,
     Chunk<T> Function()? onPaginate,
@@ -69,6 +70,10 @@ extension MockCollectionX<T extends Serializable> on MockCollection<T> {
 
     if (onListenLimited != null) {
       when(() => listenLimited(any())).thenAnswer((_) => onListenLimited());
+    }
+
+    if (onListenOrdered != null) {
+      when(() => listenOrdered(any())).thenAnswer((_) => onListenOrdered());
     }
 
     if (onListenWhere != null) {

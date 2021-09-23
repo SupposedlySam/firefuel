@@ -112,6 +112,23 @@ void main() {
   );
 
   RepositoryTestUtil.runStreamTests<List<TestUser>, TestUser>(
+    methodName: 'listenOrdered',
+    mockCollection: MockCollection(),
+    initHappyPath: (mockCollection) async {
+      mockCollection.initialize(
+        onListenOrdered: () => Stream.fromIterable([
+          [TestUser('streamUser')]
+        ]),
+      );
+    },
+    initSadPath: (mockCollection) async {
+      mockCollection.initialize(onListenOrdered: () => throw ExpectedFailure());
+    },
+    streamCallback: (testRepository) =>
+        testRepository.listenOrdered([OrderBy(field: TestUser.fieldName)]),
+  );
+
+  RepositoryTestUtil.runStreamTests<List<TestUser>, TestUser>(
     methodName: 'listenWhere(limit:null)',
     mockCollection: MockCollection(),
     initHappyPath: (mockCollection) async {

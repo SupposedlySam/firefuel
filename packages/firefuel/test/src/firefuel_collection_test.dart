@@ -237,6 +237,44 @@ void main() {
     );
   });
 
+  group('#listenOrdered', () {
+    late Stream<List<TestUser>> stream;
+    late DocumentId docId;
+    final newUser1 = TestUser('newUser1');
+    final newUser2 = TestUser('newUser2');
+
+    setUp(() async {
+      docId = await testCollection.create(defaultUser);
+      await testCollection.create(newUser1);
+
+      stream =
+          testCollection.listenOrdered([OrderBy(field: TestUser.fieldName)]);
+    });
+
+    test('should update when an item is added', () async {
+      expect(
+        stream,
+        emitsInOrder([
+          [defaultUser, newUser1],
+          [defaultUser, newUser1, newUser2],
+        ]),
+      );
+
+      await testCollection.create(newUser2);
+    });
+
+    test('should update when an item is deleted', () async {
+      expect(
+        stream,
+        emitsInOrder([
+          [newUser1],
+        ]),
+      );
+
+      await testCollection.delete(docId);
+    });
+  });
+
   group('#listenWhere', () {
     const String expectedName = 'expectedName';
     final expectedUser = TestUser(expectedName);
