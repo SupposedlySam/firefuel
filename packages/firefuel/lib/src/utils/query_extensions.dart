@@ -44,7 +44,7 @@ extension QueryX<T> on Query<T?> {
 
     return orderBy.fold(this, (result, orderBy) {
       return result.orderBy(
-        orderBy.path,
+        orderBy.field,
         descending: orderBy.direction == OrderDirection.desc,
       );
     });
