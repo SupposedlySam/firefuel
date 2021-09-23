@@ -170,7 +170,11 @@ void main() {
     mockCollection: MockCollection(),
     initHappyPath: (mockCollection) async {
       mockCollection.initialize(onPaginate: () {
-        return Chunk<TestUser>(orderByField: TestUser.fieldName);
+        return Chunk<TestUser>(orderBy: [
+          OrderBy.string(
+            field: TestUser.fieldName,
+          )
+        ]);
       });
     },
     initSadPath: (mockCollection) async {
@@ -178,7 +182,11 @@ void main() {
     },
     methodCallback: (testRepository) {
       return testRepository.paginate(
-        Chunk<TestUser>(orderByField: TestUser.fieldName),
+        Chunk<TestUser>(orderBy: [
+          OrderBy.string(
+            field: TestUser.fieldName,
+          )
+        ]),
       );
     },
   );

@@ -31,7 +31,11 @@ extension MockCollectionX<T extends Serializable> on MockCollection<T> {
   }) {
     registerFallbackValue(DocumentId('fallbackValue'));
     registerFallbackValue<Serializable>(TestUser('fallbackValue'));
-    registerFallbackValue(Chunk<TestUser>(orderByField: TestUser.fieldName));
+    registerFallbackValue(Chunk<TestUser>(orderBy: [
+      OrderBy.string(
+        field: TestUser.fieldName,
+      )
+    ]));
 
     if (onCreate != null) {
       when(() => create(any())).thenAnswer((_) => Future.value(onCreate()));
