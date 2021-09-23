@@ -89,35 +89,4 @@ void main() {
       expect(instance.direction, OrderDirection.desc);
     });
   });
-
-  group('$OrderBy.fromFieldPath', () {
-    final testFieldPath = FieldPath.fromString(testField);
-
-    test('should set direction to asc when asc is chosen', () {
-      final instance = OrderBy.fromFieldPath(
-        path: testFieldPath,
-        direction: OrderDirection.asc,
-      );
-
-      expect(instance.direction, OrderDirection.asc);
-    });
-
-    test('should set direction to desc when desc is chosen', () {
-      final instance = OrderBy.fromFieldPath(
-        path: testFieldPath,
-        direction: OrderDirection.desc,
-      );
-
-      expect(instance.direction, OrderDirection.desc);
-    });
-  });
-
-  test('should allow dot notation for field', () {
-    const pathSegments = ['some', 'nested', 'field'];
-    final instance = OrderBy.fromFieldPath(
-      path: FieldPath.fromString(pathSegments.join('.')),
-    );
-
-    expect(pathSegments, instance.path.components);
-  });
 }
