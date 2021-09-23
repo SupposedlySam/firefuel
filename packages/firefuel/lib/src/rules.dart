@@ -34,20 +34,24 @@ abstract class CollectionRead<R, T extends Serializable> {
 
   /// Get a list of documents matching all clauses
   ///
-  /// limit: optionally provide a maximum value of items to be returned
-  ///
-  /// throws a [MissingValueException] when no [Clause]s are given
-  Future<R> where(List<Clause> clauses, {int? limit});
-
-  /// Get a list of documents matching all clauses
-  ///
   /// Refreshes automatically when new matching data is added/removed from the
   /// collection
   ///
+  /// orderBy: optionally provide a list of [OrderBy] to order the results
+  ///
   /// limit: optionally provide a maximum value of items to be returned
   ///
   /// throws a [MissingValueException] when no [Clause]s are given
-  Stream<R> listenWhere(List<Clause> clauses, {int? limit});
+  Stream<R> listenWhere(
+    List<Clause> clauses, {
+    List<OrderBy>? orderBy,
+    int? limit,
+  });
+
+  /// Get a list of documents from the collection as a list ordered by the [orderBy]
+  ///
+  /// limit: optionally provide a maximum value of items to be returned
+  Future<R> orderBy(List<OrderBy> orderBy, {int? limit});
 
   /// Gets all documents from the collection
   ///
@@ -58,6 +62,15 @@ abstract class CollectionRead<R, T extends Serializable> {
   /// {@macro firefuel.rules.subclasses}
   /// {@macro firefuel.rules.implementations}
   Future<R> readAll();
+
+  /// Get a list of documents matching all clauses
+  ///
+  /// orderBy: optionally provide a list of [OrderBy] to order the results
+  ///
+  /// limit: optionally provide a maximum value of items to be returned
+  ///
+  /// throws a [MissingValueException] when no [Clause]s are given
+  Future<R> where(List<Clause> clauses, {List<OrderBy>? orderBy, int? limit});
 }
 
 /// Get a number of Documents from the Collection
