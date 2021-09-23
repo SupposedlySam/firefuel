@@ -83,6 +83,8 @@ abstract class FirefuelCollection<T extends Serializable>
     List<OrderBy>? orderBy,
     int? limit,
   }) {
+    if (clauses.isEmpty) throw MissingValueException(Clause);
+
     final allOrderBy = _ensureFirstWhereAndOrderBy(clauses, orderBy);
 
     final query =
@@ -93,6 +95,8 @@ abstract class FirefuelCollection<T extends Serializable>
 
   @override
   Future<List<T>> orderBy(List<OrderBy> orderBy, {int? limit}) async {
+    if (orderBy.isEmpty) throw MissingValueException(OrderBy);
+
     final orderedQuery = ref.sort(orderBy);
     final query = limit == null ? orderedQuery : orderedQuery.limit(limit);
 
@@ -227,6 +231,8 @@ abstract class FirefuelCollection<T extends Serializable>
     List<OrderBy>? orderBy,
     int? limit,
   }) async {
+    if (clauses.isEmpty) throw MissingValueException(Clause);
+
     final allOrderBy = _ensureFirstWhereAndOrderBy(clauses, orderBy);
 
     final query =
@@ -238,7 +244,9 @@ abstract class FirefuelCollection<T extends Serializable>
   }
 
   List<OrderBy>? _ensureFirstWhereAndOrderBy(
-      List<Clause> clauses, List<OrderBy>? orderBy) {
+    List<Clause> clauses,
+    List<OrderBy>? orderBy,
+  ) {
     final firstOrder = OrderBy.fromFieldPath(
       path: clauses.first.field,
       direction: OrderDirection.asc,
