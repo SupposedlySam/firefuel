@@ -61,8 +61,10 @@ abstract class FirefuelRepository<T extends Serializable>
   }
 
   @override
-  Future<Either<Failure, List<T>>> orderBy(List<OrderBy> orderBy,
-      {int? limit}) {
+  Future<Either<Failure, List<T>>> orderBy(
+    List<OrderBy> orderBy, {
+    int? limit,
+  }) {
     return guard(() => _collection.orderBy(orderBy, limit: limit));
   }
 
