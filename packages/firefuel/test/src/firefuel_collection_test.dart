@@ -375,7 +375,7 @@ void main() {
       expect(usersResult, [testUser1, testUser2, testUser3]);
     });
 
-    test('should return list users in desc order by name', () async {
+    test('should return results in descending order', () async {
       final usersResult = await testCollection.orderBy([
         OrderBy.string(field: TestUser.fieldName, orderBy: OrderByString.zToA)
       ]);
