@@ -11,6 +11,8 @@ class OrderBy {
   final String field;
   final OrderDirection direction;
 
+  const OrderBy({required this.field, this.direction = OrderDirection.asc});
+
   OrderBy.date({
     required this.field,
     OrderByDate orderBy = OrderByDate.newestToOldest,
