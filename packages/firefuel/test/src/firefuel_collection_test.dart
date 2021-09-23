@@ -240,23 +240,35 @@ void main() {
   group('#listenOrdered', () {
     late Stream<List<TestUser>> stream;
     late DocumentId docId;
-    final newUser1 = TestUser('newUser1');
-    final newUser2 = TestUser('newUser2');
+    final newUser1 = TestUser('Alfred');
+    final newUser2 = TestUser('Batman');
+    final newUser3 = TestUser('Catwoman');
 
     setUp(() async {
-      docId = await testCollection.create(defaultUser);
-      await testCollection.create(newUser1);
+      docId = await testCollection.create(newUser1);
+      await testCollection.create(newUser3);
 
       stream =
           testCollection.listenOrdered([OrderBy(field: TestUser.fieldName)]);
+    });
+
+    test('should return an ordered list', () async {
+      await testCollection.create(newUser2);
+
+      expect(
+        stream,
+        emitsInOrder([
+          [newUser1, newUser2, newUser3],
+        ]),
+      );
     });
 
     test('should update when an item is added', () async {
       expect(
         stream,
         emitsInOrder([
-          [defaultUser, newUser1],
-          [defaultUser, newUser1, newUser2],
+          [newUser1, newUser3],
+          [newUser1, newUser2, newUser3],
         ]),
       );
 
@@ -267,7 +279,7 @@ void main() {
       expect(
         stream,
         emitsInOrder([
-          [newUser1],
+          [newUser3],
         ]),
       );
 
