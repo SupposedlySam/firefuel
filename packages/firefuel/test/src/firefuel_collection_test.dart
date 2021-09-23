@@ -367,7 +367,7 @@ void main() {
       );
     });
 
-    test('should return list users in asc order by name', () async {
+    test('should return results in ascending order', () async {
       final usersResult = await testCollection.orderBy([
         OrderBy.string(field: TestUser.fieldName, orderBy: OrderByString.aToZ)
       ]);
