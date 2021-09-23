@@ -47,6 +47,11 @@ abstract class FirefuelRepository<T extends Serializable>
   }
 
   @override
+  Stream<Either<Failure, List<T>>> listenOrdered(List<OrderBy> orderBy) {
+    return guardStream(() => _collection.listenOrdered(orderBy));
+  }
+
+  @override
   Stream<Either<Failure, List<T>>> listenWhere(
     List<Clause> clauses, {
     List<OrderBy>? orderBy,

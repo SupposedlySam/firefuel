@@ -32,6 +32,14 @@ abstract class CollectionRead<R, T extends Serializable> {
   /// collection
   Stream<R> listenLimited(int limit);
 
+  /// Get a list of all documents from the collection sorted by [orderBy]
+  ///
+  /// Refreshes automatically when new data is added/removed from the
+  /// collection
+  ///
+  /// throws a [MissingValueException] when no [orderBy]s are given
+  Stream<R> listenOrdered(List<OrderBy> orderBy);
+
   /// Get a list of documents matching all clauses
   ///
   /// Refreshes automatically when new matching data is added/removed from the
@@ -51,6 +59,8 @@ abstract class CollectionRead<R, T extends Serializable> {
   /// Get a list of documents from the collection as a list ordered by the [orderBy]
   ///
   /// limit: optionally provide a maximum value of items to be returned
+  ///
+  /// throws a [MissingValueException] when no [orderBy]s are given
   Future<R> orderBy(List<OrderBy> orderBy, {int? limit});
 
   /// Gets all documents from the collection

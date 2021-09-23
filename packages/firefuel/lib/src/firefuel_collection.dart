@@ -78,6 +78,11 @@ abstract class FirefuelCollection<T extends Serializable>
   }
 
   @override
+  Stream<List<T>> listenOrdered(List<OrderBy> orderBy) {
+    return ref.orderBy(orderBy).snapshots().toListT();
+  }
+
+  @override
   Stream<List<T>> listenWhere(
     List<Clause> clauses, {
     List<OrderBy>? orderBy,
