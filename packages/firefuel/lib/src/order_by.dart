@@ -50,25 +50,13 @@ class OrderBy {
 
 enum OrderDirection { asc, desc }
 
-enum OrderByString {
-  aToZ,
-  zToA,
-}
+enum OrderByString { aToZ, zToA }
 
-enum OrderByNum {
-  smallestToLargest,
-  largestToSmallest,
-}
+enum OrderByNum { smallestToLargest, largestToSmallest }
 
-enum OrderByDate {
-  newestToOldest,
-  oldestToNewest,
-}
+enum OrderByDate { newestToOldest, oldestToNewest }
 
-enum OrderByBool {
-  falseToTrue,
-  trueToFalse,
-}
+enum OrderByBool { falseToTrue, trueToFalse }
 
 extension on OrderByString {
   OrderDirection get direction {
