@@ -4,7 +4,11 @@ extension QueryX<T> on Query<T?> {
   Query<T?> filterIfNotNull(List<Clause>? clauses) {
     if (clauses?.isEmpty ?? true) return this;
 
-    return clauses!.fold(this, (result, clause) {
+    return filter(clauses!);
+  }
+
+  Query<T?> filter(List<Clause> clauses) {
+    return clauses.fold(this, (result, clause) {
       return result.where(
         clause.field,
         isEqualTo: clause.isEqualTo,
@@ -27,10 +31,19 @@ extension QueryX<T> on Query<T?> {
     return startAfterDocument(cursor);
   }
 
-  Query<T?> orderIfNotNull(String? field) {
-    if (field == null) return this;
+  Query<T?> sortIfNotNull(List<OrderBy>? orderBy) {
+    if (orderBy?.isEmpty ?? true) throw MissingValueException(OrderBy);
 
-    return orderBy(field);
+    return sort(orderBy!);
+  }
+
+  Query<T?> sort(List<OrderBy> orderBy) {
+    return orderBy.fold(this, (result, orderBy) {
+      return result.orderBy(
+        orderBy.path,
+        descending: orderBy.direction == OrderDirection.desc,
+      );
+    });
   }
 
   Query<T?> limitIfNotNull(int? limit) {
