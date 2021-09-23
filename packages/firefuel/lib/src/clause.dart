@@ -23,7 +23,7 @@ import 'package:firefuel/firefuel.dart';
 /// Clause(MyModel.fieldVehicle, isEqualTo: 'Mazda', isNotEqualTo: 'Honda');
 /// ```
 class Clause {
-  final FieldPath field;
+  final String field;
 
   final Object? isEqualTo;
   final Object? isNotEqualTo;
@@ -38,7 +38,7 @@ class Clause {
   final bool? isNull;
 
   Clause(
-    String field, {
+    this.field, {
     this.isEqualTo,
     this.isNotEqualTo,
     this.isLessThan,
@@ -50,7 +50,7 @@ class Clause {
     this.whereIn,
     this.whereNotIn,
     this.isNull,
-  }) : field = FieldPath.fromString(field) {
+  }) {
     _ensureSingleOptionChosen([
       isEqualTo,
       isNotEqualTo,

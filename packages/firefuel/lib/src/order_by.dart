@@ -1,8 +1,6 @@
-import 'package:firefuel/firefuel.dart';
-
 /// Creates a condition to order your collection
 ///
-/// [path] must be provided and is normally the string representation of the
+/// [field] must be provided and is normally the string representation of the
 /// field on your document to match against.
 ///
 /// It's recommended to store field names on your model so you can access them
@@ -10,37 +8,28 @@ import 'package:firefuel/firefuel.dart';
 /// serializing your Document into, and `field<YourField>` is the naming
 /// convention to follow (don't include the angle brackets).
 class OrderBy {
-  final FieldPath path;
+  final String field;
   final OrderDirection direction;
 
   OrderBy.date({
-    required String field,
+    required this.field,
     OrderByDate orderBy = OrderByDate.newestToOldest,
-  })  : direction = orderBy.direction,
-        path = FieldPath.fromString(field);
+  }) : direction = orderBy.direction;
 
   OrderBy.bool({
-    required String field,
+    required this.field,
     OrderByBool orderBy = OrderByBool.trueToFalse,
-  })  : direction = orderBy.direction,
-        path = FieldPath.fromString(field);
+  }) : direction = orderBy.direction;
 
   OrderBy.num({
-    required String field,
+    required this.field,
     OrderByNum orderBy = OrderByNum.smallestToLargest,
-  })  : direction = orderBy.direction,
-        path = FieldPath.fromString(field);
+  }) : direction = orderBy.direction;
 
   OrderBy.string({
-    required String field,
+    required this.field,
     OrderByString orderBy = OrderByString.aToZ,
-  })  : direction = orderBy.direction,
-        path = FieldPath.fromString(field);
-
-  OrderBy.fromFieldPath({
-    required this.path,
-    this.direction = OrderDirection.asc,
-  });
+  }) : direction = orderBy.direction;
 }
 
 enum OrderDirection { asc, desc }
