@@ -247,14 +247,11 @@ abstract class FirefuelCollection<T extends Serializable>
     List<Clause> clauses,
     List<OrderBy>? orderBy,
   ) {
-    final firstOrder = OrderBy.fromFieldPath(
-      path: clauses.first.field,
-      direction: OrderDirection.asc,
-    );
+    final firstOrder = OrderBy(field: clauses.first.field);
 
     final requiresFirstOrderByFromWhere = orderBy != null &&
         orderBy.isNotEmpty &&
-        orderBy.first.path != firstOrder.path;
+        orderBy.first.field != firstOrder.field;
 
     return requiresFirstOrderByFromWhere ? [firstOrder, ...orderBy!] : orderBy;
   }
