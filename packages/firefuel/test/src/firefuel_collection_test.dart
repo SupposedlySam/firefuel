@@ -322,6 +322,13 @@ void main() {
       await testCollection.create(testUser3);
     });
 
+    test('should throw when no orderBys are given', () async {
+      expect(
+        () async => await testCollection.orderBy([]),
+        throwsA(isA<MissingValueException>()),
+      );
+    });
+
     test('should return list users in asc order by name', () async {
       final usersResult = await testCollection.orderBy([
         OrderBy.string(field: TestUser.fieldName, orderBy: OrderByString.aToZ)
