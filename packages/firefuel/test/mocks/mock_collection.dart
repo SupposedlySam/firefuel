@@ -19,6 +19,7 @@ extension MockCollectionX<T extends Serializable> on MockCollection<T> {
     Stream<List<T>> Function()? onListenAll,
     Stream<List<T>> Function()? onListenLimited,
     Stream<List<T>> Function()? onListenWhere,
+    List<T> Function()? onOrderBy,
     Chunk<T> Function()? onPaginate,
     T? Function()? onRead,
     List<T>? Function()? onReadAll,
@@ -76,6 +77,13 @@ extension MockCollectionX<T extends Serializable> on MockCollection<T> {
       }).thenAnswer(
         (_) => onListenWhere(),
       );
+    }
+
+    if (onOrderBy != null) {
+      when(() => orderBy(
+            any(),
+            limit: any(named: 'limit'),
+          )).thenAnswer((_) => Future.value(onOrderBy()));
     }
 
     if (onPaginate != null) {

@@ -308,6 +308,37 @@ void main() {
     });
   });
 
+  group('#orderBy', () {
+    const testUsername1 = 'Alfred',
+        testUsername2 = 'Batman',
+        testUsername3 = 'Catwoman';
+    final testUser1 = TestUser(testUsername1),
+        testUser2 = TestUser(testUsername2),
+        testUser3 = TestUser(testUsername3);
+
+    setUp(() async {
+      await testCollection.create(testUser1);
+      await testCollection.create(testUser2);
+      await testCollection.create(testUser3);
+    });
+
+    test('should return list users in asc order by name', () async {
+      final usersResult = await testCollection.orderBy([
+        OrderBy.string(field: TestUser.fieldName, orderBy: OrderByString.aToZ)
+      ]);
+
+      expect(usersResult, [testUser1, testUser2, testUser3]);
+    });
+
+    test('should return list users in desc order by name', () async {
+      final usersResult = await testCollection.orderBy([
+        OrderBy.string(field: TestUser.fieldName, orderBy: OrderByString.zToA)
+      ]);
+
+      expect(usersResult, [testUser3, testUser2, testUser1]);
+    });
+  });
+
   group('#paginate', () {
     setUp(() async {
       final scenarioCount = ChunkStatus.values.length;

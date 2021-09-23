@@ -165,6 +165,74 @@ void main() {
     },
   );
 
+  RepositoryTestUtil.runStreamTests<List<TestUser>, TestUser>(
+    methodName: 'listenWhere(orderBy:{value})',
+    mockCollection: MockCollection(),
+    initHappyPath: (mockCollection) async {
+      mockCollection.initialize(
+        onListenWhere: () => Stream.fromIterable(
+          [
+            [
+              TestUser('unexpectedUser1'),
+              TestUser('expectedUser'),
+              TestUser('expectedUser'),
+              TestUser('unexpectedUser2'),
+            ]
+          ],
+        ),
+      );
+    },
+    initSadPath: (mockCollection) async {
+      mockCollection.initialize(onListenWhere: () => throw ExpectedFailure());
+    },
+    streamCallback: (testRepository) {
+      return testRepository.listenWhere(
+        [Clause(TestUser.fieldName, isEqualTo: 'expectedUser')],
+        orderBy: [OrderBy(field: TestUser.fieldName)],
+      );
+    },
+  );
+
+  RepositoryTestUtil.runTests<List<TestUser>, TestUser>(
+    methodName: 'orderBy(limit:null)',
+    mockCollection: MockCollection(),
+    initHappyPath: (mockCollection) async {
+      mockCollection.initialize(
+        onOrderBy: () => [
+          TestUser('unexpectedUser1'),
+          TestUser('expectedUser'),
+          TestUser('expectedUser'),
+          TestUser('unexpectedUser2'),
+        ],
+      );
+    },
+    initSadPath: (mockCollection) async {
+      mockCollection.initialize(onOrderBy: () => throw ExpectedFailure());
+    },
+    methodCallback: (testRepository) =>
+        testRepository.orderBy([OrderBy(field: TestUser.fieldName)]),
+  );
+
+  RepositoryTestUtil.runTests<List<TestUser>, TestUser>(
+    methodName: 'orderBy(limit:1)',
+    mockCollection: MockCollection(),
+    initHappyPath: (mockCollection) async {
+      mockCollection.initialize(
+        onOrderBy: () => [
+          TestUser('unexpectedUser1'),
+          TestUser('expectedUser'),
+          TestUser('expectedUser'),
+          TestUser('unexpectedUser2'),
+        ],
+      );
+    },
+    initSadPath: (mockCollection) async {
+      mockCollection.initialize(onOrderBy: () => throw ExpectedFailure());
+    },
+    methodCallback: (testRepository) =>
+        testRepository.orderBy([OrderBy(field: TestUser.fieldName)], limit: 1),
+  );
+
   RepositoryTestUtil.runTests<Chunk<TestUser>, TestUser>(
     methodName: 'paginate',
     mockCollection: MockCollection(),
@@ -340,6 +408,30 @@ void main() {
       return testRepository.where(
         [Clause(TestUser.fieldName, isEqualTo: 'expectedUser')],
         limit: 1,
+      );
+    },
+  );
+
+  RepositoryTestUtil.runTests<List<TestUser>, TestUser>(
+    methodName: 'where(orderBy:{value})',
+    mockCollection: MockCollection(),
+    initHappyPath: (mockCollection) async {
+      mockCollection.initialize(
+        onWhere: () => [
+          TestUser('unexpectedUser1'),
+          TestUser('expectedUser'),
+          TestUser('expectedUser'),
+          TestUser('unexpectedUser2'),
+        ],
+      );
+    },
+    initSadPath: (mockCollection) async {
+      mockCollection.initialize(onWhere: () => throw ExpectedFailure());
+    },
+    methodCallback: (testRepository) {
+      return testRepository.where(
+        [Clause(TestUser.fieldName, isEqualTo: 'expectedUser')],
+        orderBy: [OrderBy(field: TestUser.fieldName)],
       );
     },
   );
