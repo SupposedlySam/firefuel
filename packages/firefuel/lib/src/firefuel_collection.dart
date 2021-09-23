@@ -237,17 +237,6 @@ abstract class FirefuelCollection<T extends Serializable>
     return snapshot.docs.toListT();
   }
 
-  Query<T?> _queryFromOrderBy(List<OrderBy> orderBy, {Query<T?>? query}) {
-    if (orderBy.isEmpty) throw MissingValueException(OrderBy);
-
-    return orderBy.fold(query ?? ref, (result, orderBy) {
-      return result.orderBy(
-        orderBy.path,
-        descending: orderBy.direction == OrderDirection.desc,
-      );
-    });
-  }
-
   List<OrderBy>? _ensureFirstWhereAndOrderBy(
       List<Clause> clauses, List<OrderBy>? orderBy) {
     final firstOrder = OrderBy.fromFieldPath(

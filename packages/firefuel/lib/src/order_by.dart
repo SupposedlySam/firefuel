@@ -13,11 +13,6 @@ class OrderBy {
   final FieldPath path;
   final OrderDirection direction;
 
-  const OrderBy._({
-    required this.path,
-    required this.direction,
-  });
-
   OrderBy.date({
     required String field,
     OrderByDate orderBy = OrderByDate.newestToOldest,
