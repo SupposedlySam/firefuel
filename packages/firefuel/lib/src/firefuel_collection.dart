@@ -97,10 +97,11 @@ abstract class FirefuelCollection<T extends Serializable>
   Future<List<T>> orderBy(List<OrderBy> orderBy, {int? limit}) async {
     if (orderBy.isEmpty) throw MissingValueException(OrderBy);
 
-    final orderedQuery = ref.sort(orderBy);
-    final query = limit == null ? orderedQuery : orderedQuery.limit(limit);
+    final query = ref.sort(orderBy).limitIfNotNull(limit);
 
-    return (await query.get()).docs.toListT();
+    final snapshot = await query.get();
+
+    return snapshot.docs.toListT();
   }
 
   @override
