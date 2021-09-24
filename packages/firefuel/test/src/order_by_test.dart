@@ -4,31 +4,29 @@ import 'package:firefuel/firefuel.dart';
 
 void main() {
   const String testField = 'testField';
-  group('$OrderBy.date', () {
+  group('$OrderBy', () {
     test('should set direction to asc when newestToOldest is chosen', () {
-      final instance = OrderBy.date(
+      final instance = OrderBy(
         field: testField,
-        orderBy: OrderByDate.newestToOldest,
+        direction: OrderDirection.newestToOldest,
       );
 
       expect(instance.direction, OrderDirection.asc);
     });
 
     test('should set direction to desc when oldestToNewest is chosen', () {
-      final instance = OrderBy.date(
+      final instance = OrderBy(
         field: testField,
-        orderBy: OrderByDate.oldestToNewest,
+        direction: OrderDirection.oldestToNewest,
       );
 
       expect(instance.direction, OrderDirection.desc);
     });
-  });
 
-  group('$OrderBy.bool', () {
     test('should set direction to asc when falseToTrue is chosen', () {
-      final instance = OrderBy.bool(
+      final instance = OrderBy(
         field: testField,
-        orderBy: OrderByBool.falseToTrue,
+        direction: OrderDirection.falseToTrue,
       );
 
       expect(instance.direction, OrderDirection.asc);
@@ -37,21 +35,19 @@ void main() {
     test(
       'should set direction to desc when trueToFalse is chosen',
       () {
-        final instance = OrderBy.bool(
+        final instance = OrderBy(
           field: testField,
-          orderBy: OrderByBool.trueToFalse,
+          direction: OrderDirection.trueToFalse,
         );
 
         expect(instance.direction, OrderDirection.desc);
       },
     );
-  });
 
-  group('$OrderBy.num', () {
     test('should set direction to asc when smallestToLargest is chosen', () {
-      final instance = OrderBy.num(
+      final instance = OrderBy(
         field: testField,
-        orderBy: OrderByNum.smallestToLargest,
+        direction: OrderDirection.smallestToLargest,
       );
 
       expect(instance.direction, OrderDirection.asc);
@@ -60,30 +56,28 @@ void main() {
     test(
       'should set direction to desc when largestToSmallest is chosen',
       () {
-        final instance = OrderBy.num(
+        final instance = OrderBy(
           field: testField,
-          orderBy: OrderByNum.largestToSmallest,
+          direction: OrderDirection.largestToSmallest,
         );
 
         expect(instance.direction, OrderDirection.desc);
       },
     );
-  });
 
-  group('$OrderBy.string', () {
     test('should set direction to asc when aToZ is chosen', () {
-      final instance = OrderBy.string(
+      final instance = OrderBy(
         field: testField,
-        orderBy: OrderByString.aToZ,
+        direction: OrderDirection.aToZ,
       );
 
       expect(instance.direction, OrderDirection.asc);
     });
 
     test('should set direction to desc when zToA is chosen', () {
-      final instance = OrderBy.string(
+      final instance = OrderBy(
         field: testField,
-        orderBy: OrderByString.zToA,
+        direction: OrderDirection.zToA,
       );
 
       expect(instance.direction, OrderDirection.desc);

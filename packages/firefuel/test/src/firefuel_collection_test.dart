@@ -380,17 +380,15 @@ void main() {
     });
 
     test('should return results in ascending order', () async {
-      final usersResult = await testCollection.orderBy([
-        OrderBy.string(field: TestUser.fieldName, orderBy: OrderByString.aToZ)
-      ]);
+      final usersResult = await testCollection.orderBy(
+          [OrderBy(field: TestUser.fieldName, direction: OrderDirection.aToZ)]);
 
       expect(usersResult, [testUser1, testUser2, testUser3]);
     });
 
     test('should return results in descending order', () async {
-      final usersResult = await testCollection.orderBy([
-        OrderBy.string(field: TestUser.fieldName, orderBy: OrderByString.zToA)
-      ]);
+      final usersResult = await testCollection.orderBy(
+          [OrderBy(field: TestUser.fieldName, direction: OrderDirection.zToA)]);
 
       expect(usersResult, [testUser3, testUser2, testUser1]);
     });
@@ -409,11 +407,7 @@ void main() {
 
     test('should use the Chunk.defaultLimit', () async {
       final startingChunk = await testCollection.paginate(
-        Chunk(orderBy: [
-          OrderBy.string(
-            field: TestUser.fieldName,
-          )
-        ]),
+        Chunk(orderBy: [OrderBy(field: TestUser.fieldName)]),
       );
 
       expect(startingChunk.data.length, Chunk.defaultLimit);
@@ -423,7 +417,7 @@ void main() {
       'should have status of $ChunkStatus.nextAvailable when receiving the middle chunk',
       () async {
         final middleChunk = await testCollection.paginate(
-          Chunk(orderBy: [OrderBy.string(field: TestUser.fieldName)]),
+          Chunk(orderBy: [OrderBy(field: TestUser.fieldName)]),
         );
 
         expect(middleChunk.status, ChunkStatus.nextAvailable);
@@ -434,7 +428,7 @@ void main() {
       'should have status of $ChunkStatus.last when receiving the last chunk',
       () async {
         final middleChunk = await testCollection.paginate(
-          Chunk(orderBy: [OrderBy.string(field: TestUser.fieldName)]),
+          Chunk(orderBy: [OrderBy(field: TestUser.fieldName)]),
         );
         final lastChunk = await testCollection.paginate(middleChunk);
 
@@ -446,7 +440,7 @@ void main() {
       'should return empty data when the last chunk is passed back in',
       () async {
         final middleChunk = await testCollection.paginate(
-          Chunk(orderBy: [OrderBy.string(field: TestUser.fieldName)]),
+          Chunk(orderBy: [OrderBy(field: TestUser.fieldName)]),
         );
         final lastChunk = await testCollection.paginate(middleChunk);
 
@@ -468,7 +462,7 @@ void main() {
         await testCollection.create(TestUser('LastUser'));
 
         final middleChunk = await testCollection.paginate(
-          Chunk(orderBy: [OrderBy.string(field: TestUser.fieldName)]),
+          Chunk(orderBy: [OrderBy(field: TestUser.fieldName)]),
         );
         final lastFullChunk = await testCollection.paginate(middleChunk);
 

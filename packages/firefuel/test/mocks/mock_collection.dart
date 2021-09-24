@@ -33,11 +33,9 @@ extension MockCollectionX<T extends Serializable> on MockCollection<T> {
   }) {
     registerFallbackValue(DocumentId('fallbackValue'));
     registerFallbackValue<Serializable>(TestUser('fallbackValue'));
-    registerFallbackValue(Chunk<TestUser>(orderBy: [
-      OrderBy.string(
-        field: TestUser.fieldName,
-      )
-    ]));
+    registerFallbackValue(
+      Chunk<TestUser>(orderBy: [OrderBy(field: TestUser.fieldName)]),
+    );
 
     if (onCreate != null) {
       when(() => create(any())).thenAnswer((_) => Future.value(onCreate()));
@@ -78,7 +76,11 @@ extension MockCollectionX<T extends Serializable> on MockCollection<T> {
 
     if (onListenWhere != null) {
       when(() {
-        return listenWhere(any(), limit: any(named: 'limit'));
+        return listenWhere(
+          any(),
+          orderBy: any(named: 'orderBy'),
+          limit: any(named: 'limit'),
+        );
       }).thenAnswer(
         (_) => onListenWhere(),
       );
@@ -147,7 +149,11 @@ extension MockCollectionX<T extends Serializable> on MockCollection<T> {
 
     if (onWhere != null) {
       when(() {
-        return where(any(), limit: any(named: 'limit'));
+        return where(
+          any(),
+          orderBy: any(named: 'orderBy'),
+          limit: any(named: 'limit'),
+        );
       }).thenAnswer((_) => Future.value(onWhere()));
     }
   }

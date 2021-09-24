@@ -84,8 +84,7 @@ void main() {
     });
 
     test('should return a new query when not null', () async {
-      final result =
-          ref.sortIfNotNull([OrderBy.string(field: TestUser.fieldName)]);
+      final result = ref.sortIfNotNull([OrderBy(field: TestUser.fieldName)]);
 
       expect(identityHashCode(result), isNot(identityHashCode(ref)));
     });
@@ -99,7 +98,7 @@ void main() {
     });
 
     test('should return a new query', () {
-      final result = ref.sort([OrderBy.string(field: TestUser.fieldName)]);
+      final result = ref.sort([OrderBy(field: TestUser.fieldName)]);
 
       expect(identityHashCode(result), isNot(identityHashCode(ref)));
     });

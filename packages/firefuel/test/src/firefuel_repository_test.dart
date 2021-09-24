@@ -211,7 +211,7 @@ void main() {
   );
 
   RepositoryTestUtil.runTests<List<TestUser>, TestUser>(
-    methodName: 'orderBy(limit:null)',
+    methodName: 'orderBy.string(limit:null)',
     mockCollection: MockCollection(),
     initHappyPath: (mockCollection) async {
       mockCollection.initialize(
@@ -231,7 +231,7 @@ void main() {
   );
 
   RepositoryTestUtil.runTests<List<TestUser>, TestUser>(
-    methodName: 'orderBy(limit:1)',
+    methodName: 'orderBy.string(limit:1)',
     mockCollection: MockCollection(),
     initHappyPath: (mockCollection) async {
       mockCollection.initialize(
@@ -256,7 +256,7 @@ void main() {
     initHappyPath: (mockCollection) async {
       mockCollection.initialize(onPaginate: () {
         return Chunk<TestUser>(orderBy: [
-          OrderBy.string(
+          OrderBy(
             field: TestUser.fieldName,
           )
         ]);
@@ -268,7 +268,7 @@ void main() {
     methodCallback: (testRepository) {
       return testRepository.paginate(
         Chunk<TestUser>(orderBy: [
-          OrderBy.string(
+          OrderBy(
             field: TestUser.fieldName,
           )
         ]),

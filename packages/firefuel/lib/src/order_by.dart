@@ -11,78 +11,39 @@ class OrderBy {
   final String field;
   final OrderDirection direction;
 
-  const OrderBy({required this.field, this.direction = OrderDirection.asc});
-
-  OrderBy.date({
+  OrderBy({
     required this.field,
-    OrderByDate orderBy = OrderByDate.newestToOldest,
-  }) : direction = orderBy.direction;
-
-  OrderBy.bool({
-    required this.field,
-    OrderByBool orderBy = OrderByBool.trueToFalse,
-  }) : direction = orderBy.direction;
-
-  OrderBy.num({
-    required this.field,
-    OrderByNum orderBy = OrderByNum.smallestToLargest,
-  }) : direction = orderBy.direction;
-
-  OrderBy.string({
-    required this.field,
-    OrderByString orderBy = OrderByString.aToZ,
-  }) : direction = orderBy.direction;
+    OrderDirection direction = OrderDirection.asc,
+  }) : this.direction = direction.toAscDesc;
 }
 
-enum OrderDirection { asc, desc }
-
-enum OrderByString { aToZ, zToA }
-
-enum OrderByNum { smallestToLargest, largestToSmallest }
-
-enum OrderByDate { newestToOldest, oldestToNewest }
-
-enum OrderByBool { falseToTrue, trueToFalse }
-
-extension on OrderByString {
-  OrderDirection get direction {
-    switch (this) {
-      case OrderByString.aToZ:
-        return OrderDirection.asc;
-      case OrderByString.zToA:
-        return OrderDirection.desc;
-    }
-  }
+enum OrderDirection {
+  asc,
+  desc,
+  aToZ,
+  zToA,
+  smallestToLargest,
+  largestToSmallest,
+  newestToOldest,
+  oldestToNewest,
+  falseToTrue,
+  trueToFalse,
 }
 
-extension on OrderByNum {
-  OrderDirection get direction {
+extension on OrderDirection {
+  OrderDirection get toAscDesc {
     switch (this) {
-      case OrderByNum.smallestToLargest:
+      case OrderDirection.asc:
+      case OrderDirection.aToZ:
+      case OrderDirection.smallestToLargest:
+      case OrderDirection.newestToOldest:
+      case OrderDirection.falseToTrue:
         return OrderDirection.asc;
-      case OrderByNum.largestToSmallest:
-        return OrderDirection.desc;
-    }
-  }
-}
-
-extension on OrderByDate {
-  OrderDirection get direction {
-    switch (this) {
-      case OrderByDate.newestToOldest:
-        return OrderDirection.asc;
-      case OrderByDate.oldestToNewest:
-        return OrderDirection.desc;
-    }
-  }
-}
-
-extension on OrderByBool {
-  OrderDirection get direction {
-    switch (this) {
-      case OrderByBool.falseToTrue:
-        return OrderDirection.asc;
-      case OrderByBool.trueToFalse:
+      case OrderDirection.desc:
+      case OrderDirection.zToA:
+      case OrderDirection.largestToSmallest:
+      case OrderDirection.oldestToNewest:
+      case OrderDirection.trueToFalse:
         return OrderDirection.desc;
     }
   }
