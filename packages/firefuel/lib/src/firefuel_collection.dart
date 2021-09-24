@@ -90,10 +90,15 @@ abstract class FirefuelCollection<T extends Serializable>
   }) {
     if (clauses.isEmpty) throw MissingValueException(Clause);
 
-    final allOrderBy = _ensureFirstWhereAndOrderBy(clauses, orderBy);
+    final orderByWithMatchingClause = _createOrderByIfNotExists(
+      clauses.first,
+      orderBy,
+    );
 
-    final query =
-        ref.filter(clauses).sortIfNotNull(allOrderBy).limitIfNotNull(limit);
+    final query = ref
+        .filter(clauses)
+        .sortIfNotNull(orderByWithMatchingClause)
+        .limitIfNotNull(limit);
 
     return query.snapshots().toListT();
   }
@@ -239,26 +244,51 @@ abstract class FirefuelCollection<T extends Serializable>
   }) async {
     if (clauses.isEmpty) throw MissingValueException(Clause);
 
-    final allOrderBy = _ensureFirstWhereAndOrderBy(clauses, orderBy);
+    final orderByWithMatchingClause = _createOrderByIfNotExists(
+      clauses.first,
+      orderBy,
+    );
 
-    final query =
-        ref.filter(clauses).sortIfNotNull(allOrderBy).limitIfNotNull(limit);
+    final query = ref
+        .filter(clauses)
+        .sortIfNotNull(orderByWithMatchingClause)
+        .limitIfNotNull(limit);
 
     final snapshot = await query.get();
 
     return snapshot.docs.toListT();
   }
 
-  List<OrderBy>? _ensureFirstWhereAndOrderBy(
-    List<Clause> clauses,
+  List<OrderBy>? _createOrderByIfNotExists(
+    Clause firstClause,
     List<OrderBy>? orderBy,
   ) {
-    final firstOrder = OrderBy(field: clauses.first.field);
+    if (orderBy?.isEmpty ?? true) return null;
 
-    final requiresFirstOrderByFromWhere = orderBy != null &&
-        orderBy.isNotEmpty &&
-        orderBy.first.field != firstOrder.field;
+    final hasCorrectValueInWrongSpot = orderBy!.contains(
+      (orderBy) => orderBy.field == firstClause.field,
+    );
+    final firstOrder = OrderBy(field: firstClause.field);
+    final isMissingCorrectValue = orderBy.first.field != firstOrder.field;
 
-    return requiresFirstOrderByFromWhere ? [firstOrder, ...orderBy!] : orderBy;
+    if (hasCorrectValueInWrongSpot) {
+      return _moveToFirst(firstClause, orderBy);
+    } else if (isMissingCorrectValue) {
+      return [firstOrder, ...orderBy];
+    }
+
+    return orderBy;
+  }
+
+  List<OrderBy> _moveToFirst(Clause firstClause, List<OrderBy>? orderBy) {
+    final matchingClause = orderBy!.firstWhere(
+      (orderBy) => orderBy.field == firstClause.field,
+    );
+
+    final remainingOrderBy = orderBy.where(
+      (orderBy) => orderBy != matchingClause,
+    );
+
+    return [matchingClause, ...remainingOrderBy];
   }
 }
