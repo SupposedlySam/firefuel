@@ -3,23 +3,35 @@ import 'package:equatable/equatable.dart';
 import 'package:firefuel/firefuel.dart';
 
 class TestUser extends Serializable with EquatableMixin {
-  static const String fieldName = 'name';
+  static const String fieldName = 'name',
+      fieldAge = 'age',
+      fieldOccupation = 'occupation';
 
-  TestUser(this.name, [this.docId]);
+  TestUser(this.name, {this.docId, this.age, this.occupation});
 
   final String name;
-
+  final String? age;
   final String? docId;
+  final String? occupation;
 
   @override
-  List<Object?> get props => [name];
+  List<Object?> get props => [
+        name,
+        if (age != null) age,
+        if (occupation != null) occupation,
+      ];
 
-  factory TestUser.fromJson(Map<String, dynamic> json, String id) {
-    return TestUser(json[fieldName], id);
+  factory TestUser.fromJson(Map<String, dynamic> json, String docId) {
+    return TestUser(
+      json[fieldName],
+      age: json[fieldAge],
+      docId: docId,
+      occupation: json[fieldOccupation],
+    );
   }
 
   @override
   Map<String, dynamic> toJson() {
-    return {fieldName: name};
+    return {fieldName: name, fieldAge: age, fieldOccupation: occupation};
   }
 }
