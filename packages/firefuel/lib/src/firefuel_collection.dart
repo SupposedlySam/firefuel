@@ -88,17 +88,11 @@ abstract class FirefuelCollection<T extends Serializable>
     List<OrderBy>? orderBy,
     int? limit,
   }) {
-    if (clauses.isEmpty) throw MissingValueException(Clause);
-
-    final orderByWithMatchingClause = OrderBy.moveOrCreateMatchingField(
-        fieldToMatch: clauses.first.field,
-        orderBy: orderBy,
-        isRangeComparison: Clause.hasRangeComparison(clauses));
-
-    final query = ref
-        .filter(clauses)
-        .sortIfNotNull(orderByWithMatchingClause)
-        .limitIfNotNull(limit);
+    final query = _getWhereWithOrderByAndLimitQuery(
+      clauses: clauses,
+      orderBy: orderBy,
+      limit: limit,
+    );
 
     return query.snapshots().toListT();
   }
@@ -242,21 +236,43 @@ abstract class FirefuelCollection<T extends Serializable>
     List<OrderBy>? orderBy,
     int? limit,
   }) async {
-    if (clauses.isEmpty) throw MissingValueException(Clause);
+    final query = _getWhereWithOrderByAndLimitQuery(
+      clauses: clauses,
+      orderBy: orderBy,
+      limit: limit,
+    );
 
-    final orderByWithMatchingClause = OrderBy.moveOrCreateMatchingField(
+    final snapshot = await query.get();
+
+    return snapshot.docs.toListT();
+  }
+
+  Query<T?> _getWhereWithOrderByAndLimitQuery({
+    required List<Clause> clauses,
+    required List<OrderBy>? orderBy,
+    required int? limit,
+  }) {
+    if (clauses.isEmpty) {
+      throw MissingValueException(Clause);
+    } else if (Clause.hasMoreThanOneFieldInRangeComparisons(clauses)) {
+      throw MismatchedFieldsInRangeClausesException();
+    }
+
+    final augmentedOrderBys = OrderBy.moveOrCreateMatchingField(
       fieldToMatch: clauses.first.field,
       orderBy: orderBy,
       isRangeComparison: Clause.hasRangeComparison(clauses),
     );
 
-    final query = ref
+    final processedOrderBys = OrderBy.removeEqualtyAndInMatchingFields(
+      fieldsToMatch: Clause.getEqualityOrInComparisonFields(clauses),
+      orderBy: augmentedOrderBys,
+      isEqualityOrInComparison: Clause.hasEqualityOrInComparison(clauses),
+    );
+
+    return ref
         .filter(clauses)
-        .sortIfNotNull(orderByWithMatchingClause)
+        .sortIfNotNull(processedOrderBys)
         .limitIfNotNull(limit);
-
-    final snapshot = await query.get();
-
-    return snapshot.docs.toListT();
   }
 }

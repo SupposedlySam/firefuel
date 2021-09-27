@@ -7,6 +7,9 @@
 /// with `MyModel.field<YourField>` where `MyModel` references the class you're
 /// serializing your Document into, and `field<YourField>` is the naming
 /// convention to follow (don't include the angle brackets).
+///
+/// An OrderBy clause also filters for existence of the given fields. The
+/// result set will not include documents that do not contain the given fields.
 class OrderBy {
   final String field;
   final OrderDirection direction;
@@ -16,6 +19,26 @@ class OrderBy {
     OrderDirection direction = OrderDirection.asc,
   }) : this.direction = direction.toAscDesc;
 
+  /// Handle cases when using [OrderBy] with where clauses containing range
+  /// comparisons.
+  ///
+  /// Where clauses with orderBy criteria have special rules if you use any
+  /// range comparisons. When a range comparison exists, the first orderBy
+  /// field must match the first where clause field.
+  ///
+  /// ## Use Cases
+  ///
+  /// ### Missing Field
+  ///
+  /// If your first where clause field isn't located in the order by clauses at
+  /// all, this method creates an order by clause and puts it in the first
+  /// position of the order by list.
+  ///
+  /// ### Correct Field, Wrong Place
+  ///
+  /// If your first where clause field isn't located in the first position of
+  /// the order by list, this method moves the matching order by field to the
+  /// first position of the order by list.
   static List<OrderBy>? moveOrCreateMatchingField({
     required String fieldToMatch,
     required List<OrderBy>? orderBy,
@@ -35,6 +58,27 @@ class OrderBy {
       } else if (isMissingCorrectValue) {
         return [firstOrder, ...orderBy];
       }
+    }
+
+    return orderBy;
+  }
+
+  /// Handle cases when using [OrderBy] with where clauses containing equality
+  /// or in comparisons.
+  ///
+  /// You cannot order your query by any field included in an equality or in
+  /// clause
+  static List<OrderBy>? removeEqualtyAndInMatchingFields({
+    required List<String> fieldsToMatch,
+    required List<OrderBy>? orderBy,
+    required bool isEqualityOrInComparison,
+  }) {
+    if (orderBy?.isEmpty ?? true) return null;
+
+    if (isEqualityOrInComparison) {
+      return orderBy!
+          .where((orderBy) => !fieldsToMatch.contains((orderBy.field)))
+          .toList();
     }
 
     return orderBy;

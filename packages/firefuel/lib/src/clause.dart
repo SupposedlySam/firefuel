@@ -92,6 +92,22 @@ class Clause {
     return clauses.any((clause) => clause.isEqualityOrInComparison);
   }
 
+  static bool hasMoreThanOneFieldInRangeComparisons(List<Clause> clauses) {
+    final rangeClauses = clauses.where((clause) => clause.isRangeComparison);
+    final uniqueFields = rangeClauses.map((clause) => clause.field).toSet();
+
+    return uniqueFields.length > 1;
+  }
+
+  static List<String> getEqualityOrInComparisonFields(
+    List<Clause> clauses,
+  ) {
+    return clauses
+        .where((clause) => clause.isEqualityOrInComparison)
+        .map((clause) => clause.field)
+        .toList();
+  }
+
   /// Checks for non-null options and throws a [TooManyArgumentsException] when
   /// more than one option is provided
   void _ensureSingleOptionChosen(List<dynamic> options) {
