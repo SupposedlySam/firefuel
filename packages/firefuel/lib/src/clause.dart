@@ -84,17 +84,17 @@ class Clause extends Equatable {
   @override
   List<Object?> get props => [
         field,
-        isEqualTo,
-        isNotEqualTo,
-        isLessThan,
-        isLessThanOrEqualTo,
-        isGreaterThan,
-        isGreaterThanOrEqualTo,
-        arrayContains,
-        arrayContainsAny,
-        whereIn,
-        whereNotIn,
-        isNull,
+        if (isEqualTo != null) isEqualTo,
+        if (isNotEqualTo != null) isNotEqualTo,
+        if (isLessThan != null) isLessThan,
+        if (isLessThanOrEqualTo != null) isLessThanOrEqualTo,
+        if (isGreaterThan != null) isGreaterThan,
+        if (isGreaterThanOrEqualTo != null) isGreaterThanOrEqualTo,
+        if (arrayContains != null) arrayContains,
+        if (arrayContainsAny != null) arrayContainsAny,
+        if (whereIn != null) whereIn,
+        if (whereNotIn != null) whereNotIn,
+        if (isNull != null) isNull,
       ];
 
   /// Checks for non-null options and throws a [TooManyArgumentsException] when
