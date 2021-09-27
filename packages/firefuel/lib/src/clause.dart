@@ -84,14 +84,19 @@ class Clause {
     ]);
   }
 
+  /// Checks to see whether any of the clauses given are range comparisons
   static bool hasRangeComparison(List<Clause> clauses) {
     return clauses.any((clause) => clause.isRangeComparison);
   }
 
+  /// Checks to see whether any of the clauses given are equality or in
+  /// (contains) comparisons
   static bool hasEqualityOrInComparison(List<Clause> clauses) {
     return clauses.any((clause) => clause.isEqualityOrInComparison);
   }
 
+  /// Checks to see if more than one field is found between all range
+  /// comparisons
   static bool hasMoreThanOneFieldInRangeComparisons(List<Clause> clauses) {
     final rangeClauses = clauses.where((clause) => clause.isRangeComparison);
     final uniqueFields = rangeClauses.map((clause) => clause.field).toSet();
@@ -99,6 +104,8 @@ class Clause {
     return uniqueFields.length > 1;
   }
 
+  /// Get a subset of the given clauses that are either equality or in
+  /// (contains) comparisons
   static List<String> getEqualityOrInComparisonFields(
     List<Clause> clauses,
   ) {
