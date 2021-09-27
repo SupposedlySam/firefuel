@@ -70,7 +70,7 @@ abstract class CollectionRead<R, T extends Serializable> {
   ///
   /// {@template firefuel.rules.whereExceptions}
   /// throws a [MissingValueException] when no [Clause]s are given
-  /// throws a [MismatchedFieldsInRangeClausesException] when range filters are
+  /// throws a [MoreThanOneFieldInRangeClauseException] when range filters are
   /// on different fields
   /// {@endtemplate}
   Stream<R> listenWhere(

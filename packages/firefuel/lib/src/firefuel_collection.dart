@@ -255,7 +255,7 @@ abstract class FirefuelCollection<T extends Serializable>
     if (clauses.isEmpty) {
       throw MissingValueException(Clause);
     } else if (Clause.hasMoreThanOneFieldInRangeComparisons(clauses)) {
-      throw MismatchedFieldsInRangeClausesException();
+      throw MoreThanOneFieldInRangeClauseException();
     }
 
     final augmentedOrderBys = OrderBy.moveOrCreateMatchingField(
