@@ -61,12 +61,8 @@ class Clause {
         isEqualityOrInComparison = _hasAny(
           [
             isEqualTo,
-            isNotEqualTo,
-            arrayContains,
-            arrayContainsAny,
             whereIn,
-            whereNotIn,
-            isNull
+            isNull,
           ],
         ) {
     _ensureSingleOptionChosen([
