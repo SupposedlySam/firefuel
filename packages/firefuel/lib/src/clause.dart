@@ -1,3 +1,4 @@
+import 'package:equatable/equatable.dart';
 import 'package:firefuel/firefuel.dart';
 
 /// Creates a condition to filter your Collection
@@ -22,7 +23,7 @@ import 'package:firefuel/firefuel.dart';
 /// ```dart
 /// Clause(MyModel.fieldVehicle, isEqualTo: 'Mazda', isNotEqualTo: 'Honda');
 /// ```
-class Clause {
+class Clause extends Equatable {
   final String field;
 
   final Object? isEqualTo;
@@ -80,9 +81,40 @@ class Clause {
     ]);
   }
 
-  /// Checks to see whether any of the clauses given are range comparisons
-  static bool hasRangeComparison(List<Clause> clauses) {
-    return clauses.any((clause) => clause.isRangeComparison);
+  @override
+  List<Object?> get props => [
+        field,
+        isEqualTo,
+        isNotEqualTo,
+        isLessThan,
+        isLessThanOrEqualTo,
+        isGreaterThan,
+        isGreaterThanOrEqualTo,
+        arrayContains,
+        arrayContainsAny,
+        whereIn,
+        whereNotIn,
+        isNull,
+      ];
+
+  /// Checks for non-null options and throws a [TooManyArgumentsException] when
+  /// more than one option is provided
+  void _ensureSingleOptionChosen(List<dynamic> options) {
+    final providedOptionLength = options.where((e) => e != null).length;
+    if (providedOptionLength == 1) return;
+
+    throw TooManyArgumentsException();
+  }
+
+  /// Get a subset of the given clauses that are either equality or in
+  /// (contains) comparisons
+  static List<String> getEqualityOrInComparisonFields(
+    List<Clause> clauses,
+  ) {
+    return clauses
+        .where((clause) => clause.isEqualityOrInComparison)
+        .map((clause) => clause.field)
+        .toList();
   }
 
   /// Checks to see whether any of the clauses given are equality or in
@@ -100,24 +132,9 @@ class Clause {
     return uniqueFields.length > 1;
   }
 
-  /// Get a subset of the given clauses that are either equality or in
-  /// (contains) comparisons
-  static List<String> getEqualityOrInComparisonFields(
-    List<Clause> clauses,
-  ) {
-    return clauses
-        .where((clause) => clause.isEqualityOrInComparison)
-        .map((clause) => clause.field)
-        .toList();
-  }
-
-  /// Checks for non-null options and throws a [TooManyArgumentsException] when
-  /// more than one option is provided
-  void _ensureSingleOptionChosen(List<dynamic> options) {
-    final providedOptionLength = options.where((e) => e != null).length;
-    if (providedOptionLength == 1) return;
-
-    throw TooManyArgumentsException();
+  /// Checks to see whether any of the clauses given are range comparisons
+  static bool hasRangeComparison(List<Clause> clauses) {
+    return clauses.any((clause) => clause.isRangeComparison);
   }
 
   static bool _hasAny(List<dynamic> options) {

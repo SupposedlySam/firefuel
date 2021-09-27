@@ -1,3 +1,5 @@
+import 'package:equatable/equatable.dart';
+
 /// Creates a condition to order your collection
 ///
 /// [field] must be provided and is normally the string representation of the
@@ -10,7 +12,7 @@
 ///
 /// An OrderBy clause also filters for existence of the given fields. The
 /// result set will not include documents that do not contain the given fields.
-class OrderBy {
+class OrderBy extends Equatable {
   final String field;
   final OrderDirection direction;
 
@@ -18,6 +20,9 @@ class OrderBy {
     required this.field,
     OrderDirection direction = OrderDirection.asc,
   }) : this.direction = direction.toAscDesc;
+
+  @override
+  List<Object?> get props => [field, direction];
 
   /// Handle cases when using [OrderBy] with where clauses containing range
   /// comparisons.
@@ -47,7 +52,7 @@ class OrderBy {
     if (orderBy?.isEmpty ?? true) return null;
 
     if (isRangeComparison) {
-      final hasCorrectValueInWrongSpot = orderBy!.contains(
+      final hasCorrectValueInWrongSpot = orderBy!.any(
         (orderBy) => orderBy.field == fieldToMatch,
       );
       final firstOrder = OrderBy(field: fieldToMatch);
