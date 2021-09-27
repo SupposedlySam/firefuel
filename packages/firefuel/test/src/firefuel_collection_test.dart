@@ -330,12 +330,25 @@ void main() {
         );
       });
 
-      test('should throw when no clauses are given', () {
+      test('should throw $MissingValueException when no clauses are given', () {
         expect(
           () => testCollection.listenWhere([]),
           throwsA(isA<MissingValueException>()),
         );
       });
+
+      test(
+        'should throw $MoreThanOneFieldInRangeClauseException when more than one field is used in multiple range clauses',
+        () {
+          expect(
+            () => testCollection.listenWhere([
+              Clause('firstField', isGreaterThan: 44),
+              Clause('secondField', isLessThan: 22)
+            ]),
+            throwsA(isA<MoreThanOneFieldInRangeClauseException>()),
+          );
+        },
+      );
     });
 
     group('with limit', () {
@@ -721,6 +734,19 @@ void main() {
           throwsA(isA<MissingValueException>()),
         );
       });
+
+      test(
+        'should throw $MoreThanOneFieldInRangeClauseException when more than one field is used in multiple range clauses',
+        () {
+          expect(
+            () => testCollection.listenWhere([
+              Clause('firstField', isGreaterThan: 44),
+              Clause('secondField', isLessThan: 22)
+            ]),
+            throwsA(isA<MoreThanOneFieldInRangeClauseException>()),
+          );
+        },
+      );
     });
 
     group('with orderBy should return a subset of the existing list', () {
