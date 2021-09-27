@@ -1,5 +1,6 @@
-import 'package:firefuel/firefuel.dart';
 import 'package:flutter_test/flutter_test.dart';
+
+import 'package:firefuel/firefuel.dart';
 
 void main() {
   final rangeComparisons = [

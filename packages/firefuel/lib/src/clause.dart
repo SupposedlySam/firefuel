@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+
 import 'package:firefuel/firefuel.dart';
 
 /// Creates a condition to filter your Collection
