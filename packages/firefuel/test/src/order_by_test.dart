@@ -83,11 +83,39 @@ void main() {
       expect(instance.direction, OrderDirection.desc);
     });
   });
-  group('.removeEqualityAndInMatchingFields', () {}, skip: true);
+
+  group('.removeEqualityAndInMatchingFields', () {
+    test('should return empty list when all OrderBys are matching', () {
+      final orderByName = OrderBy(field: 'name');
+
+      final result = OrderBy.removeEqualtyAndInMatchingFields(
+        fieldsToMatch: ['name'],
+        orderBy: [orderByName],
+        isEqualityOrInComparison: true,
+      );
+
+      expect(result, isEmpty);
+    });
+
+    test('should return sublist when some OrderBys are matching', () {
+      final orderByAge = OrderBy(field: 'age');
+      final orderByName = OrderBy(field: 'name');
+
+      final result = OrderBy.removeEqualtyAndInMatchingFields(
+        fieldsToMatch: ['name'],
+        orderBy: [orderByAge, orderByName],
+        isEqualityOrInComparison: true,
+      );
+
+      expect(result, [orderByAge]);
+    });
+  });
+
   group('.moveOrCreateMatchingField', () {
     test('should move $OrderBy when it exists but is not first', () {
       final orderByAge = OrderBy(field: 'age');
       final orderByName = OrderBy(field: 'name');
+
       final result = OrderBy.moveOrCreateMatchingField(
         fieldToMatch: 'name',
         orderBy: [orderByAge, orderByName],
@@ -100,6 +128,7 @@ void main() {
     test('should create $OrderBy when it does not exist', () {
       final orderByAge = OrderBy(field: 'age');
       final orderByName = OrderBy(field: 'name');
+
       final result = OrderBy.moveOrCreateMatchingField(
         fieldToMatch: 'name',
         orderBy: [orderByAge],
