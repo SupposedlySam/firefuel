@@ -83,4 +83,6 @@ void main() {
       expect(instance.direction, OrderDirection.desc);
     });
   });
+  group('.removeEqualityAndInMatchingFields', () {}, skip: true);
+  group('.moveOrCreateMatchingField', () {}, skip: true);
 }
