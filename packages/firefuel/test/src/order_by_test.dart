@@ -84,5 +84,29 @@ void main() {
     });
   });
   group('.removeEqualityAndInMatchingFields', () {}, skip: true);
-  group('.moveOrCreateMatchingField', () {}, skip: true);
+  group('.moveOrCreateMatchingField', () {
+    test('should move $OrderBy when it exists but is not first', () {
+      final orderByAge = OrderBy(field: 'age');
+      final orderByName = OrderBy(field: 'name');
+      final result = OrderBy.moveOrCreateMatchingField(
+        fieldToMatch: 'name',
+        orderBy: [orderByAge, orderByName],
+        isRangeComparison: true,
+      );
+
+      expect(result, [orderByName, orderByAge]);
+    });
+
+    test('should create $OrderBy when it does not exist', () {
+      final orderByAge = OrderBy(field: 'age');
+      final orderByName = OrderBy(field: 'name');
+      final result = OrderBy.moveOrCreateMatchingField(
+        fieldToMatch: 'name',
+        orderBy: [orderByAge],
+        isRangeComparison: true,
+      );
+
+      expect(result, [orderByName, orderByAge]);
+    });
+  });
 }
