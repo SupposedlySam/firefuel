@@ -667,17 +667,17 @@ void main() {
 
   group('#where', () {
     const String expectedName = 'expectedName';
-    final expectedUser = TestUser(expectedName);
+    final expectedUser = TestUser(expectedName),
+        unexpectedName1 = 'unexpectedName1',
+        unexpectedName2 = 'unexpectedName2';
 
-    group('without limit', () {
-      const String unexpectedName1 = 'unexpectedName1',
-          unexpectedName2 = 'unexpectedName2';
-
+    group('with clauses', () {
       setUp(() async {
         await testCollection.create(TestUser(unexpectedName1));
         await testCollection.create(expectedUser);
         await testCollection.create(TestUser(unexpectedName2));
       });
+
       test('should return a subset of the existing list', () async {
         final filteredList = await testCollection.where(
           [Clause(TestUser.fieldName, isEqualTo: expectedName)],
@@ -720,6 +720,60 @@ void main() {
           () async => await testCollection.where([]),
           throwsA(isA<MissingValueException>()),
         );
+      });
+    });
+
+    group('with orderBy should return a subset of the existing list', () {
+      final leela = TestUser('Leela', age: 25, occupation: 'Pilot');
+      final bender = TestUser('Bender', age: 4, occupation: 'Soldier');
+      final fry = TestUser('Fry', age: 25, occupation: 'Delivery Boy');
+
+      setUp(() async {
+        await testCollection.create(leela);
+        await testCollection.create(bender);
+        await testCollection.create(fry);
+      });
+
+      test('when first $OrderBy matches first $Clause', () async {
+        final filteredList = await testCollection.where(
+          [Clause(TestUser.fieldName, isNotEqualTo: expectedUser)],
+          orderBy: [OrderBy(field: TestUser.fieldName)],
+        );
+
+        expect(filteredList, [bender, fry, leela]);
+      });
+
+      group('when using a range comparison', () {
+        final oldFry = TestUser('Fry', age: 1025, occupation: 'Delivery Boy');
+
+        setUp(() async {
+          await testCollection.create(oldFry);
+        });
+
+        test('and $OrderBy does not exist for first $Clause', () async {
+          // Should create age OrderBy and put it first
+          final filteredList = await testCollection.where(
+            [Clause(TestUser.fieldAge, isGreaterThan: 4)],
+            orderBy: [OrderBy(field: TestUser.fieldName)],
+          );
+
+          // Should order by age then name
+          expect(filteredList, [fry, oldFry, leela]);
+        });
+
+        test('and matching $OrderBy is not first in orderBy list', () async {
+          // Should move age OrderBy clause before name
+          final filteredList = await testCollection.where(
+            [Clause(TestUser.fieldAge, isGreaterThan: 4)],
+            orderBy: [
+              OrderBy(field: TestUser.fieldName),
+              OrderBy(field: TestUser.fieldAge)
+            ],
+          );
+
+          // Should order by age, then name
+          expect(filteredList, [fry, leela, oldFry]);
+        });
       });
     });
 

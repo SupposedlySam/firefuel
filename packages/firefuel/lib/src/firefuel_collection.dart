@@ -90,10 +90,10 @@ abstract class FirefuelCollection<T extends Serializable>
   }) {
     if (clauses.isEmpty) throw MissingValueException(Clause);
 
-    final orderByWithMatchingClause = _createOrderByIfNotExists(
-      clauses.first,
-      orderBy,
-    );
+    final orderByWithMatchingClause = OrderBy.moveOrCreateMatchingField(
+        fieldToMatch: clauses.first.field,
+        orderBy: orderBy,
+        isRangeComparison: Clause.hasRangeComparison(clauses));
 
     final query = ref
         .filter(clauses)
@@ -244,9 +244,10 @@ abstract class FirefuelCollection<T extends Serializable>
   }) async {
     if (clauses.isEmpty) throw MissingValueException(Clause);
 
-    final orderByWithMatchingClause = _createOrderByIfNotExists(
-      clauses.first,
-      orderBy,
+    final orderByWithMatchingClause = OrderBy.moveOrCreateMatchingField(
+      fieldToMatch: clauses.first.field,
+      orderBy: orderBy,
+      isRangeComparison: Clause.hasRangeComparison(clauses),
     );
 
     final query = ref
@@ -257,38 +258,5 @@ abstract class FirefuelCollection<T extends Serializable>
     final snapshot = await query.get();
 
     return snapshot.docs.toListT();
-  }
-
-  List<OrderBy>? _createOrderByIfNotExists(
-    Clause firstClause,
-    List<OrderBy>? orderBy,
-  ) {
-    if (orderBy?.isEmpty ?? true) return null;
-
-    final hasCorrectValueInWrongSpot = orderBy!.contains(
-      (orderBy) => orderBy.field == firstClause.field,
-    );
-    final firstOrder = OrderBy(field: firstClause.field);
-    final isMissingCorrectValue = orderBy.first.field != firstOrder.field;
-
-    if (hasCorrectValueInWrongSpot) {
-      return _moveToFirst(firstClause, orderBy);
-    } else if (isMissingCorrectValue) {
-      return [firstOrder, ...orderBy];
-    }
-
-    return orderBy;
-  }
-
-  List<OrderBy> _moveToFirst(Clause firstClause, List<OrderBy>? orderBy) {
-    final matchingClause = orderBy!.firstWhere(
-      (orderBy) => orderBy.field == firstClause.field,
-    );
-
-    final remainingOrderBy = orderBy.where(
-      (orderBy) => orderBy != matchingClause,
-    );
-
-    return [matchingClause, ...remainingOrderBy];
   }
 }

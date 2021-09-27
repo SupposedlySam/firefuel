@@ -36,6 +36,8 @@ class Clause {
   final List<Object?>? whereIn;
   final List<Object?>? whereNotIn;
   final bool? isNull;
+  final bool isRangeComparison;
+  final bool isEqualityOrInComparison;
 
   Clause(
     this.field, {
@@ -50,7 +52,23 @@ class Clause {
     this.whereIn,
     this.whereNotIn,
     this.isNull,
-  }) {
+  })  : isRangeComparison = _hasAny([
+          isLessThan,
+          isLessThanOrEqualTo,
+          isGreaterThan,
+          isGreaterThanOrEqualTo,
+        ]),
+        isEqualityOrInComparison = _hasAny(
+          [
+            isEqualTo,
+            isNotEqualTo,
+            arrayContains,
+            arrayContainsAny,
+            whereIn,
+            whereNotIn,
+            isNull
+          ],
+        ) {
     _ensureSingleOptionChosen([
       isEqualTo,
       isNotEqualTo,
@@ -66,6 +84,14 @@ class Clause {
     ]);
   }
 
+  static bool hasRangeComparison(List<Clause> clauses) {
+    return clauses.any((clause) => clause.isRangeComparison);
+  }
+
+  static bool hasEqualityOrInComparison(List<Clause> clauses) {
+    return clauses.any((clause) => clause.isEqualityOrInComparison);
+  }
+
   /// Checks for non-null options and throws a [TooManyArgumentsException] when
   /// more than one option is provided
   void _ensureSingleOptionChosen(List<dynamic> options) {
@@ -73,5 +99,9 @@ class Clause {
     if (providedOptionLength == 1) return;
 
     throw TooManyArgumentsException();
+  }
+
+  static bool _hasAny(List<dynamic> options) {
+    return options.any((option) => option != null);
   }
 }

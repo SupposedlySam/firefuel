@@ -15,6 +15,45 @@ class OrderBy {
     required this.field,
     OrderDirection direction = OrderDirection.asc,
   }) : this.direction = direction.toAscDesc;
+
+  static List<OrderBy>? moveOrCreateMatchingField({
+    required String fieldToMatch,
+    required List<OrderBy>? orderBy,
+    required bool isRangeComparison,
+  }) {
+    if (orderBy?.isEmpty ?? true) return null;
+
+    if (isRangeComparison) {
+      final hasCorrectValueInWrongSpot = orderBy!.contains(
+        (orderBy) => orderBy.field == fieldToMatch,
+      );
+      final firstOrder = OrderBy(field: fieldToMatch);
+      final isMissingCorrectValue = orderBy.first.field != firstOrder.field;
+
+      if (hasCorrectValueInWrongSpot) {
+        return _moveToFirst(fieldToMatch, orderBy);
+      } else if (isMissingCorrectValue) {
+        return [firstOrder, ...orderBy];
+      }
+    }
+
+    return orderBy;
+  }
+
+  static List<OrderBy> _moveToFirst(
+    String fieldToMatch,
+    List<OrderBy>? orderBy,
+  ) {
+    final matchingClause = orderBy!.firstWhere(
+      (orderBy) => orderBy.field == fieldToMatch,
+    );
+
+    final remainingOrderBy = orderBy.where(
+      (orderBy) => orderBy != matchingClause,
+    );
+
+    return [matchingClause, ...remainingOrderBy];
+  }
 }
 
 enum OrderDirection {

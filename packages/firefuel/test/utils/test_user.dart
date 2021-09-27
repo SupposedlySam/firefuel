@@ -7,10 +7,10 @@ class TestUser extends Serializable with EquatableMixin {
       fieldAge = 'age',
       fieldOccupation = 'occupation';
 
-  TestUser(this.name, {this.docId, this.age, this.occupation});
+  const TestUser(this.name, {this.docId, this.age, this.occupation});
 
   final String name;
-  final String? age;
+  final int? age;
   final String? docId;
   final String? occupation;
 
