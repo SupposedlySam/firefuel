@@ -3,7 +3,7 @@
   - [Getting Started](gettingstarted.md)
   - [Why Firefuel?](whyfirefuel.md)
   - Core Concepts
-    - [package:firefuel](coreconcepts.md)
+    [package:firefuel](coreconcepts.md)
   - [Architecture](architecture.md)
   - [Naming Conventions](firefuelnamingconventions.md)
 
