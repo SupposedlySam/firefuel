@@ -16,6 +16,98 @@ void main() {
     testCollection = TestCollection();
   });
 
+  void testWhereWithOrderBy() {
+    const String expectedName = 'expectedName';
+    final expectedUser = TestUser(expectedName);
+    group('with orderBy should return a subset of the existing list', () {
+      final leela = TestUser('Leela', age: 25, occupation: 'Pilot');
+      final bender = TestUser('Bender', age: 4, occupation: 'Soldier');
+      final fry = TestUser('Fry', age: 25, occupation: 'Delivery Boy');
+
+      setUp(() async {
+        await testCollection.create(leela);
+        await testCollection.create(bender);
+        await testCollection.create(fry);
+      });
+
+      test('when first $OrderBy matches first $Clause', () async {
+        final filteredList = await testCollection.where(
+          [Clause(TestUser.fieldName, isNotEqualTo: expectedUser)],
+          orderBy: [OrderBy(field: TestUser.fieldName)],
+        );
+
+        expect(filteredList, [bender, fry, leela]);
+      });
+
+      group('when using a range comparison', () {
+        final oldFry = TestUser('Fry', age: 1025, occupation: 'Delivery Boy');
+
+        setUp(() async {
+          await testCollection.create(oldFry);
+        });
+
+        test('and $OrderBy does not exist for first $Clause', () async {
+          await expectLater(
+            testCollection.where(
+              [Clause(TestUser.fieldAge, isGreaterThan: 4)],
+              orderBy: [OrderBy(field: TestUser.fieldName)],
+            ),
+            completes,
+          );
+        });
+
+        test('and matching $OrderBy is not first in orderBy list', () async {
+          await expectLater(
+            testCollection.where(
+              [Clause(TestUser.fieldAge, isGreaterThan: 4)],
+              orderBy: [
+                OrderBy(field: TestUser.fieldName),
+                OrderBy(field: TestUser.fieldAge)
+              ],
+            ),
+            completes,
+          );
+        });
+      });
+
+      group('when using a equality comparison', () {
+        test('and has matching $OrderBy field', () async {
+          await expectLater(
+            testCollection.where(
+              [Clause(TestUser.fieldAge, isEqualTo: 25)],
+              orderBy: [OrderBy(field: TestUser.fieldAge)],
+            ),
+            completes,
+          );
+        });
+
+        test('and has matching $OrderBy field', () async {
+          await expectLater(
+            testCollection.where(
+              [Clause(TestUser.fieldAge, isNull: true)],
+              orderBy: [OrderBy(field: TestUser.fieldAge)],
+            ),
+            completes,
+          );
+        });
+      });
+
+      group('when using a in comparison', () {
+        test('and has matching $OrderBy field', () async {
+          await expectLater(
+            testCollection.where(
+              [
+                Clause(TestUser.fieldAge, whereIn: [4, 25])
+              ],
+              orderBy: [OrderBy(field: TestUser.fieldAge)],
+            ),
+            completes,
+          );
+        });
+      });
+    });
+  }
+
   group('#create', () {
     test('should return a new document', () async {
       final originalDocId = await testCollection.create(defaultUser);
@@ -237,6 +329,56 @@ void main() {
     );
   });
 
+  group('#listenOrdered', () {
+    late Stream<List<TestUser>> stream;
+    late DocumentId docId;
+    final newUser1 = TestUser('Alfred');
+    final newUser2 = TestUser('Batman');
+    final newUser3 = TestUser('Catwoman');
+
+    setUp(() async {
+      docId = await testCollection.create(newUser1);
+      await testCollection.create(newUser3);
+
+      stream =
+          testCollection.listenOrdered([OrderBy(field: TestUser.fieldName)]);
+    });
+
+    test('should return an ordered list', () async {
+      await testCollection.create(newUser2);
+
+      expect(
+        stream,
+        emitsInOrder([
+          [newUser1, newUser2, newUser3],
+        ]),
+      );
+    });
+
+    test('should update when an item is added', () async {
+      expect(
+        stream,
+        emitsInOrder([
+          [newUser1, newUser3],
+          [newUser1, newUser2, newUser3],
+        ]),
+      );
+
+      await testCollection.create(newUser2);
+    });
+
+    test('should update when an item is deleted', () async {
+      expect(
+        stream,
+        emitsInOrder([
+          [newUser3],
+        ]),
+      );
+
+      await testCollection.delete(docId);
+    });
+  });
+
   group('#listenWhere', () {
     const String expectedName = 'expectedName';
     final expectedUser = TestUser(expectedName);
@@ -280,13 +422,28 @@ void main() {
         );
       });
 
-      test('should throw when no clauses are given', () {
+      test('should throw $MissingValueException when no clauses are given', () {
         expect(
           () => testCollection.listenWhere([]),
           throwsA(isA<MissingValueException>()),
         );
       });
+
+      test(
+        'should throw $MoreThanOneFieldInRangeClauseException when more than one field is used in multiple range clauses',
+        () {
+          expect(
+            () => testCollection.listenWhere([
+              Clause('firstField', isGreaterThan: 44),
+              Clause('secondField', isLessThan: 22)
+            ]),
+            throwsA(isA<MoreThanOneFieldInRangeClauseException>()),
+          );
+        },
+      );
     });
+
+    testWhereWithOrderBy();
 
     group('with limit', () {
       test('should set the max value of items to return', () async {
@@ -308,6 +465,42 @@ void main() {
     });
   });
 
+  group('#orderBy', () {
+    const testUsername1 = 'Alfred',
+        testUsername2 = 'Batman',
+        testUsername3 = 'Catwoman';
+    final testUser1 = TestUser(testUsername1),
+        testUser2 = TestUser(testUsername2),
+        testUser3 = TestUser(testUsername3);
+
+    setUp(() async {
+      await testCollection.create(testUser1);
+      await testCollection.create(testUser2);
+      await testCollection.create(testUser3);
+    });
+
+    test('should throw when no orderBys are given', () async {
+      expect(
+        () async => await testCollection.orderBy([]),
+        throwsA(isA<MissingValueException>()),
+      );
+    });
+
+    test('should return results in ascending order', () async {
+      final usersResult = await testCollection.orderBy(
+          [OrderBy(field: TestUser.fieldName, direction: OrderDirection.aToZ)]);
+
+      expect(usersResult, [testUser1, testUser2, testUser3]);
+    });
+
+    test('should return results in descending order', () async {
+      final usersResult = await testCollection.orderBy(
+          [OrderBy(field: TestUser.fieldName, direction: OrderDirection.zToA)]);
+
+      expect(usersResult, [testUser3, testUser2, testUser1]);
+    });
+  });
+
   group('#paginate', () {
     setUp(() async {
       final scenarioCount = ChunkStatus.values.length;
@@ -321,7 +514,7 @@ void main() {
 
     test('should use the Chunk.defaultLimit', () async {
       final startingChunk = await testCollection.paginate(
-        Chunk(orderByField: TestUser.fieldName),
+        Chunk(orderBy: [OrderBy(field: TestUser.fieldName)]),
       );
 
       expect(startingChunk.data.length, Chunk.defaultLimit);
@@ -331,7 +524,7 @@ void main() {
       'should have status of $ChunkStatus.nextAvailable when receiving the middle chunk',
       () async {
         final middleChunk = await testCollection.paginate(
-          Chunk(orderByField: TestUser.fieldName),
+          Chunk(orderBy: [OrderBy(field: TestUser.fieldName)]),
         );
 
         expect(middleChunk.status, ChunkStatus.nextAvailable);
@@ -342,7 +535,7 @@ void main() {
       'should have status of $ChunkStatus.last when receiving the last chunk',
       () async {
         final middleChunk = await testCollection.paginate(
-          Chunk(orderByField: TestUser.fieldName),
+          Chunk(orderBy: [OrderBy(field: TestUser.fieldName)]),
         );
         final lastChunk = await testCollection.paginate(middleChunk);
 
@@ -354,7 +547,7 @@ void main() {
       'should return empty data when the last chunk is passed back in',
       () async {
         final middleChunk = await testCollection.paginate(
-          Chunk(orderByField: TestUser.fieldName),
+          Chunk(orderBy: [OrderBy(field: TestUser.fieldName)]),
         );
         final lastChunk = await testCollection.paginate(middleChunk);
 
@@ -376,7 +569,7 @@ void main() {
         await testCollection.create(TestUser('LastUser'));
 
         final middleChunk = await testCollection.paginate(
-          Chunk(orderByField: TestUser.fieldName),
+          Chunk(orderBy: [OrderBy(field: TestUser.fieldName)]),
         );
         final lastFullChunk = await testCollection.paginate(middleChunk);
 
@@ -581,17 +774,17 @@ void main() {
 
   group('#where', () {
     const String expectedName = 'expectedName';
-    final expectedUser = TestUser(expectedName);
+    final expectedUser = TestUser(expectedName),
+        unexpectedName1 = 'unexpectedName1',
+        unexpectedName2 = 'unexpectedName2';
 
-    group('without limit', () {
-      const String unexpectedName1 = 'unexpectedName1',
-          unexpectedName2 = 'unexpectedName2';
-
+    group('with clauses', () {
       setUp(() async {
         await testCollection.create(TestUser(unexpectedName1));
         await testCollection.create(expectedUser);
         await testCollection.create(TestUser(unexpectedName2));
       });
+
       test('should return a subset of the existing list', () async {
         final filteredList = await testCollection.where(
           [Clause(TestUser.fieldName, isEqualTo: expectedName)],
@@ -635,7 +828,22 @@ void main() {
           throwsA(isA<MissingValueException>()),
         );
       });
+
+      test(
+        'should throw $MoreThanOneFieldInRangeClauseException when more than one field is used in multiple range clauses',
+        () {
+          expect(
+            () => testCollection.listenWhere([
+              Clause('firstField', isGreaterThan: 44),
+              Clause('secondField', isLessThan: 22)
+            ]),
+            throwsA(isA<MoreThanOneFieldInRangeClauseException>()),
+          );
+        },
+      );
     });
+
+    testWhereWithOrderBy();
 
     group('with limit', () {
       test('should set the max value of items to return', () async {

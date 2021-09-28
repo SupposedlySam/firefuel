@@ -47,11 +47,25 @@ abstract class FirefuelRepository<T extends Serializable>
   }
 
   @override
+  Stream<Either<Failure, List<T>>> listenOrdered(List<OrderBy> orderBy) {
+    return guardStream(() => _collection.listenOrdered(orderBy));
+  }
+
+  @override
   Stream<Either<Failure, List<T>>> listenWhere(
     List<Clause> clauses, {
+    List<OrderBy>? orderBy,
     int? limit,
   }) {
     return guardStream(() => _collection.listenWhere(clauses, limit: limit));
+  }
+
+  @override
+  Future<Either<Failure, List<T>>> orderBy(
+    List<OrderBy> orderBy, {
+    int? limit,
+  }) {
+    return guard(() => _collection.orderBy(orderBy, limit: limit));
   }
 
   @override
@@ -129,6 +143,7 @@ abstract class FirefuelRepository<T extends Serializable>
   @override
   Future<Either<Failure, List<T>>> where(
     List<Clause> clauses, {
+    List<OrderBy>? orderBy,
     int? limit,
   }) {
     return guard(() => _collection.where(clauses, limit: limit));

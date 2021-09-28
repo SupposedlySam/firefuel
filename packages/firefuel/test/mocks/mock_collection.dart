@@ -18,7 +18,9 @@ extension MockCollectionX<T extends Serializable> on MockCollection<T> {
     Stream<T?> Function()? onListen,
     Stream<List<T>> Function()? onListenAll,
     Stream<List<T>> Function()? onListenLimited,
+    Stream<List<T>> Function()? onListenOrdered,
     Stream<List<T>> Function()? onListenWhere,
+    List<T> Function()? onOrderBy,
     Chunk<T> Function()? onPaginate,
     T? Function()? onRead,
     List<T>? Function()? onReadAll,
@@ -31,7 +33,9 @@ extension MockCollectionX<T extends Serializable> on MockCollection<T> {
   }) {
     registerFallbackValue(DocumentId('fallbackValue'));
     registerFallbackValue<Serializable>(TestUser('fallbackValue'));
-    registerFallbackValue(Chunk<TestUser>(orderByField: TestUser.fieldName));
+    registerFallbackValue(
+      Chunk<TestUser>(orderBy: [OrderBy(field: TestUser.fieldName)]),
+    );
 
     if (onCreate != null) {
       when(() => create(any())).thenAnswer((_) => Future.value(onCreate()));
@@ -66,12 +70,27 @@ extension MockCollectionX<T extends Serializable> on MockCollection<T> {
       when(() => listenLimited(any())).thenAnswer((_) => onListenLimited());
     }
 
+    if (onListenOrdered != null) {
+      when(() => listenOrdered(any())).thenAnswer((_) => onListenOrdered());
+    }
+
     if (onListenWhere != null) {
       when(() {
-        return listenWhere(any(), limit: any(named: 'limit'));
+        return listenWhere(
+          any(),
+          orderBy: any(named: 'orderBy'),
+          limit: any(named: 'limit'),
+        );
       }).thenAnswer(
         (_) => onListenWhere(),
       );
+    }
+
+    if (onOrderBy != null) {
+      when(() => orderBy(
+            any(),
+            limit: any(named: 'limit'),
+          )).thenAnswer((_) => Future.value(onOrderBy()));
     }
 
     if (onPaginate != null) {
@@ -130,7 +149,11 @@ extension MockCollectionX<T extends Serializable> on MockCollection<T> {
 
     if (onWhere != null) {
       when(() {
-        return where(any(), limit: any(named: 'limit'));
+        return where(
+          any(),
+          orderBy: any(named: 'orderBy'),
+          limit: any(named: 'limit'),
+        );
       }).thenAnswer((_) => Future.value(onWhere()));
     }
   }

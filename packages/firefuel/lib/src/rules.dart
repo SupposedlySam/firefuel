@@ -32,22 +32,59 @@ abstract class CollectionRead<R, T extends Serializable> {
   /// collection
   Stream<R> listenLimited(int limit);
 
-  /// Get a list of documents matching all clauses
+  /// Get a list of all documents from the collection sorted by [orderBy]
   ///
-  /// limit: optionally provide a maximum value of items to be returned
+  /// Refreshes automatically when new data is added/removed from the
+  /// collection
   ///
-  /// throws a [MissingValueException] when no [Clause]s are given
-  Future<R> where(List<Clause> clauses, {int? limit});
+  /// throws a [MissingValueException] when no [orderBy]s are given
+  Stream<R> listenOrdered(List<OrderBy> orderBy);
 
   /// Get a list of documents matching all clauses
   ///
   /// Refreshes automatically when new matching data is added/removed from the
   /// collection
   ///
+  /// {@template firefuel.rules.whereWithOrderByRules}
+  /// orderBy: optionally provide a list of [OrderBy] to order the results
+  ///
+  /// ### !Important!
+  /// [OrderBy] criteria will be created, moved, or removed depending on what
+  /// where [Clause]s are given.
+  ///
+  /// If you provide [OrderBy] criteria matching a [Clause]s field where
+  /// - any clause is a range operator and the first orderBy's field doesn't
+  /// match the first where clause's field, the orderBy criteria will be moved
+  /// if it exists or created if it doesn't exist
+  /// - any clause is an equality or in (contains) operator, the orderBy criteria
+  /// will be removed
+  ///
+  /// #### Rules
+  /// - If you include a filter with a range comparison, your first ordering must
+  /// be on the same field
+  /// - You cannot order your query by any field included in an equality or in
+  /// clause
+  /// {@endtemplate}
+  ///
   /// limit: optionally provide a maximum value of items to be returned
   ///
+  /// {@template firefuel.rules.whereExceptions}
   /// throws a [MissingValueException] when no [Clause]s are given
-  Stream<R> listenWhere(List<Clause> clauses, {int? limit});
+  /// throws a [MoreThanOneFieldInRangeClauseException] when range filters are
+  /// on different fields
+  /// {@endtemplate}
+  Stream<R> listenWhere(
+    List<Clause> clauses, {
+    List<OrderBy>? orderBy,
+    int? limit,
+  });
+
+  /// Get a list of documents from the collection as a list ordered by the [orderBy]
+  ///
+  /// limit: optionally provide a maximum value of items to be returned
+  ///
+  /// throws a [MissingValueException] when no [orderBy]s are given
+  Future<R> orderBy(List<OrderBy> orderBy, {int? limit});
 
   /// Gets all documents from the collection
   ///
@@ -58,6 +95,15 @@ abstract class CollectionRead<R, T extends Serializable> {
   /// {@macro firefuel.rules.subclasses}
   /// {@macro firefuel.rules.implementations}
   Future<R> readAll();
+
+  /// Get a list of documents matching all clauses
+  ///
+  /// {@macro firefuel.rules.whereWithOrderByRules}
+  ///
+  /// limit: optionally provide a maximum value of items to be returned
+  ///
+  /// {@macro firefuel.rules.whereExceptions}
+  Future<R> where(List<Clause> clauses, {List<OrderBy>? orderBy, int? limit});
 }
 
 /// Get a number of Documents from the Collection

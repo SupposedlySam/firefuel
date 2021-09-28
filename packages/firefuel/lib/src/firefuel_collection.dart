@@ -85,11 +85,34 @@ abstract class FirefuelCollection<T extends Serializable>
   }
 
   @override
-  Stream<List<T>> listenWhere(List<Clause> clauses, {int? limit}) {
-    final filteredQuery = _queryFromClauses(clauses);
-    final query = limit == null ? filteredQuery : filteredQuery.limit(limit);
+  Stream<List<T>> listenOrdered(List<OrderBy> orderBy) {
+    return ref.sort(orderBy).snapshots().toListT();
+  }
+
+  @override
+  Stream<List<T>> listenWhere(
+    List<Clause> clauses, {
+    List<OrderBy>? orderBy,
+    int? limit,
+  }) {
+    final query = _getWhereWithOrderByAndLimitQuery(
+      clauses: clauses,
+      orderBy: orderBy,
+      limit: limit,
+    );
 
     return query.snapshots().toListT();
+  }
+
+  @override
+  Future<List<T>> orderBy(List<OrderBy> orderBy, {int? limit}) async {
+    if (orderBy.isEmpty) throw MissingValueException(OrderBy);
+
+    final query = ref.sort(orderBy).limitIfNotNull(limit);
+
+    final snapshot = await query.get();
+
+    return snapshot.docs.toListT();
   }
 
   @override
@@ -106,12 +129,12 @@ abstract class FirefuelCollection<T extends Serializable>
         ? Chunk<T>.next(
             data: data,
             cursor: cursor,
-            orderByField: chunk.orderByField,
+            orderBy: chunk.orderBy,
           )
         : Chunk<T>.last(
             data: data,
             cursor: cursor,
-            orderByField: chunk.orderByField,
+            orderBy: chunk.orderBy,
           );
   }
 
@@ -122,17 +145,11 @@ abstract class FirefuelCollection<T extends Serializable>
   Future<QuerySnapshot<T?>> _buildPaginationSnapshot(Chunk<T> chunk) async {
     var query = ref
         .filterIfNotNull(chunk.clauses)
-        .orderIfNotNull(chunk.orderByField)
+        .sortIfNotNull(chunk.orderBy)
         .startAfterIfNotNull(chunk.cursor)
         .limitIfNotNull(chunk.limit);
 
     return query.get();
-  }
-
-  Query<T?> filterRef(Chunk<T> chunk, List<Clause>? clauses) {
-    if (clauses == null) return ref;
-
-    return _queryFromClauses(chunk.clauses!);
   }
 
   @override
@@ -221,31 +238,48 @@ abstract class FirefuelCollection<T extends Serializable>
   }
 
   @override
-  Future<List<T>> where(List<Clause> clauses, {int? limit}) async {
-    final filteredQuery = _queryFromClauses(clauses);
-    final query = limit == null ? filteredQuery : filteredQuery.limit(limit);
+  Future<List<T>> where(
+    List<Clause> clauses, {
+    List<OrderBy>? orderBy,
+    int? limit,
+  }) async {
+    final query = _getWhereWithOrderByAndLimitQuery(
+      clauses: clauses,
+      orderBy: orderBy,
+      limit: limit,
+    );
+
     final snapshot = await query.get();
 
     return snapshot.docs.toListT();
   }
 
-  Query<T?> _queryFromClauses(List<Clause> clauses) {
-    if (clauses.isEmpty) throw MissingValueException(Clause);
+  Query<T?> _getWhereWithOrderByAndLimitQuery({
+    required List<Clause> clauses,
+    required List<OrderBy>? orderBy,
+    required int? limit,
+  }) {
+    if (clauses.isEmpty) {
+      throw MissingValueException(Clause);
+    } else if (Clause.hasMoreThanOneFieldInRangeComparisons(clauses)) {
+      throw MoreThanOneFieldInRangeClauseException();
+    }
 
-    return clauses.fold(ref, (result, clause) {
-      return result.where(
-        clause.field,
-        isEqualTo: clause.isEqualTo,
-        isNotEqualTo: clause.isNotEqualTo,
-        isLessThan: clause.isLessThan,
-        isLessThanOrEqualTo: clause.isLessThanOrEqualTo,
-        isGreaterThan: clause.isGreaterThan,
-        isGreaterThanOrEqualTo: clause.isGreaterThanOrEqualTo,
-        arrayContains: clause.arrayContains,
-        whereIn: clause.whereIn,
-        whereNotIn: clause.whereNotIn,
-        isNull: clause.isNull,
-      );
-    });
+    final augmentedOrderBys = OrderBy.moveOrCreateMatchingField(
+      fieldToMatch: clauses.first.field,
+      orderBy: orderBy,
+      isRangeComparison: Clause.hasRangeComparison(clauses),
+    );
+
+    final processedOrderBys = OrderBy.removeEqualtyAndInMatchingFields(
+      fieldsToMatch: Clause.getEqualityOrInComparisonFields(clauses),
+      orderBy: augmentedOrderBys,
+      isEqualityOrInComparison: Clause.hasEqualityOrInComparison(clauses),
+    );
+
+    return ref
+        .filter(clauses)
+        .sortIfNotNull(processedOrderBys)
+        .limitIfNotNull(limit);
   }
 }
