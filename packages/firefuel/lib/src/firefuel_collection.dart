@@ -25,9 +25,6 @@ abstract class FirefuelCollection<T extends Serializable>
     );
   }
 
-  @override
-  Stream<List<T>> get stream => listenAll();
-
   CollectionReference<Map<String, dynamic>> get untypedRef {
     return firestore.collection(path);
   }
@@ -70,27 +67,27 @@ abstract class FirefuelCollection<T extends Serializable>
   }
 
   @override
-  Stream<T?> listen(DocumentId docId) {
+  Stream<T?> stream(DocumentId docId) {
     return ref.doc(docId.docId).snapshots().toMaybeT();
   }
 
   @override
-  Stream<List<T>> listenAll() {
+  Stream<List<T>> streamAll() {
     return ref.snapshots().toListT();
   }
 
   @override
-  Stream<List<T>> listenLimited(int limit) {
+  Stream<List<T>> streamLimited(int limit) {
     return ref.limit(limit).snapshots().toListT();
   }
 
   @override
-  Stream<List<T>> listenOrdered(List<OrderBy> orderBy) {
+  Stream<List<T>> streamOrdered(List<OrderBy> orderBy) {
     return ref.sort(orderBy).snapshots().toListT();
   }
 
   @override
-  Stream<List<T>> listenWhere(
+  Stream<List<T>> streamWhere(
     List<Clause> clauses, {
     List<OrderBy>? orderBy,
     int? limit,
