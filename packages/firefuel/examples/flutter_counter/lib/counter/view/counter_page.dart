@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_counter/counter/data/collection/counter_collection.dart';
+import 'package:flutter_counter/counter/data/repo/counter_repository.dart';
 
 import '../counter.dart';
 import 'counter_view.dart';
@@ -15,7 +17,9 @@ class CounterPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (_) => CounterCubit(),
+      create: (_) => CounterCubit(
+        counterRepo: CounterRepository(collection: CounterCollection()),
+      ),
       child: CounterView(),
     );
   }
