@@ -13,6 +13,4 @@ abstract class Collection<T extends Serializable>
   const Collection();
 
   CollectionReference<T?> get ref;
-
-  Stream<List<T>> get stream;
 }

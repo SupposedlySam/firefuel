@@ -32,32 +32,32 @@ abstract class FirefuelRepository<T extends Serializable>
   }
 
   @override
-  Stream<Either<Failure, T?>> listen(DocumentId docId) {
-    return guardStream(() => _collection.listen(docId));
+  Stream<Either<Failure, T?>> stream(DocumentId docId) {
+    return guardStream(() => _collection.stream(docId));
   }
 
   @override
-  Stream<Either<Failure, List<T>>> listenAll() {
-    return guardStream(() => _collection.listenAll());
+  Stream<Either<Failure, List<T>>> streamAll() {
+    return guardStream(() => _collection.streamAll());
   }
 
   @override
-  Stream<Either<Failure, List<T>>> listenLimited(int limit) {
-    return guardStream(() => _collection.listenLimited(limit));
+  Stream<Either<Failure, List<T>>> streamLimited(int limit) {
+    return guardStream(() => _collection.streamLimited(limit));
   }
 
   @override
-  Stream<Either<Failure, List<T>>> listenOrdered(List<OrderBy> orderBy) {
-    return guardStream(() => _collection.listenOrdered(orderBy));
+  Stream<Either<Failure, List<T>>> streamOrdered(List<OrderBy> orderBy) {
+    return guardStream(() => _collection.streamOrdered(orderBy));
   }
 
   @override
-  Stream<Either<Failure, List<T>>> listenWhere(
+  Stream<Either<Failure, List<T>>> streamWhere(
     List<Clause> clauses, {
     List<OrderBy>? orderBy,
     int? limit,
   }) {
-    return guardStream(() => _collection.listenWhere(clauses, limit: limit));
+    return guardStream(() => _collection.streamWhere(clauses, limit: limit));
   }
 
   @override

@@ -15,11 +15,11 @@ extension MockCollectionX<T extends Serializable> on MockCollection<T> {
     DocumentId Function()? onCreateById,
     Null Function()? onDelete,
     List<T> Function()? onLimit,
-    Stream<T?> Function()? onListen,
-    Stream<List<T>> Function()? onListenAll,
-    Stream<List<T>> Function()? onListenLimited,
-    Stream<List<T>> Function()? onListenOrdered,
-    Stream<List<T>> Function()? onListenWhere,
+    Stream<T?> Function()? onStream,
+    Stream<List<T>> Function()? onStreamAll,
+    Stream<List<T>> Function()? onStreamLimited,
+    Stream<List<T>> Function()? onStreamOrdered,
+    Stream<List<T>> Function()? onStreamWhere,
     List<T> Function()? onOrderBy,
     Chunk<T> Function()? onPaginate,
     T? Function()? onRead,
@@ -58,31 +58,31 @@ extension MockCollectionX<T extends Serializable> on MockCollection<T> {
       when(() => limit(any())).thenAnswer((_) => Future.value(onLimit()));
     }
 
-    if (onListen != null) {
-      when(() => listen(any())).thenAnswer((_) => onListen());
+    if (onStream != null) {
+      when(() => stream(any())).thenAnswer((_) => onStream());
     }
 
-    if (onListenAll != null) {
-      when(() => listenAll()).thenAnswer((_) => onListenAll());
+    if (onStreamAll != null) {
+      when(() => streamAll()).thenAnswer((_) => onStreamAll());
     }
 
-    if (onListenLimited != null) {
-      when(() => listenLimited(any())).thenAnswer((_) => onListenLimited());
+    if (onStreamLimited != null) {
+      when(() => streamLimited(any())).thenAnswer((_) => onStreamLimited());
     }
 
-    if (onListenOrdered != null) {
-      when(() => listenOrdered(any())).thenAnswer((_) => onListenOrdered());
+    if (onStreamOrdered != null) {
+      when(() => streamOrdered(any())).thenAnswer((_) => onStreamOrdered());
     }
 
-    if (onListenWhere != null) {
+    if (onStreamWhere != null) {
       when(() {
-        return listenWhere(
+        return streamWhere(
           any(),
           orderBy: any(named: 'orderBy'),
           limit: any(named: 'limit'),
         );
       }).thenAnswer(
-        (_) => onListenWhere(),
+        (_) => onStreamWhere(),
       );
     }
 

@@ -19,7 +19,7 @@ abstract class CollectionRead<R, T extends Serializable> {
   /// Refreshes automatically when new data is added/removed from the collection
   ///
   /// See: StreamBuilder
-  Stream<R> listenAll();
+  Stream<R> streamAll();
 
   /// Get up to the maximum number of documents specified by the [limit]
   ///
@@ -30,7 +30,7 @@ abstract class CollectionRead<R, T extends Serializable> {
   ///
   /// Refreshes automatically when new data is added/removed from the
   /// collection
-  Stream<R> listenLimited(int limit);
+  Stream<R> streamLimited(int limit);
 
   /// Get a list of all documents from the collection sorted by [orderBy]
   ///
@@ -38,7 +38,7 @@ abstract class CollectionRead<R, T extends Serializable> {
   /// collection
   ///
   /// throws a [MissingValueException] when no [orderBy]s are given
-  Stream<R> listenOrdered(List<OrderBy> orderBy);
+  Stream<R> streamOrdered(List<OrderBy> orderBy);
 
   /// Get a list of documents matching all clauses
   ///
@@ -73,7 +73,7 @@ abstract class CollectionRead<R, T extends Serializable> {
   /// throws a [MoreThanOneFieldInRangeClauseException] when range filters are
   /// on different fields
   /// {@endtemplate}
-  Stream<R> listenWhere(
+  Stream<R> streamWhere(
     List<Clause> clauses, {
     List<OrderBy>? orderBy,
     int? limit,
@@ -90,7 +90,7 @@ abstract class CollectionRead<R, T extends Serializable> {
   ///
   /// Does NOT refresh automatically
   ///
-  /// Related: [listenAll]
+  /// Related: [streamAll]
   ///
   /// {@macro firefuel.rules.subclasses}
   /// {@macro firefuel.rules.implementations}
@@ -195,7 +195,7 @@ abstract class DocDelete<R> {
 /// {@macro firefuel.rules.implementations}
 abstract class DocRead<R> {
   /// Gets a stream of the document requested
-  Stream<R> listen(DocumentId docId);
+  Stream<R> stream(DocumentId docId);
 
   /// Gets a single document from the collection
   ///

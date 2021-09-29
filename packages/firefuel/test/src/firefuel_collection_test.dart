@@ -213,14 +213,14 @@ void main() {
     );
   });
 
-  group('#listen', () {
+  group('#stream', () {
     late Stream<TestUser?> stream;
     late DocumentId docId;
 
     setUp(() async {
       docId = await testCollection.create(defaultUser);
 
-      stream = testCollection.listen(docId);
+      stream = testCollection.stream(docId);
     });
 
     test('should output new value when doc updates', () async {
@@ -245,7 +245,7 @@ void main() {
     });
   });
 
-  group('#listenAll', () {
+  group('#streamAll', () {
     late Stream<List<TestUser>> stream;
     late DocumentId docId;
     final newUser1 = TestUser('newUser1');
@@ -255,7 +255,7 @@ void main() {
       docId = await testCollection.create(defaultUser);
       await testCollection.create(newUser1);
 
-      stream = testCollection.listenAll();
+      stream = testCollection.streamAll();
     });
 
     test('should update when an item is added', () async {
@@ -282,7 +282,7 @@ void main() {
     });
   });
 
-  group('#listenLimited', () {
+  group('#streamLimited', () {
     setUp(() async {
       await testCollection.create(defaultUser);
       await testCollection.create(defaultUser);
@@ -290,7 +290,7 @@ void main() {
     });
 
     test('when items are less than limit, should return all items', () {
-      final stream = testCollection.listenLimited(4);
+      final stream = testCollection.streamLimited(4);
 
       expect(
         stream,
@@ -303,7 +303,7 @@ void main() {
     test(
       'when items are greater than limit, should return items up to limit',
       () {
-        final stream = testCollection.listenLimited(2);
+        final stream = testCollection.streamLimited(2);
 
         expect(
           stream,
@@ -317,7 +317,7 @@ void main() {
     test(
       'when items are equal to limit, should return all items',
       () {
-        final stream = testCollection.listenLimited(3);
+        final stream = testCollection.streamLimited(3);
 
         expect(
           stream,
@@ -329,7 +329,7 @@ void main() {
     );
   });
 
-  group('#listenOrdered', () {
+  group('#streamOrdered', () {
     late Stream<List<TestUser>> stream;
     late DocumentId docId;
     final newUser1 = TestUser('Alfred');
@@ -341,7 +341,7 @@ void main() {
       await testCollection.create(newUser3);
 
       stream =
-          testCollection.listenOrdered([OrderBy(field: TestUser.fieldName)]);
+          testCollection.streamOrdered([OrderBy(field: TestUser.fieldName)]);
     });
 
     test('should return an ordered list', () async {
@@ -379,7 +379,7 @@ void main() {
     });
   });
 
-  group('#listenWhere', () {
+  group('#streamWhere', () {
     const String expectedName = 'expectedName';
     final expectedUser = TestUser(expectedName);
 
@@ -394,7 +394,7 @@ void main() {
       });
 
       test('should return a subset of the existing list', () {
-        final filteredStream = testCollection.listenWhere(
+        final filteredStream = testCollection.streamWhere(
           [Clause(TestUser.fieldName, isEqualTo: expectedName)],
         );
 
@@ -407,7 +407,7 @@ void main() {
       });
 
       test('should return a subset based on multiple clauses', () {
-        final filteredStream = testCollection.listenWhere(
+        final filteredStream = testCollection.streamWhere(
           [
             Clause(TestUser.fieldName, isNotEqualTo: unexpectedName1),
             Clause(TestUser.fieldName, isNotEqualTo: unexpectedName2),
@@ -424,7 +424,7 @@ void main() {
 
       test('should throw $MissingValueException when no clauses are given', () {
         expect(
-          () => testCollection.listenWhere([]),
+          () => testCollection.streamWhere([]),
           throwsA(isA<MissingValueException>()),
         );
       });
@@ -433,7 +433,7 @@ void main() {
         'should throw $MoreThanOneFieldInRangeClauseException when more than one field is used in multiple range clauses',
         () {
           expect(
-            () => testCollection.listenWhere([
+            () => testCollection.streamWhere([
               Clause('firstField', isGreaterThan: 44),
               Clause('secondField', isLessThan: 22)
             ]),
@@ -450,7 +450,7 @@ void main() {
         await testCollection.create(expectedUser);
         await testCollection.create(expectedUser);
 
-        final limitedStream = testCollection.listenWhere(
+        final limitedStream = testCollection.streamWhere(
           [Clause(TestUser.fieldName, isEqualTo: expectedName)],
           limit: 1,
         );
@@ -833,7 +833,7 @@ void main() {
         'should throw $MoreThanOneFieldInRangeClauseException when more than one field is used in multiple range clauses',
         () {
           expect(
-            () => testCollection.listenWhere([
+            () => testCollection.streamWhere([
               Clause('firstField', isGreaterThan: 44),
               Clause('secondField', isLessThan: 22)
             ]),
