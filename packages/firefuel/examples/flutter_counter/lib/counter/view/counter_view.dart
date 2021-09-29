@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_counter/counter/data/domain/counter_model.dart';
 
 import '../counter.dart';
 
@@ -14,9 +15,9 @@ class CounterView extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(title: const Text('Counter')),
       body: Center(
-        child: BlocBuilder<CounterCubit, int>(
+        child: BlocBuilder<CounterCubit, Counter>(
           builder: (context, state) {
-            return Text('$state', style: textTheme.headline2);
+            return Text('${state.value}', style: textTheme.headline2);
           },
         ),
       ),
