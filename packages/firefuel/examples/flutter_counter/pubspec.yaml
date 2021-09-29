@@ -1,0 +1,26 @@
+name: flutter_counter
+description: A new Flutter project.
+version: 1.0.0+1
+publish_to: none
+
+environment:
+  sdk: ">=2.13.0 <3.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  bloc: ^7.2.1
+  flutter_bloc: ^7.3.0
+  firefuel:
+    path: ../../../firefuel
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  bloc_test: ^8.2.0
+  mocktail: ^0.1.4
+  integration_test:
+    sdk: flutter
+
+flutter:
+  uses-material-design: true
