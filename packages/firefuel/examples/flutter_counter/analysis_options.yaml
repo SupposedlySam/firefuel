@@ -4,6 +4,10 @@ analyzer:
     implicit-dynamic: false
   errors:
     close_sinks: ignore
+    public_member_api_docs: ignore
+    implicit_dynamic_map_literal: ignore
+    argument_type_not_assignable: ignore
+    unnecessary_lambdas: ignore
 
 linter:
   rules:
