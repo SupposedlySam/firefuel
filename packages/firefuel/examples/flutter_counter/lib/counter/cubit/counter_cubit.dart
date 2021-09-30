@@ -1,3 +1,5 @@
+import 'package:flutter/foundation.dart';
+
 import 'package:bloc/bloc.dart';
 import 'package:firefuel/firefuel.dart';
 
@@ -25,7 +27,7 @@ class CounterCubit extends Cubit<Counter> {
     );
 
     result.fold(
-      (l) => print(l.error),
+      (l) => debugPrint(l.error.toString()),
       (r) => emit(r),
     );
   }
@@ -40,7 +42,7 @@ class CounterCubit extends Cubit<Counter> {
     );
 
     result.fold(
-      (l) => print(l.error),
+      (l) => debugPrint(l.error.toString()),
       (r) => emit(r),
     );
   }

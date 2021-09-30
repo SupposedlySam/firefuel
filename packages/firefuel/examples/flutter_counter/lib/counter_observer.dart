@@ -1,3 +1,5 @@
+import 'package:flutter/foundation.dart';
+
 import 'package:bloc/bloc.dart';
 
 /// {@template counter_observer}
@@ -8,6 +10,6 @@ class CounterObserver extends BlocObserver {
   @override
   void onChange(BlocBase bloc, Change change) {
     super.onChange(bloc, change);
-    print('${bloc.runtimeType} $change');
+    debugPrint('${bloc.runtimeType} $change');
   }
 }
