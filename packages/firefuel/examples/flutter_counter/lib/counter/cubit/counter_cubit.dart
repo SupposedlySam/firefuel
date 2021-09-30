@@ -6,11 +6,11 @@ import 'package:firefuel/firefuel.dart';
 import 'package:flutter_counter/counter/data/domain/counter_model.dart';
 import 'package:flutter_counter/counter/data/repo/counter_repository.dart';
 
-/// {@template counter_cubit}
+/// {@template flutter_counter.counter_cubit}
 /// A [Cubit] which manages a [Counter] as its state.
 /// {@endtemplate}
 class CounterCubit extends Cubit<Counter> {
-  /// {@macro counter_cubit}
+  /// {@macro flutter_counter.counter_cubit}
   CounterCubit({
     required this.counterRepo,
   }) : super(const Counter(id: 'count', value: 0));
@@ -22,13 +22,13 @@ class CounterCubit extends Cubit<Counter> {
     final incrementedState = state.copyWith(value: state.value + 1);
 
     final result = await counterRepo.updateOrCreate(
-      docId: DocumentId(incrementedState.id),
+      docId: DocumentId(incrementedState.id), // docId == count
       value: incrementedState,
     );
 
     result.fold(
-      (l) => debugPrint(l.error.toString()),
-      (r) => emit(r),
+      (failure) => debugPrint(failure.error.toString()),
+      (success) => emit(success),
     );
   }
 
@@ -37,13 +37,13 @@ class CounterCubit extends Cubit<Counter> {
     final decrementedState = state.copyWith(value: state.value - 1);
 
     final result = await counterRepo.updateOrCreate(
-      docId: DocumentId(decrementedState.id),
+      docId: DocumentId(decrementedState.id), // docId == count
       value: decrementedState,
     );
 
     result.fold(
-      (l) => debugPrint(l.error.toString()),
-      (r) => emit(r),
+      (failure) => debugPrint(failure.error.toString()),
+      (success) => emit(success),
     );
   }
 }
