@@ -1,8 +1,9 @@
 import 'dart:convert';
 
 import 'package:equatable/equatable.dart';
+
+import 'package:firefuel_core/firefuel_core.dart';
 import 'package:firefuel_core/src/models/document_id/document_id_serializer.dart';
-import 'package:firefuel_core/src/serializable.dart';
 
 /// Strips out illegal characters from a string intended to be used as a
 /// document ID in Firestore
@@ -75,11 +76,3 @@ class DocumentId extends Serializable with EquatableMixin {
   @override
   List<Object?> get props => [docId];
 }
-
-class CannotBeNoLongerThan1500Bytes extends FormatException {}
-
-class CannotSolelyConsistOfASingleOrDoublePeriod extends FormatException {}
-
-class CannotStartAndEndWithDoubleUnderscore extends FormatException {}
-
-class CannotContainForwardSlash extends FormatException {}

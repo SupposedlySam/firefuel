@@ -50,7 +50,7 @@ A Repository in Firefuel is equivalent to a top level collection (TLC) in your F
 
 As mentioned previously, Firestore has the ability to contain subcollections. Subcollections have all the same functionality as a top level collection, but are nested inside of a top level collection (TLC). 
 
-[repository_subcollections.dart](_snippets/architecture/repository_subcollections.dart.md ':include')
+[repository_subcollections.dart](_snippets/core_concepts/repository_subcollections.dart.md ':include')
 
 As seen in the previous snippet, you can provide methods or getters to access your subcollections directly from the Repository.
 
