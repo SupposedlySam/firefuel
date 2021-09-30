@@ -1,14 +1,18 @@
+// Flutter imports:
+import 'package:flutter/material.dart';
+
+// Package imports:
 import 'package:bloc_test/bloc_test.dart';
 import 'package:fake_cloud_firestore/fake_cloud_firestore.dart';
 import 'package:firefuel/firefuel.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_counter/counter/counter.dart';
-import 'package:flutter_counter/counter/data/domain/counter_model.dart';
-import 'package:flutter_counter/counter/view/counter_view.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 
+// Project imports:
+import 'package:flutter_counter/counter/counter.dart';
+import 'package:flutter_counter/counter/data/domain/counter_model.dart';
+import 'package:flutter_counter/counter/view/counter_view.dart';
 import '../../utils/test_counter.dart';
 
 class MockCounterCubit extends MockCubit<Counter> implements CounterCubit {}

@@ -1,4 +1,7 @@
+// Package imports:
 import 'package:firefuel/firefuel.dart';
+
+// Project imports:
 import 'package:flutter_counter/counter/data/collection/counter_collection.dart';
 import 'package:flutter_counter/counter/data/domain/counter_model.dart';
 

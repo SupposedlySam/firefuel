@@ -1,11 +1,17 @@
 // ignore_for_file: prefer_const_constructors
+
+// Flutter imports:
+import 'package:flutter/material.dart';
+
+// Package imports:
 import 'package:fake_cloud_firestore/fake_cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firefuel/firefuel.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter_test/flutter_test.dart';
+
+// Project imports:
 import 'package:flutter_counter/app.dart';
 import 'package:flutter_counter/counter/counter.dart';
-import 'package:flutter_test/flutter_test.dart';
 
 void main() {
   setUp(() => Firefuel.initialize(FakeFirebaseFirestore()));

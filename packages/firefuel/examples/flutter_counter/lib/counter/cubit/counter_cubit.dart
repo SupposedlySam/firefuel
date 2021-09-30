@@ -1,5 +1,8 @@
+// Package imports:
 import 'package:bloc/bloc.dart';
 import 'package:firefuel/firefuel.dart';
+
+// Project imports:
 import 'package:flutter_counter/counter/data/domain/counter_model.dart';
 import 'package:flutter_counter/counter/data/repo/counter_repository.dart';
 

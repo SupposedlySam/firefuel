@@ -1,7 +1,11 @@
+// Flutter imports:
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_counter/counter/data/domain/counter_model.dart';
 
+// Package imports:
+import 'package:flutter_bloc/flutter_bloc.dart';
+
+// Project imports:
+import 'package:flutter_counter/counter/data/domain/counter_model.dart';
 import '../counter.dart';
 
 /// {@template counter_view}
