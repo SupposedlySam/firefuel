@@ -1,10 +1,8 @@
-// Package imports:
 import 'package:bloc_test/bloc_test.dart';
 import 'package:fake_cloud_firestore/fake_cloud_firestore.dart';
 import 'package:firefuel/firefuel.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-// Project imports:
 import 'package:flutter_counter/counter/counter.dart';
 import 'package:flutter_counter/counter/data/collection/counter_collection.dart';
 import 'package:flutter_counter/counter/data/domain/counter_model.dart';

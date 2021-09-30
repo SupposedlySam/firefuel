@@ -1,4 +1,3 @@
-// Package imports:
 import 'package:firefuel/firefuel.dart';
 
 class Counter extends Serializable {

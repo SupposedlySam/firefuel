@@ -1,13 +1,10 @@
-// Flutter imports:
 import 'package:flutter/material.dart';
 
-// Package imports:
 import 'package:bloc/bloc.dart';
 import 'package:fake_cloud_firestore/fake_cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firefuel/firefuel.dart';
 
-// Project imports:
 import 'app.dart';
 import 'counter_observer.dart';
 

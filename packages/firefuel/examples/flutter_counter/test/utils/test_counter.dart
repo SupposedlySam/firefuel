@@ -1,4 +1,3 @@
-// Project imports:
 import 'package:flutter_counter/counter/data/domain/counter_model.dart';
 
 class TestCounter extends Counter {
