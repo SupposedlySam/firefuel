@@ -7,6 +7,8 @@ import 'package:flutter_counter/counter/data/domain/counter_model.dart';
 import 'package:flutter_counter/counter/data/repo/counter_repository.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import '../../utils/test_counter.dart';
+
 void main() {
   late CounterCubit counterCubit;
 
@@ -76,8 +78,4 @@ void main() {
       );
     });
   });
-}
-
-class TestCounter extends Counter {
-  const TestCounter(int value) : super(id: 'count', value: value);
 }
