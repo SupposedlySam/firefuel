@@ -1,10 +1,15 @@
 // ignore_for_file: prefer_const_constructors
+import 'package:fake_cloud_firestore/fake_cloud_firestore.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firefuel/firefuel.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_counter/app.dart';
 import 'package:flutter_counter/counter/counter.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
+  setUp(() => Firefuel.initialize(FakeFirebaseFirestore()));
+
   group('CounterApp', () {
     testWidgets('is a MaterialApp', (tester) async {
       expect(CounterApp(), isA<MaterialApp>());
