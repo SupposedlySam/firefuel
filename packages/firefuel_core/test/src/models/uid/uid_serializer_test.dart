@@ -1,8 +1,9 @@
 import 'dart:convert';
 
+import 'package:test/test.dart';
+
 import 'package:firefuel_core/src/models/uid/uid_model.dart';
 import 'package:firefuel_core/src/models/uid/uid_serializer.dart';
-import 'package:test/test.dart';
 
 void main() {
   const uidValue = 'someTestValue',

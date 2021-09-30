@@ -2,8 +2,9 @@ import 'dart:convert';
 import 'dart:math';
 import 'dart:typed_data';
 
-import 'package:firefuel_core/src/models/document_id/document_id_model.dart';
 import 'package:test/test.dart';
+
+import 'package:firefuel_core/firefuel_core.dart';
 
 void main() {
   test('should remove all forward from input', () {

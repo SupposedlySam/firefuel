@@ -1,5 +1,6 @@
-import 'package:firefuel_core/src/models/uid/uid_model.dart';
 import 'package:test/test.dart';
+
+import 'package:firefuel_core/src/models/uid/uid_model.dart';
 
 void main() {
   test('should store unmodified input', () {
