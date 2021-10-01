@@ -24,7 +24,7 @@ abstract class FirefuelFailure extends Failure {
     final isTesting = Platform.environment.containsKey('FLUTTER_TEST');
 
     if (!isTesting) {
-      print(toString());
+      print(toString()); // coverage:ignore-line
     }
   }
 }
