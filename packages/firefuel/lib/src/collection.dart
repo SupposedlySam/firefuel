@@ -10,7 +10,7 @@ abstract class Collection<T extends Serializable>
         DocRead<T?>,
         DocReplace<Null, T>,
         DocUpdate<Null, T> {
-  const Collection();
+  const Collection(); // coverage:ignore-line
 
   CollectionReference<T?> get ref;
 }

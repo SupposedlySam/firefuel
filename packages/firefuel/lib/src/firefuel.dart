@@ -1,8 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class Firefuel {
-  const Firefuel._();
-
   static FirebaseFirestore get firestore {
     assert(_firestore != null, 'Firefuel is not initialized');
     return _firestore!;

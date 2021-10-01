@@ -4,24 +4,34 @@ import 'package:firefuel/firefuel.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:flutter_counter/counter/counter.dart';
-import 'package:flutter_counter/counter/data/collection/counter_collection.dart';
-import 'package:flutter_counter/counter/data/domain/counter_model.dart';
-import 'package:flutter_counter/counter/data/repo/counter_repository.dart';
-import '../../utils/test_counter.dart';
+import 'package:firefuel_counter/firefuel_counter.dart';
 
 void main() {
+  final docId = DocumentId('count');
   late CounterCubit counterCubit;
+  late CounterRepository counterRepo;
 
-  setUp(() {
+  setUp(() async {
     Firefuel.initialize(FakeFirebaseFirestore());
-    final counterRepository =
-        CounterRepository(collection: CounterCollection());
-    counterCubit = CounterCubit(counterRepo: counterRepository);
+
+    counterRepo = CounterRepository(
+      collection: CounterCollection(),
+    );
+
+    final defaultValue = await counterRepo.readOrCreate(
+      docId: docId,
+      createValue: Counter.initial(),
+    );
+
+    counterCubit = CounterCubit(
+      counterRepo: counterRepo,
+      defaultValue: defaultValue.getRight(),
+    );
   });
 
   group('CounterCubit', () {
     test('initial state is 0', () {
-      expect(counterCubit.state, const TestCounter(0));
+      expect(counterCubit.state, const Counter(0));
     });
 
     group('increment', () {
@@ -29,7 +39,7 @@ void main() {
         'emits [1] when state is 0',
         build: () => counterCubit,
         act: (cubit) async => await cubit.increment(),
-        expect: () => const <Counter>[TestCounter(1)],
+        expect: () => const <Counter>[Counter(1)],
       );
 
       blocTest<CounterCubit, Counter>(
@@ -39,16 +49,29 @@ void main() {
           await cubit.increment();
           await cubit.increment();
         },
-        expect: () => const <Counter>[TestCounter(1), TestCounter(2)],
+        expect: () => const <Counter>[Counter(1), Counter(2)],
       );
 
-      blocTest<CounterCubit, Counter>(
-        'emits [42] when state is 41',
-        build: () => counterCubit,
-        seed: () => const TestCounter(41),
-        act: (cubit) async => await cubit.increment(),
-        expect: () => const <Counter>[TestCounter(42)],
-      );
+      group('with default of 41', () {
+        setUp(() async {
+          await counterRepo.update(
+            docId: docId,
+            value: Counter(41),
+          );
+
+          counterCubit = CounterCubit(
+            counterRepo: counterRepo,
+            defaultValue: Counter(41),
+          );
+        });
+
+        blocTest<CounterCubit, Counter>(
+          'emits [42] when state is 41',
+          build: () => counterCubit,
+          act: (cubit) async => await cubit.increment(),
+          expect: () => const <Counter>[Counter(42)],
+        );
+      });
     });
 
     group('decrement', () {
@@ -56,7 +79,7 @@ void main() {
         'emits [-1] when state is 0',
         build: () => counterCubit,
         act: (cubit) async => await cubit.decrement(),
-        expect: () => const <Counter>[TestCounter(-1)],
+        expect: () => const <Counter>[Counter(-1)],
       );
 
       blocTest<CounterCubit, Counter>(
@@ -66,16 +89,29 @@ void main() {
           await cubit.decrement();
           await cubit.decrement();
         },
-        expect: () => const <Counter>[TestCounter(-1), TestCounter(-2)],
+        expect: () => const <Counter>[Counter(-1), Counter(-2)],
       );
 
-      blocTest<CounterCubit, Counter>(
-        'emits [42] when state is 43',
-        build: () => counterCubit,
-        seed: () => const Counter(id: 'count', value: 43),
-        act: (cubit) async => await cubit.decrement(),
-        expect: () => const <Counter>[TestCounter(42)],
-      );
+      group('with default of 43', () {
+        setUp(() async {
+          await counterRepo.update(
+            docId: docId,
+            value: Counter(43),
+          );
+
+          counterCubit = CounterCubit(
+            counterRepo: counterRepo,
+            defaultValue: Counter(43),
+          );
+        });
+
+        blocTest<CounterCubit, Counter>(
+          'emits [42] when state is 43',
+          build: () => counterCubit,
+          act: (cubit) async => await cubit.decrement(),
+          expect: () => const <Counter>[Counter(42)],
+        );
+      });
     });
   });
 }

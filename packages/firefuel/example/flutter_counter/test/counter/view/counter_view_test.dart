@@ -8,9 +8,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 
 import 'package:flutter_counter/counter/counter.dart';
-import 'package:flutter_counter/counter/data/domain/counter_model.dart';
+import 'package:firefuel_counter/firefuel_counter.dart';
 import 'package:flutter_counter/counter/view/counter_view.dart';
-import '../../utils/test_counter.dart';
 
 class MockCounterCubit extends MockCubit<Counter> implements CounterCubit {}
 
@@ -21,7 +20,7 @@ void main() {
   late CounterCubit counterCubit;
 
   setUpAll(() {
-    registerFallbackValue(const TestCounter(0));
+    registerFallbackValue(const Counter(0));
   });
 
   setUp(() {
@@ -32,7 +31,7 @@ void main() {
   group('CounterView', () {
     testWidgets('renders current CounterCubit state', (tester) async {
       when(() => counterCubit.state).thenReturn(
-        const TestCounter(42),
+        const Counter(42),
       );
       await tester.pumpWidget(
         MaterialApp(
@@ -46,7 +45,7 @@ void main() {
     });
 
     testWidgets('tapping increment button invokes increment', (tester) async {
-      when(() => counterCubit.state).thenReturn(const TestCounter(0));
+      when(() => counterCubit.state).thenReturn(const Counter(0));
       when(() => counterCubit.increment()).thenAnswer((_) => Future.value());
       await tester.pumpWidget(
         MaterialApp(
@@ -61,7 +60,7 @@ void main() {
     });
 
     testWidgets('tapping decrement button invokes decrement', (tester) async {
-      when(() => counterCubit.state).thenReturn(const TestCounter(0));
+      when(() => counterCubit.state).thenReturn(const Counter(0));
       when(() => counterCubit.decrement()).thenAnswer((_) => Future.value());
       await tester.pumpWidget(
         MaterialApp(

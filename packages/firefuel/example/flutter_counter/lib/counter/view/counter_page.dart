@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 
+import 'package:firefuel/firefuel.dart';
+import 'package:firefuel_counter/firefuel_counter.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import 'package:flutter_counter/counter/data/collection/counter_collection.dart';
-import 'package:flutter_counter/counter/data/repo/counter_repository.dart';
 import '../counter.dart';
 import 'counter_view.dart';
 
@@ -17,11 +17,39 @@ class CounterPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (_) => CounterCubit(
-        counterRepo: CounterRepository(collection: CounterCollection()),
-      ),
-      child: CounterView(),
+    final counterRepo = CounterRepository(collection: CounterCollection());
+    final getInitialCounter = counterRepo.readOrCreate(
+      docId: DocumentId('counter'),
+      createValue: Counter.initial(),
     );
+
+    return FutureBuilder<Either<Failure, Counter>>(
+        future: getInitialCounter,
+        builder: (context, snapshot) {
+          if (snapshot.hasData) {
+            return snapshot.data!.fold(
+              (failure) {
+                return Scaffold(
+                  body: Center(
+                    child: SelectableText(
+                      failure.error.toString(),
+                    ),
+                  ),
+                );
+              },
+              (counter) {
+                return BlocProvider(
+                  create: (_) => CounterCubit(
+                    counterRepo: counterRepo,
+                    defaultValue: counter,
+                  ),
+                  child: CounterView(),
+                );
+              },
+            );
+          }
+
+          return Scaffold(body: Center(child: Text('Please Wait...')));
+        });
   }
 }

@@ -10,5 +10,5 @@ abstract class Repository<T extends Serializable>
         DocRead<Either<Failure, T?>>,
         DocReplace<Either<Failure, Null>, T>,
         DocUpdate<Either<Failure, Null>, T> {
-  const Repository();
+  const Repository(); // coverage:ignore-line
 }

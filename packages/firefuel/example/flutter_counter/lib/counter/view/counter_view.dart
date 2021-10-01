@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
+import 'package:firefuel_counter/firefuel_counter.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import 'package:flutter_counter/counter/data/domain/counter_model.dart';
 import '../counter.dart';
 
 /// {@template counter_view}

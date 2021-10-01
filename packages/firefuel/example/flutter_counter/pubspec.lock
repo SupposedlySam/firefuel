@@ -86,7 +86,7 @@ packages:
     source: hosted
     version: "1.1.0"
   cloud_firestore:
-    dependency: "direct main"
+    dependency: transitive
     description:
       name: cloud_firestore
       url: "https://pub.dartlang.org"
@@ -170,7 +170,7 @@ packages:
     source: hosted
     version: "6.1.2"
   firebase_core:
-    dependency: "direct main"
+    dependency: transitive
     description:
       name: firebase_core
       url: "https://pub.dartlang.org"
@@ -191,7 +191,7 @@ packages:
     source: hosted
     version: "1.1.0"
   firefuel:
-    dependency: "direct main"
+    dependency: transitive
     description:
       path: "../.."
       relative: true
@@ -203,6 +203,13 @@ packages:
       name: firefuel_core
       url: "https://pub.dartlang.org"
     source: hosted
+    version: "0.0.1"
+  firefuel_counter:
+    dependency: "direct main"
+    description:
+      path: "../packages/firefuel_counter"
+      relative: true
+    source: path
     version: "0.0.1"
   flutter:
     dependency: "direct main"

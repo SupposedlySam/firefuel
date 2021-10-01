@@ -1,6 +1,6 @@
-import 'package:firefuel/firefuel.dart';
-
 import 'package:flutter_test/flutter_test.dart';
+
+import 'package:firefuel/firefuel.dart';
 
 void main() {
   late TestFetchMixin testFetchMixin;
@@ -30,6 +30,34 @@ void main() {
       );
 
       expect(result.getLeft(), isA<FirestoreFailure>());
+    });
+  });
+
+  group('#guardStream', () {
+    test('should return Right on success', () async {
+      final result = await testFetchMixin.guardStream(
+        () => Stream.fromIterable(['successValue!']),
+      );
+
+      expect(await result.first, isA<Right<Failure, String>>());
+    });
+
+    test('should return Left on failure', () async {
+      final result = await testFetchMixin.guardStream<String>(
+        () => throw FormatException(),
+      );
+
+      expect(await result.first, isA<Left<Failure, String>>());
+    });
+
+    test('should return $FirestoreFailure on failure', () async {
+      final result = await testFetchMixin.guardStream<String>(
+        () => throw FormatException('some output'),
+      );
+
+      final first = await result.first;
+
+      expect(first.getLeft(), isA<FirestoreFailure>());
     });
   });
 }

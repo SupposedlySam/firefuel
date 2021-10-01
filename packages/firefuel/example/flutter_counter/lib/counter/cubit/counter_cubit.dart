@@ -1,10 +1,8 @@
 import 'package:flutter/foundation.dart';
 
 import 'package:bloc/bloc.dart';
+import 'package:firefuel_counter/firefuel_counter.dart';
 import 'package:firefuel/firefuel.dart';
-
-import 'package:flutter_counter/counter/data/domain/counter_model.dart';
-import 'package:flutter_counter/counter/data/repo/counter_repository.dart';
 
 /// {@template flutter_counter.counter_cubit}
 /// A [Cubit] which manages a [Counter] as its state.
@@ -13,17 +11,18 @@ class CounterCubit extends Cubit<Counter> {
   /// {@macro flutter_counter.counter_cubit}
   CounterCubit({
     required this.counterRepo,
-  }) : super(const Counter(id: 'count', value: 0));
+    required this.defaultValue,
+  }) : super(defaultValue);
 
+  static const _stepper = Counter(1);
   final CounterRepository counterRepo;
+  final Counter defaultValue;
 
   /// Add 1 to the current state.
   Future<void> increment() async {
-    final incrementedState = state.copyWith(value: state.value + 1);
-
-    final result = await counterRepo.updateOrCreate(
-      docId: DocumentId(incrementedState.id), // docId == count
-      value: incrementedState,
+    final result = await counterRepo.increment(
+      docId: DocumentId(state.id),
+      counter: _stepper,
     );
 
     result.fold(
@@ -34,11 +33,9 @@ class CounterCubit extends Cubit<Counter> {
 
   /// Subtract 1 from the current state.
   Future<void> decrement() async {
-    final decrementedState = state.copyWith(value: state.value - 1);
-
-    final result = await counterRepo.updateOrCreate(
-      docId: DocumentId(decrementedState.id), // docId == count
-      value: decrementedState,
+    final result = await counterRepo.decrement(
+      docId: DocumentId(state.id),
+      counter: _stepper,
     );
 
     result.fold(

@@ -82,6 +82,7 @@ class Clause extends Equatable {
     ]);
   }
 
+  // coverage:ignore-start
   @override
   List<Object?> get props => [
         field,
@@ -97,6 +98,7 @@ class Clause extends Equatable {
         if (whereNotIn != null) whereNotIn,
         if (isNull != null) isNull,
       ];
+  // coverage:ignore-end
 
   /// Checks for non-null options and throws a [TooManyArgumentsException] when
   /// more than one option is provided
