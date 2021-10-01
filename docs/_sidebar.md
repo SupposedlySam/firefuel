@@ -8,5 +8,5 @@
   - [Naming Conventions](firefuelnamingconventions.md)
 
 - API Reference
-  - [firefuel](https://pub.dev/documentation/firefuel/latest/firefuel/firefuel.html)
+  - [firefuel](https://pub.dev/documentation/firefuel/latest/firefuel/firefuel-library.html)
   
