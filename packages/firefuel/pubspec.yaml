@@ -5,15 +5,15 @@ repository: https://github.com/SupposedlySam/firefuel
 
 environment:
   sdk: ">=2.12.0 <3.0.0"
-  flutter: ">=2.2.0 <3.0.0"
+  flutter: ">=2.2.0"
 
 dependencies:
-  flutter:
-    sdk: flutter
   cloud_firestore: ^2.5.0
   dartz: ^0.10.0
   equatable: ^2.0.3
   firefuel_core: ^0.0.1
+  flutter:
+    sdk: flutter
   stack_trace: ^1.10.0
 
 dev_dependencies:
