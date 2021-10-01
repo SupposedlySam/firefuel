@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:firefuel_core/firefuel_core.dart';
 import 'package:stack_trace/stack_trace.dart';
 import 'package:test/test.dart';
