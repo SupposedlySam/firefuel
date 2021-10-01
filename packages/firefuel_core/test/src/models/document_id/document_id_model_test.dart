@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:math';
 import 'dart:typed_data';
 
+import 'package:firefuel_core/src/models/document_id/document_id_serializer.dart';
 import 'package:test/test.dart';
 
 import 'package:firefuel_core/firefuel_core.dart';
@@ -87,5 +88,20 @@ void main() {
         );
       },
     );
+  });
+
+  test('should have value as prop', () {
+    final value = 'testValue';
+    final docId = DocumentId(value);
+
+    expect(docId.props, [value]);
+  });
+
+  test('should serialize using the $DocumentIdSerializer', () {
+    final value = 'testValue';
+    final docId = DocumentId(value);
+    final expectedResult = DocumentIdSerializer.toMap(docId);
+
+    expect(docId.toJson(), expectedResult);
   });
 }
