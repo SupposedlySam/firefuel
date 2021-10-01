@@ -172,11 +172,9 @@ packages:
   firefuel_core:
     dependency: "direct main"
     description:
-      path: "packages/firefuel_core"
-      ref: HEAD
-      resolved-ref: "9bd6d88b55a800c6ea60a342ab6ae1aaf0606958"
-      url: "https://github.com/SupposedlySam/firefuel.git"
-    source: git
+      name: firefuel_core
+      url: "https://pub.dartlang.org"
+    source: hosted
     version: "0.0.1"
   flutter:
     dependency: "direct main"
