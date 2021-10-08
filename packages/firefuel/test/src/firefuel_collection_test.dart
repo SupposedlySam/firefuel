@@ -1,11 +1,9 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:fake_cloud_firestore/fake_cloud_firestore.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:firefuel/firefuel.dart';
+import '../utils/test_collection.dart';
 import '../utils/test_user.dart';
-
-const _testUsersCollectionName = 'testUsers';
 
 void main() {
   late TestCollection testCollection;
@@ -955,22 +953,4 @@ void main() {
       });
     });
   });
-}
-
-class TestCollection extends FirefuelCollection<TestUser> {
-  TestCollection() : super(_testUsersCollectionName);
-
-  @override
-  TestUser? fromFirestore(DocumentSnapshot<Map<String, dynamic>> snapshot,
-      SnapshotOptions? options) {
-    final data = snapshot.data();
-    return data == null
-        ? null
-        : TestUser.fromJson(snapshot.data()!, snapshot.id);
-  }
-
-  @override
-  Map<String, Object?> toFirestore(TestUser? model, SetOptions? options) {
-    return model?.toJson() ?? <String, Object?>{};
-  }
 }
