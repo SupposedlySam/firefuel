@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:firefuel/firefuel.dart';
+import 'package:firefuel/src/utils/serializable_extensions.dart';
 
 abstract class FirefuelCollection<T extends Serializable>
     implements Collection<T> {
@@ -198,10 +199,7 @@ abstract class FirefuelCollection<T extends Serializable>
     required T value,
     required List<String> fieldPaths,
   }) async {
-    final paths =
-        fieldPaths.map((field) => FieldPath.fromString(field)).toList();
-    final replacement = value.toJson()
-      ..removeWhere((key, _) => !paths.contains(FieldPath.fromString(key)));
+    final replacement = value.getReplacement(fieldPaths);
 
     await untypedRef.doc(docId.docId).update(replacement);
 
