@@ -145,14 +145,17 @@ abstract class DocCreate<R, T extends Serializable> {
   });
 }
 
+/// {@template firefuel.rules.doc_create_if_not_exists}
 /// Do some action, then create a Document if it doesn't exist
 ///
 /// [R]: should return a [T] or some subset,
 /// i.e. `Either<Failure, T>`
+/// {@endtemplate}
 ///
 /// {@macro firefuel.rules.subclasses}
 /// {@macro firefuel.rules.implementations}
-abstract class DocCreateIfNotExist<R, T extends Serializable> {
+abstract class DocCreateIfNotExist<R, T extends Serializable>
+    implements DocUpdateOrCreate<R, T> {
   /// Get the document by id, or create a new one
   ///
   /// If the documentId returns a snapshot that does not exist, or `data()`
@@ -161,7 +164,13 @@ abstract class DocCreateIfNotExist<R, T extends Serializable> {
     required DocumentId docId,
     required T createValue,
   });
+}
 
+/// {@macro firefuel.rules.doc_create_if_not_exists}
+///
+/// {@macro firefuel.rules.subclasses}
+/// {@macro firefuel.rules.implementations}
+abstract class DocUpdateOrCreate<R, T extends Serializable> {
   /// Updates data on the document if it exists. Data will be merged with
   /// any existing document data.
   ///
