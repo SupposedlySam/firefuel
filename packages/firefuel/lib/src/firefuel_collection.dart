@@ -251,6 +251,18 @@ abstract class FirefuelCollection<T extends Serializable>
     return snapshot.docs.toListT();
   }
 
+  @override
+  Future<T?> whereById(DocumentId docId) async {
+    final snapshot =
+        await ref.where(FieldPath.documentId, isEqualTo: docId.docId).get();
+
+    final docs = snapshot.docs;
+
+    if (docs.isEmpty) return null;
+
+    return docs.first.data();
+  }
+
   Query<T?> _getWhereWithOrderByAndLimitQuery({
     required List<Clause> clauses,
     required List<OrderBy>? orderBy,
