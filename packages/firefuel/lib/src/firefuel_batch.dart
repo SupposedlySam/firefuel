@@ -13,6 +13,9 @@ class FirefuelBatch<T extends Serializable> extends Batch<T> with _BatchMixin {
   }
 
   @override
+  Future<int> commit() => _commitBatch();
+
+  @override
   Future<int?> create(T value) => _transact((batch) {
         batch.set(collection.ref.doc(), value);
       });
@@ -57,7 +60,11 @@ class FirefuelBatch<T extends Serializable> extends Batch<T> with _BatchMixin {
       });
 
   @override
-  Future<int> commit() => _commitBatch();
+  Future<int?> updateOrCreate({required DocumentId docId, required T value}) =>
+      _transact((batch) {
+        batch.set(
+            collection.ref.doc(docId.docId), value, SetOptions(merge: true));
+      });
 }
 
 mixin _BatchMixin<T extends Serializable> on Batch<T> {

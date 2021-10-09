@@ -5,7 +5,8 @@ abstract class Batch<T extends Serializable>
         DocCreate<int?, T>,
         DocDelete<int?>,
         DocReplace<int?, T>,
-        DocUpdate<int?, T> {
+        DocUpdate<int?, T>,
+        DocUpdateOrCreate<int?, T> {
   final FirefuelCollection<T> collection;
 
   Batch(this.collection);
