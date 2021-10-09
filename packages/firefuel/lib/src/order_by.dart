@@ -15,11 +15,20 @@ import 'package:equatable/equatable.dart';
 class OrderBy extends Equatable {
   final String field;
   final OrderDirection direction;
+  final bool byId;
 
   OrderBy({
     required this.field,
     OrderDirection direction = OrderDirection.asc,
-  }) : this.direction = direction.toAscDesc;
+  })  : this.direction = direction.toAscDesc,
+        this.byId = false;
+
+  /// Creates a condition to order your collection by document id
+  OrderBy.docId([
+    OrderDirection direction = OrderDirection.asc,
+  ])  : this.field = '__id__',
+        this.direction = direction,
+        byId = true;
 
   @override
   List<Object?> get props => [field, direction];
