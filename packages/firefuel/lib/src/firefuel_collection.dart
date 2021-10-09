@@ -17,6 +17,8 @@ abstract class FirefuelCollection<T extends Serializable>
     return path;
   }
 
+  DocumentId generateDocumentId() => DocumentId(ref.doc().id);
+
   @override
   CollectionReference<T?> get ref {
     return untypedRef.withConverter(
