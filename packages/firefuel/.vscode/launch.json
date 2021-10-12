@@ -1,0 +1,25 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Dart: Run all Tests",
+            "type": "dart",
+            "request": "launch",
+            "program": "./test/"
+        },
+        {
+            "name": "firefuel",
+            "request": "launch",
+            "type": "dart"
+        },
+        {
+            "name": "flutter_counter",
+            "cwd": "example/flutter_counter",
+            "request": "launch",
+            "type": "dart"
+        }
+    ]
+}

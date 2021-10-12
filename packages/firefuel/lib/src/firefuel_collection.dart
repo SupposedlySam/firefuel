@@ -199,7 +199,7 @@ abstract class FirefuelCollection<T extends Serializable>
     required T value,
     required List<String> fieldPaths,
   }) async {
-    final replacement = value.getReplacement(fieldPaths);
+    final replacement = value.toIsolatedJson(fieldPaths);
 
     await untypedRef.doc(docId.docId).update(replacement);
 

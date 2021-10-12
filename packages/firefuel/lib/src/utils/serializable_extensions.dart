@@ -1,12 +1,8 @@
 import 'package:firefuel/firefuel.dart';
 
 extension SerializableX on Serializable {
-  Map<String, dynamic> getReplacement(List<String> fieldPaths) {
-    final paths =
-        fieldPaths.map((field) => FieldPath.fromString(field)).toList();
-    final replacement = toJson()
-      ..removeWhere((key, _) => !paths.contains(FieldPath.fromString(key)));
-
-    return replacement;
+  /// Creates a JSON object with only the provided fields
+  Map<String, dynamic> toIsolatedJson(List<String> fields) {
+    return toJson()..removeWhere((key, _) => !fields.contains(key));
   }
 }

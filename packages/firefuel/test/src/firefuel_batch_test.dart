@@ -19,31 +19,31 @@ void main() {
 
   group('#size', () {
     test('should start at 0', () {
-      expect(testBatch.size, 0);
+      expect(testBatch.transactionSize, 0);
     });
 
     test('should increase when transaction occurs', () async {
       await testBatch.create(batman);
 
-      expect(testBatch.size, 1);
+      expect(testBatch.transactionSize, 1);
     });
 
     test('should return 1 after maxSize + 1 is reached', () async {
-      final overSize = testBatch.maxSize + 1;
+      final overSize = testBatch.transactionLimit + 1;
 
       for (var i = 0; i < overSize; i++) {
         await testBatch.create(batman);
       }
 
-      expect(testBatch.size, 1);
+      expect(testBatch.transactionSize, 1);
     });
 
-    test('should return 0 after commit occurs', () async {
+    test('should return 0 after complete', () async {
       await testBatch.create(batman);
 
-      await testBatch.commit();
+      await testBatch.complete();
 
-      expect(testBatch.size, 0);
+      expect(testBatch.transactionSize, 0);
     });
   });
 
@@ -77,22 +77,25 @@ void main() {
     test('should return 1 when one transaction is committed', () async {
       await testBatch.create(batman);
 
-      final result = await testBatch.commit();
-
-      expect(result, 1);
-    });
-
-    test('should return batman new batch after its committed', () async {
-      final originalBatch = testBatch.batch;
-
-      await testBatch.create(batman);
-
       await testBatch.commit();
 
-      final newBatch = testBatch.batch;
-
-      expect(originalBatch, isNot(newBatch));
+      expect(testBatch.transactionSize, 1);
     });
+
+    test(
+      'should return batman new batch after its completed',
+      () async {
+        final originalBatch = testBatch.batch;
+
+        await testBatch.create(batman);
+
+        await testBatch.complete();
+
+        final newBatch = testBatch.batch;
+
+        expect(originalBatch, isNot(newBatch));
+      },
+    );
   });
 
   group('#create', () {
@@ -100,11 +103,11 @@ void main() {
       await testBatch.create(batman);
       await testBatch.create(batman);
 
-      final createdCount = await testBatch.commit();
+      await testBatch.commit();
 
       final results = await testCollection.readAll();
 
-      expect(createdCount, 2);
+      expect(testBatch.transactionSize, 2);
       expect(results.length, 2);
     });
 

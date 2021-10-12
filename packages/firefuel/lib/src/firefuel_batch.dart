@@ -13,58 +13,83 @@ class FirefuelBatch<T extends Serializable> extends Batch<T> with _BatchMixin {
   }
 
   @override
-  Future<int> commit() => _commitBatch();
+  Future<void> commit() => _commitBatch();
 
   @override
-  Future<int?> create(T value) => _transact((batch) {
-        batch.set(collection.ref.doc(), value);
-      });
+  void reset() => _createNewBatch();
 
   @override
-  Future<int?> createById({required T value, required DocumentId docId}) =>
-      _transact((batch) {
-        batch.set(collection.ref.doc(docId.docId), value);
-      });
+  Future<void> complete() async {
+    await commit();
+
+    reset();
+  }
 
   @override
-  Future<int?> delete(DocumentId docId) => _transact((batch) {
-        batch.delete(collection.ref.doc(docId.docId));
-      });
+  Future<void> create(T value) async {
+    await _addToBatch((batch) {
+      batch.set(collection.ref.doc(), value);
+    });
+  }
 
   @override
-  Future<int?> replace({required DocumentId docId, required T value}) =>
-      _transact((batch) async {
-        final existingDoc = await collection.read(docId);
-
-        if (existingDoc == null) return null;
-
-        batch.set(collection.ref.doc(docId.docId), value);
-      });
+  Future<void> createById({required T value, required DocumentId docId}) async {
+    await _addToBatch((batch) {
+      batch.set(collection.ref.doc(docId.docId), value);
+    });
+  }
 
   @override
-  Future<int?> replaceFields({
+  Future<void> delete(DocumentId docId) async {
+    await _addToBatch((batch) {
+      batch.delete(collection.ref.doc(docId.docId));
+    });
+  }
+
+  @override
+  Future<void> replace({required DocumentId docId, required T value}) async {
+    await _addToBatch((batch) async {
+      final existingDoc = await collection.read(docId);
+
+      if (existingDoc == null) return null;
+
+      batch.set(collection.ref.doc(docId.docId), value);
+    });
+  }
+
+  @override
+  Future<void> replaceFields({
     required DocumentId docId,
     required T value,
     required List<String> fieldPaths,
-  }) =>
-      _transact((batch) {
-        final replacement = value.getReplacement(fieldPaths);
+  }) async {
+    await _addToBatch((batch) {
+      final replacement = value.toIsolatedJson(fieldPaths);
 
-        batch.update(collection.ref.doc(docId.docId), replacement);
-      });
-
-  @override
-  Future<int?> update({required DocumentId docId, required T value}) =>
-      _transact((batch) {
-        batch.update(collection.ref.doc(docId.docId), value.toJson());
-      });
+      batch.update(collection.ref.doc(docId.docId), replacement);
+    });
+  }
 
   @override
-  Future<int?> updateOrCreate({required DocumentId docId, required T value}) =>
-      _transact((batch) {
-        batch.set(
-            collection.ref.doc(docId.docId), value, SetOptions(merge: true));
-      });
+  Future<void> update({required DocumentId docId, required T value}) async {
+    await _addToBatch((batch) {
+      batch.update(collection.ref.doc(docId.docId), value.toJson());
+    });
+  }
+
+  @override
+  Future<void> updateOrCreate({
+    required DocumentId docId,
+    required T value,
+  }) async {
+    await _addToBatch((batch) {
+      batch.set(
+        collection.ref.doc(docId.docId),
+        value,
+        SetOptions(merge: true),
+      );
+    });
+  }
 }
 
 mixin _BatchMixin<T extends Serializable> on Batch<T> {
@@ -73,38 +98,36 @@ mixin _BatchMixin<T extends Serializable> on Batch<T> {
   /// {@template firefuel.batch.size}
   /// Each request adds 1 to the size of the batch.
   ///
-  /// [size] is greater than or equal to [maxSize] (500),
+  /// [transactionSize] is greater than or equal to [transactionLimit] (500),
   /// the batch will be automatically be committed.
   /// {@endtemplate}
-  var _size = 0;
+  var _transactionSize = 0;
 
   /// {@template firefuel.batch.maxSize}
-  /// The maximum [size] of transactions that can be committed
+  /// The maximum [transactionSize] of transactions that can be committed
   /// at once
   ///
   /// Max: **500** Transactions
   /// {@endtemplate}
-  final maxSize = 500;
+  final transactionLimit = 500;
 
   /// {@macro firefuel.batch.size}
-  int get size => _size;
+  int get transactionSize => _transactionSize;
 
   /// {@template firefuel.batch.total_transactions}
-  /// The total number of transactions in the batch
-  /// that have been committed
+  /// The total number of transactions in the batch that have been committed
   /// {@endtemplate}
   var _totalTransactionsCommitted = 0;
 
   /// {@macro firefuel.batch.total_transactions}
   int get totalTransactionsCommitted => _totalTransactionsCommitted;
 
-  /// creates a new batch &
-  /// disposes the current batch.
+  /// creates a new batch
   ///
-  /// resets the [size] of the batch.
+  /// resets the [transactionSize] of the batch.
   void _createNewBatch() {
     // reset the size to reflect a new batch
-    _size = 0;
+    _transactionSize = 0;
     _batch = collection.firestore.batch();
   }
 
@@ -113,46 +136,34 @@ mixin _BatchMixin<T extends Serializable> on Batch<T> {
 
   /// Commits all transactions in the batch.
   ///
-  /// returns the number of Transactions committed &
-  /// resets the [size] of the batch.
+  /// Calling this method prevents any future operations from being added.
   ///
-  /// If the batch is empty, this method will return 0.
-  ///
-  /// [_commitBatch] should be called after all transactions have been added to the batch.
+  /// Should be called after all transactions have been added to the batch.
   ///
   /// {@macro firefuel.batch.size}
-  Future<int> _commitBatch() async {
+  Future<void> _commitBatch() async {
     await batch.commit();
 
     // add the number of Transactions  to the total
-    _totalTransactionsCommitted += _size;
-
-    // get the amount of transactions that were committed
-    final committed = size;
-
-    // dispose old batch & create new one
-    _createNewBatch();
-
-    // returns the number of Transactions committed
-    return committed;
+    _totalTransactionsCommitted += _transactionSize;
   }
 
   /// The method used to add a new transaction to the batch.
-  Future<int?> _transact(FutureOr<void> Function(WriteBatch) action) async {
+  ///
+  /// Automatically commits the current batch and creates a new one when the
+  /// [transactionLimit] is reached
+  Future<void> _addToBatch(FutureOr<void> Function(WriteBatch) action) async {
     // increment the size of the batch
-    _size++;
+    _transactionSize++;
 
     // if the batch is full, commit it
-    int? transactionsCommitted;
-    if (_size >= maxSize) {
-      transactionsCommitted = await _commitBatch();
+    if (_transactionSize >= transactionLimit) {
+      await _commitBatch();
+
+      _createNewBatch();
     }
 
     // execute the action
     await action(batch);
-
-    // returns the number of Transactions committed
-    // if the batch was full, otherwise returns null
-    return transactionsCommitted;
   }
 }
