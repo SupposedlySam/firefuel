@@ -16,9 +16,6 @@ class FirefuelBatch<T extends Serializable> extends Batch<T> with _BatchMixin {
   Future<void> commit() => _commitBatch();
 
   @override
-  void reset() => _createNewBatch();
-
-  @override
   Future<void> complete() async {
     await commit();
 
@@ -71,6 +68,9 @@ class FirefuelBatch<T extends Serializable> extends Batch<T> with _BatchMixin {
   }
 
   @override
+  void reset() => _createNewBatch();
+
+  @override
   Future<void> update({required DocumentId docId, required T value}) async {
     await _addToBatch((batch) {
       batch.update(collection.ref.doc(docId.docId), value.toJson());
@@ -111,42 +111,19 @@ mixin _BatchMixin<T extends Serializable> on Batch<T> {
   /// {@endtemplate}
   final transactionLimit = 500;
 
-  /// {@macro firefuel.batch.size}
-  int get transactionSize => _transactionSize;
-
   /// {@template firefuel.batch.total_transactions}
   /// The total number of transactions in the batch that have been committed
   /// {@endtemplate}
   var _totalTransactionsCommitted = 0;
 
-  /// {@macro firefuel.batch.total_transactions}
-  int get totalTransactionsCommitted => _totalTransactionsCommitted;
-
-  /// creates a new batch
-  ///
-  /// resets the [transactionSize] of the batch.
-  void _createNewBatch() {
-    // reset the size to reflect a new batch
-    _transactionSize = 0;
-    _batch = collection.firestore.batch();
-  }
-
   @visibleForTesting
   WriteBatch get batch => _batch;
 
-  /// Commits all transactions in the batch.
-  ///
-  /// Calling this method prevents any future operations from being added.
-  ///
-  /// Should be called after all transactions have been added to the batch.
-  ///
-  /// {@macro firefuel.batch.size}
-  Future<void> _commitBatch() async {
-    await batch.commit();
+  /// {@macro firefuel.batch.total_transactions}
+  int get totalTransactionsCommitted => _totalTransactionsCommitted;
 
-    // add the number of Transactions  to the total
-    _totalTransactionsCommitted += _transactionSize;
-  }
+  /// {@macro firefuel.batch.size}
+  int get transactionSize => _transactionSize;
 
   /// The method used to add a new transaction to the batch.
   ///
@@ -165,5 +142,28 @@ mixin _BatchMixin<T extends Serializable> on Batch<T> {
 
     // execute the action
     await action(batch);
+  }
+
+  /// Commits all transactions in the batch.
+  ///
+  /// Calling this method prevents any future operations from being added.
+  ///
+  /// Should be called after all transactions have been added to the batch.
+  ///
+  /// {@macro firefuel.batch.size}
+  Future<void> _commitBatch() async {
+    await batch.commit();
+
+    // add the number of Transactions  to the total
+    _totalTransactionsCommitted += _transactionSize;
+  }
+
+  /// creates a new batch
+  ///
+  /// resets the [transactionSize] of the batch.
+  void _createNewBatch() {
+    // reset the size to reflect a new batch
+    _transactionSize = 0;
+    _batch = collection.firestore.batch();
   }
 }
