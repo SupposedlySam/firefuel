@@ -7,9 +7,9 @@ abstract class Batch<T extends Serializable>
         DocReplace<void, T>,
         DocUpdate<void, T>,
         DocUpdateOrCreate<void, T> {
-  final FirefuelCollection<T> collection;
-
   Batch(this.collection);
+
+  final FirefuelCollection<T> collection;
 
   /// Commits the current batch of transactions
   ///
