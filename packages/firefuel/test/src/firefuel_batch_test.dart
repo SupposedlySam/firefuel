@@ -279,6 +279,31 @@ void main() {
     });
   });
 
+  group('#reset', () {
+    setUp(() async {
+      await testBatch.create(batman);
+      await testBatch.create(batman);
+    });
+
+    test('should set transactionSize back to zero', () {
+      expect(testBatch.transactionSize, 2);
+
+      testBatch.reset();
+
+      expect(testBatch.transactionSize, isZero);
+    });
+
+    test('should set transactionSize back to zero', () {
+      final batch1 = identityHashCode(testBatch.batch);
+
+      testBatch.reset();
+
+      final batch2 = identityHashCode(testBatch.batch.hashCode);
+
+      expect(batch1, isNot(batch2));
+    });
+  });
+
   group('#update', () {
     // TODO: not sure if this is a bug with firebase or fake_cloud_firestore
     // This test fails because if the document is not found, the batch
