@@ -26,7 +26,7 @@ class OrderBy extends Equatable {
   /// Creates a condition to order your collection by document id
   OrderBy.docId([
     OrderDirection direction = OrderDirection.asc,
-  ])  : this.field = '__id__',
+  ])  : this.field = 'unused',
         this.direction = direction,
         byId = true;
 
