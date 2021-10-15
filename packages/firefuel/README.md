@@ -18,24 +18,88 @@ Still not convinced? See our documentation on why we thing you should [choose fi
 # Scope
 `firefuel` focuses on simplifying the edge of your data layer, meaning this package pairs well with all ui, state management, model generation, and injection packages.
 
-# Quick Start
-
-We've created a base `Repository` and `Collection` for you to extend to your liking with the `FirefuelRepository` and `FirefuelCollection`. 
-
-The `Repository` is structurally reponsible for holding references to your main/top-level collection and any subcollections. The `Repository` is also logically responsible for ensuring all errors are caught and returned to your business logic layer as `Either` types.
-
-See the [firefuel documentation](https://firefuel.dev/#/coreconcepts) to walk through the core concepts of using `firefuel`.
-
-See also: [Handling Errors](https://firefuel.dev/#/coreconcepts?id=handling-errors)
-
-# Handling Errors Yourself
-No problem! Use the `Collection`s on their own, and forget `Repositories` even exist. Handle errors how you are today without making the switch.
-
 # Getting Started
 
 Simply add the latest version of `firefuel` as a dependency in your `pubspec.yaml` file. Import `package:firefuel/firefuel.dart` into your entry point (often `main.dart`). Then, initialize `firefuel` using the `Firefuel.initialize(FirebaseFirestore.instance);` before calling `runApp`.
 
 Read the full walkthrough in our [docs](https://firefuel.dev/#/gettingstarted?id=installation).
+
+# Quick Start
+
+Choose a collection from your Firestore db and create a class to model your document. For this example let's assume you have a collection of users with a username, first name, last name, and favorite color. 
+
+Each model needs to extend `Serializable` so `firefuel` is able to automatically convert the model to JSON. We'll also want to add a `fromJson` method that we'll use to convert it from json into an instance of the model.
+
+Most of the time, when comparing two models of the same type, you want to know whether the two instances have identical values. However, by default, Dart will compare whether the instances reference the same object in memory. I suggest using the `equatable` package with your models to compare by value rather than by reference.
+
+## Create a Model
+
+```dart
+class User extends Serializable with EquatableMixin {
+  static const String fieldUsername = 'username', fieldUsername = 'firstName',fieldUsername = 'lastName',fieldUsername = 'favoriteColor',;
+
+  const User(this.name, {this.docId, this.age, this.occupation});
+
+  final String name;
+  final int? age;
+  final String? docId;
+  final String? occupation;
+
+  @override
+  List<Object?> get props => [name, age, occupation];
+
+  factory User.fromJson(Map<String, dynamic> json, String docId) {
+    return User(
+      json[fieldName],
+      age: json[fieldAge],
+      docId: docId,
+      occupation: json[fieldOccupation],
+    );
+  }
+
+  @override
+  Map<String, dynamic> toJson() {
+    return {fieldName: name, fieldAge: age, fieldOccupation: occupation};
+  }
+}
+```
+
+## Create a Collection
+
+```dart
+class UserCollection extends FirefuelCollection<User> {
+  Collection() : super(collectionName);
+  
+  static const collectionName = 'users';
+
+  @override
+  User? fromFirestore(
+    DocumentSnapshot<Map<String, dynamic>> snapshot,
+    SnapshotOptions? options,
+  ) {
+    final data = snapshot.data();
+
+    return data == null
+        ? null
+        : User.fromJson(snapshot.data()!, snapshot.id);
+  }
+
+  @override
+  Map<String, Object?> toFirestore(User? model, SetOptions? options) {
+    return model?.toJson() ?? <String, Object?>{};
+  }
+}
+```
+
+## Profit
+That's it! Now you can access your data through the `UserCollection` with any of [the following methods](https://pub.dev/documentation/firefuel/latest/firefuel/FirefuelCollection-class.html).
+
+### Related Links
+
+See the [firefuel documentation](https://firefuel.dev/#/coreconcepts) to walk through the core concepts of using `firefuel`.
+
+See also: [Handling Errors](https://firefuel.dev/#/coreconcepts?id=handling-errors)
+
 
 # Issues and feedback
 
