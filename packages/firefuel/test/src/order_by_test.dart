@@ -5,7 +5,7 @@ import 'package:firefuel/firefuel.dart';
 void main() {
   const String testField = 'testField';
   group('$OrderBy', () {
-    group('#docId', () {
+    group('@docId', () {
       test('should set byId to true ', () {
         final instance = OrderBy.docId(OrderDirection.aToZ);
 
