@@ -11,12 +11,6 @@ abstract class FirefuelCollection<T extends Serializable>
   FirefuelCollection(String path, {bool useEnv = true})
       : this.path = _buildPath(path, useEnv);
 
-  static String _buildPath(String path, bool useEnv) {
-    if (useEnv) return '${Firefuel.env}$path';
-
-    return path;
-  }
-
   @override
   CollectionReference<T?> get ref {
     return untypedRef.withConverter(
@@ -59,46 +53,17 @@ abstract class FirefuelCollection<T extends Serializable>
     SnapshotOptions? options,
   );
 
+  /// Auto-generate a [DocumentId]
+  ///
+  /// The unique key generated is prefixed with a client-generated timestamp
+  /// so that the resulting list will be chronologically-sorted.
+  DocumentId generateDocId() => DocumentId(ref.doc().id);
+
   @override
   Future<List<T>> limit(int limit) async {
     final snapshot = await ref.limit(limit).get();
 
     return snapshot.docs.toListT();
-  }
-
-  @override
-  Stream<T?> stream(DocumentId docId) {
-    return ref.doc(docId.docId).snapshots().toMaybeT();
-  }
-
-  @override
-  Stream<List<T>> streamAll() {
-    return ref.snapshots().toListT();
-  }
-
-  @override
-  Stream<List<T>> streamLimited(int limit) {
-    return ref.limit(limit).snapshots().toListT();
-  }
-
-  @override
-  Stream<List<T>> streamOrdered(List<OrderBy> orderBy) {
-    return ref.sort(orderBy).snapshots().toListT();
-  }
-
-  @override
-  Stream<List<T>> streamWhere(
-    List<Clause> clauses, {
-    List<OrderBy>? orderBy,
-    int? limit,
-  }) {
-    final query = _getWhereWithOrderByAndLimitQuery(
-      clauses: clauses,
-      orderBy: orderBy,
-      limit: limit,
-    );
-
-    return query.snapshots().toListT();
   }
 
   @override
@@ -133,20 +98,6 @@ abstract class FirefuelCollection<T extends Serializable>
             cursor: cursor,
             orderBy: chunk.orderBy,
           );
-  }
-
-  /// Get the Documents used to create a [Chunk] when paginating data from a
-  /// Collection
-  ///
-  /// Orders and limits the [ref] and returns the [QuerySnapshot]
-  Future<QuerySnapshot<T?>> _buildPaginationSnapshot(Chunk<T> chunk) async {
-    var query = ref
-        .filterIfNotNull(chunk.clauses)
-        .sortIfNotNull(chunk.orderBy)
-        .startAfterIfNotNull(chunk.cursor)
-        .limitIfNotNull(chunk.limit);
-
-    return query.get();
   }
 
   @override
@@ -208,6 +159,41 @@ abstract class FirefuelCollection<T extends Serializable>
     return null;
   }
 
+  @override
+  Stream<T?> stream(DocumentId docId) {
+    return ref.doc(docId.docId).snapshots().toMaybeT();
+  }
+
+  @override
+  Stream<List<T>> streamAll() {
+    return ref.snapshots().toListT();
+  }
+
+  @override
+  Stream<List<T>> streamLimited(int limit) {
+    return ref.limit(limit).snapshots().toListT();
+  }
+
+  @override
+  Stream<List<T>> streamOrdered(List<OrderBy> orderBy) {
+    return ref.sort(orderBy).snapshots().toListT();
+  }
+
+  @override
+  Stream<List<T>> streamWhere(
+    List<Clause> clauses, {
+    List<OrderBy>? orderBy,
+    int? limit,
+  }) {
+    final query = _getWhereWithOrderByAndLimitQuery(
+      clauses: clauses,
+      orderBy: orderBy,
+      limit: limit,
+    );
+
+    return query.snapshots().toListT();
+  }
+
   /// Converts a [T?] to a [Map<String, Object?>] to upload to Firestore.
   Map<String, Object?> toFirestore(
     T? model,
@@ -251,6 +237,21 @@ abstract class FirefuelCollection<T extends Serializable>
     return snapshot.docs.toListT();
   }
 
+  /// Get the Documents used to create a [Chunk] when paginating data from a
+  /// Collection
+  ///
+  /// Orders and limits the [ref] and returns the [QuerySnapshot]
+  Future<QuerySnapshot<T?>> _buildPaginationSnapshot(Chunk<T> chunk) async {
+    var query = ref
+        .filterIfNotNull(chunk.clauses)
+        .sortIfNotNull(chunk.orderBy)
+        .startAfterIfNotNull(chunk.cursor)
+        .limitIfNotNull(chunk.limit);
+
+    return query.get();
+  }
+
+  // Creates a query to filter, sort, and limit the collection
   Query<T?> _getWhereWithOrderByAndLimitQuery({
     required List<Clause> clauses,
     required List<OrderBy>? orderBy,
@@ -278,5 +279,14 @@ abstract class FirefuelCollection<T extends Serializable>
         .filter(clauses)
         .sortIfNotNull(processedOrderBys)
         .limitIfNotNull(limit);
+  }
+
+  /// Prefix the collection path with the environment
+  ///
+  /// if the environment isn't provided, the path is returned unaltered.
+  static String _buildPath(String path, bool useEnv) {
+    if (useEnv) return '${Firefuel.env}$path';
+
+    return path;
   }
 }

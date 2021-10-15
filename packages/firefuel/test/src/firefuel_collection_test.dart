@@ -80,6 +80,15 @@ void main() {
     });
   });
 
+  group('#generateDocId', () {
+    test('should create a new id with each call', () {
+      final docId1 = testCollection.generateDocId();
+      final docId2 = testCollection.generateDocId();
+
+      expect(docId1, isNot(docId2));
+    });
+  });
+
   group('#limit', () {
     setUp(() async {
       await testCollection.create(defaultUser);
