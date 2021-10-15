@@ -36,30 +36,38 @@ Most of the time, when comparing two models of the same type, you want to know w
 
 ```dart
 class User extends Serializable with EquatableMixin {
-  static const String fieldUsername = 'username', fieldUsername = 'firstName',fieldUsername = 'lastName',fieldUsername = 'favoriteColor',;
+  static const String fieldDocId = 'docId',
+      fieldUsername = 'username',
+      fieldFavoriteColor = 'favoriteColor';
 
-  const User(this.name, {this.docId, this.age, this.occupation});
+  const User({
+    required this.docId,
+    required this.username,
+    required this.favoriteColor,
+  });
 
-  final String name;
-  final int? age;
-  final String? docId;
-  final String? occupation;
+  final String docId;
+  final String username;
+  final String favoriteColor;
 
   @override
-  List<Object?> get props => [name, age, occupation];
+  List<Object?> get props => [docId, username, favoriteColor];
 
   factory User.fromJson(Map<String, dynamic> json, String docId) {
     return User(
-      json[fieldName],
-      age: json[fieldAge],
       docId: docId,
-      occupation: json[fieldOccupation],
+      username: json[fieldUsername],
+      favoriteColor: json[fieldFavoriteColor],
     );
   }
 
   @override
   Map<String, dynamic> toJson() {
-    return {fieldName: name, fieldAge: age, fieldOccupation: occupation};
+    return {
+      fieldDocId: docId, // optionally add this to your document
+      fieldUsername: username,
+      fieldFavoriteColor: favoriteColor,
+    };
   }
 }
 ```
