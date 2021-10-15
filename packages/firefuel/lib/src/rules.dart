@@ -210,6 +210,9 @@ abstract class DocRead<R> {
   ///
   /// Does NOT refresh automatically
   Future<R> read(DocumentId docId);
+
+  /// Get a document matching the document id
+  Future<R?> whereById(DocumentId docId);
 }
 
 /// Replace an existing Document

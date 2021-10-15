@@ -5,6 +5,14 @@ import 'package:firefuel/firefuel.dart';
 void main() {
   const String testField = 'testField';
   group('$OrderBy', () {
+    group('@docId', () {
+      test('should set byId to true ', () {
+        final instance = OrderBy.docId(OrderDirection.aToZ);
+
+        expect(instance.byId, isTrue);
+      });
+    });
+
     test('should set direction to asc when newestToOldest is chosen', () {
       final instance = OrderBy(
         field: testField,

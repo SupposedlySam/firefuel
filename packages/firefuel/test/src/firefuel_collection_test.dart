@@ -78,6 +78,15 @@ void main() {
     });
   });
 
+  group('#generateDocId', () {
+    test('should create a new id with each call', () {
+      final docId1 = testCollection.generateDocId();
+      final docId2 = testCollection.generateDocId();
+
+      expect(docId1, isNot(docId2));
+    });
+  });
+
   group('#limit', () {
     setUp(() async {
       await testCollection.create(defaultUser);
@@ -951,6 +960,22 @@ void main() {
 
         expect(filteredList, [expectedUser]);
       });
+    });
+  });
+
+  group('#whereById', () {
+    test('should return the Type when docId exists', () async {
+      final docId = await testCollection.create(defaultUser);
+
+      final readResult = await testCollection.whereById(docId);
+
+      expect(readResult, defaultUser);
+    });
+
+    test('should return null when docId does not exist', () async {
+      final readResult = await testCollection.whereById(DocumentId('dodoBird'));
+
+      expect(readResult, isNull);
     });
   });
 }
