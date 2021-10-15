@@ -148,4 +148,9 @@ abstract class FirefuelRepository<T extends Serializable>
   }) {
     return guard(() => _collection.where(clauses, limit: limit));
   }
+
+  @override
+  Future<Either<Failure, T?>> whereById(DocumentId docId) {
+    return guard(() => _collection.whereById(docId));
+  }
 }

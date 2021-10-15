@@ -30,6 +30,7 @@ extension MockCollectionX<T extends Serializable> on MockCollection<T> {
     Null Function()? onUpdate,
     T Function()? onUpdateOrCreate,
     List<T> Function()? onWhere,
+    T? Function()? onWhereById,
   }) {
     registerFallbackValue(DocumentId('fallbackValue'));
     registerFallbackValue<Serializable>(TestUser('fallbackValue'));
@@ -155,6 +156,11 @@ extension MockCollectionX<T extends Serializable> on MockCollection<T> {
           limit: any(named: 'limit'),
         );
       }).thenAnswer((_) => Future.value(onWhere()));
+    }
+
+    if (onWhereById != null) {
+      when(() => whereById(any()))
+          .thenAnswer((_) => Future.value(onWhereById()));
     }
   }
 }

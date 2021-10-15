@@ -964,6 +964,22 @@ void main() {
       });
     });
   });
+
+  group('#whereById', () {
+    test('should return the Type when docId exists', () async {
+      final docId = await testCollection.create(defaultUser);
+
+      final readResult = await testCollection.whereById(docId);
+
+      expect(readResult, defaultUser);
+    });
+
+    test('should return null when docId does not exist', () async {
+      final readResult = await testCollection.whereById(DocumentId('dodoBird'));
+
+      expect(readResult, isNull);
+    });
+  });
 }
 
 class TestCollection extends FirefuelCollection<TestUser> {
