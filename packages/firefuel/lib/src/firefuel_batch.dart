@@ -6,11 +6,11 @@ import 'package:firefuel/src/utils/serializable_extensions.dart';
 import 'package:flutter/foundation.dart';
 
 class FirefuelBatch<T extends Serializable> extends Batch<T> with _BatchMixin {
-  final FirefuelCollection<T> collection;
-
   FirefuelBatch(this.collection) : super(collection) {
     _createNewBatch();
   }
+
+  final FirefuelCollection<T> collection;
 
   @override
   Future<void> commit() async {
@@ -106,7 +106,7 @@ mixin _BatchMixin<T extends Serializable> on Batch<T> {
   ///
   /// Max: **500** Transactions
   /// {@endtemplate}
-  final transactionLimit = 500;
+  int get transactionLimit => 500;
 
   /// {@template firefuel.batch.total_transactions}
   /// The total number of transactions in the batch that have been committed
