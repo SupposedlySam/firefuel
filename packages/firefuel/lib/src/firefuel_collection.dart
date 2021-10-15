@@ -239,8 +239,12 @@ abstract class FirefuelCollection<T extends Serializable>
 
   @override
   Future<T?> whereById(DocumentId docId) async {
-    final snapshot =
-        await ref.where(FieldPath.documentId, isEqualTo: docId.docId).get();
+    final snapshot = await ref
+        .where(
+          FieldPath.documentId,
+          isEqualTo: docId.docId,
+        )
+        .get();
 
     final docs = snapshot.docs;
 
