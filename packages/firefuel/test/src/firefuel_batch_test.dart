@@ -280,12 +280,10 @@ void main() {
   });
 
   group('#reset', () {
-    setUp(() async {
+    test('should set transactionSize back to zero', () async {
       await testBatch.create(batman);
       await testBatch.create(batman);
-    });
 
-    test('should set transactionSize back to zero', () {
       expect(testBatch.transactionSize, 2);
 
       testBatch.reset();
