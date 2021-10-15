@@ -53,6 +53,12 @@ abstract class FirefuelCollection<T extends Serializable>
     SnapshotOptions? options,
   );
 
+  /// Auto-generate a [DocumentId]
+  ///
+  /// The unique key generated is prefixed with a client-generated timestamp
+  /// so that the resulting list will be chronologically-sorted.
+  DocumentId generateDocId() => DocumentId(ref.doc().id);
+
   @override
   Future<List<T>> limit(int limit) async {
     final snapshot = await ref.limit(limit).get();
@@ -257,6 +263,7 @@ abstract class FirefuelCollection<T extends Serializable>
     return query.get();
   }
 
+  // Creates a query to filter, sort, and limit the collection
   Query<T?> _getWhereWithOrderByAndLimitQuery({
     required List<Clause> clauses,
     required List<OrderBy>? orderBy,
@@ -286,6 +293,9 @@ abstract class FirefuelCollection<T extends Serializable>
         .limitIfNotNull(limit);
   }
 
+  /// Prefix the collection path with the environment
+  ///
+  /// if the environment isn't provided, the path is returned unaltered.
   static String _buildPath(String path, bool useEnv) {
     if (useEnv) return '${Firefuel.env}$path';
 
