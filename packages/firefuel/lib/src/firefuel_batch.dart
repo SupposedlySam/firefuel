@@ -13,13 +13,10 @@ class FirefuelBatch<T extends Serializable> extends Batch<T> with _BatchMixin {
   }
 
   @override
-  Future<void> commit() => _commitBatch();
+  Future<void> commit() async {
+    await _commitBatch();
 
-  @override
-  Future<void> complete() async {
-    await commit();
-
-    reset();
+    _createNewBatch();
   }
 
   @override

@@ -16,9 +16,6 @@ abstract class Batch<T extends Serializable>
   /// Keeps the existing batch and transactionSize
   Future<void> commit();
 
-  /// Commits all transactions and creates a new batch
-  Future<void> complete();
-
   /// Creates a new batch without commiting the current transactions
   void reset();
 }

@@ -38,10 +38,10 @@ void main() {
       expect(testBatch.transactionSize, 1);
     });
 
-    test('should return 0 after complete', () async {
+    test('should return 0 after committed', () async {
       await testBatch.create(batman);
 
-      await testBatch.complete();
+      await testBatch.commit();
 
       expect(testBatch.transactionSize, 0);
     });
@@ -74,22 +74,22 @@ void main() {
   });
 
   group('#commit', () {
-    test('should return 1 when one transaction is committed', () async {
+    test('should reset the transactionSize to zero', () async {
       await testBatch.create(batman);
 
       await testBatch.commit();
 
-      expect(testBatch.transactionSize, 1);
+      expect(testBatch.transactionSize, isZero);
     });
 
     test(
-      'should return batman new batch after its completed',
+      'should create new batch',
       () async {
         final originalBatch = testBatch.batch;
 
         await testBatch.create(batman);
 
-        await testBatch.complete();
+        await testBatch.commit();
 
         final newBatch = testBatch.batch;
 
@@ -99,7 +99,17 @@ void main() {
   });
 
   group('#create', () {
-    test('should return 2 new documents', () async {
+    test('should add user to database', () async {
+      await testBatch.create(batman);
+
+      await testBatch.commit();
+
+      final result = await testCollection.readAll();
+
+      expect(result, [batman]);
+    });
+
+    test('should add multiple users to database', () async {
       await testBatch.create(batman);
       await testBatch.create(batman);
 
@@ -107,21 +117,7 @@ void main() {
 
       final results = await testCollection.readAll();
 
-      expect(testBatch.transactionSize, 2);
-      expect(results.length, 2);
-    });
-
-    test('should create batman new document with the values provided',
-        () async {
-      final newUser = TestUser('overwrittenUser');
-      await testBatch.create(newUser);
-
-      await testBatch.commit();
-
-      final result = await testCollection.limit(1);
-      final updatedUser = result.first;
-
-      expect(updatedUser, newUser);
+      expect(results, [batman, batman]);
     });
   });
 
@@ -143,7 +139,7 @@ void main() {
   });
 
   group('#delete', () {
-    late DocumentId defaultDocId;
+    late final DocumentId defaultDocId;
 
     setUp(() async {
       defaultDocId = await testCollection.create(batman);
@@ -178,12 +174,12 @@ void main() {
       expect(readResult, isNull);
     });
 
-    // TODO: https://github.com/SupposedlySam/firefuel/issues/43
     test('should overwrite all values in document', () async {
       final newUser = TestUser('newUser');
       final updatedUser = TestUser('updatedUser');
 
       await testBatch.createById(value: newUser, docId: originalDocId);
+      await testBatch.commit();
 
       await testBatch.replace(
         value: updatedUser,
@@ -195,7 +191,7 @@ void main() {
       final readUser = await testCollection.read(originalDocId);
 
       expect(updatedUser, readUser);
-    }, skip: true);
+    });
   });
 
   group('#replaceFields', () {
@@ -210,7 +206,7 @@ void main() {
     // TODO: not sure if this is a bug with firebase or fake_cloud_firestore
     // This test fails because if the document is not found, the batch
     // creates a new document with the provided fields.
-    test('should fail silently when document does not exist', () async {
+    test('should fail when document does not exist', () async {
       final dodoId = DocumentId('dodoBird');
 
       await testBatch.replaceFields(
