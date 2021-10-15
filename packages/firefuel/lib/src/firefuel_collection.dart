@@ -251,6 +251,7 @@ abstract class FirefuelCollection<T extends Serializable>
     return query.get();
   }
 
+  // Creates a query to filter, sort, and limit the collection
   Query<T?> _getWhereWithOrderByAndLimitQuery({
     required List<Clause> clauses,
     required List<OrderBy>? orderBy,
