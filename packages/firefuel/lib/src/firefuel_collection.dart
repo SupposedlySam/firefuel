@@ -280,6 +280,9 @@ abstract class FirefuelCollection<T extends Serializable>
         .limitIfNotNull(limit);
   }
 
+  /// Prefix the collection path with the environment
+  ///
+  /// if the environment isn't provided, the path is returned unaltered.
   static String _buildPath(String path, bool useEnv) {
     if (useEnv) return '${Firefuel.env}$path';
 
