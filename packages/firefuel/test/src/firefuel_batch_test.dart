@@ -60,16 +60,34 @@ void main() {
       expect(testBatch.totalTransactionsCommitted, 1);
     });
 
-    test('should return 501 when 501 transactions are committed', () async {
-      final overSize = 501;
+    group('should persist transaction count across batches', () {
+      test('when auto-commit takes place', () async {
+        final overSize = testBatch.transactionLimit + 1;
 
-      for (var i = 0; i < overSize; i++) {
-        await testBatch.create(batman);
-      }
+        for (var i = 0; i < overSize; i++) {
+          await testBatch.create(batman);
+        }
 
-      await testBatch.commit();
+        await testBatch.commit();
 
-      expect(testBatch.totalTransactionsCommitted, overSize);
+        expect(testBatch.totalTransactionsCommitted, overSize);
+      });
+
+      test('when manually committing', () async {
+        final batchedTransactionCount = 20;
+        final batches = 2;
+        final expectedCount = batches * batchedTransactionCount;
+
+        for (var b = 0; b < batches; b++) {
+          for (var t = 0; t < batchedTransactionCount; t++) {
+            await testBatch.create(batman);
+          }
+
+          await testBatch.commit();
+        }
+
+        expect(testBatch.totalTransactionsCommitted, expectedCount);
+      });
     });
   });
 
@@ -82,20 +100,27 @@ void main() {
       expect(testBatch.transactionSize, isZero);
     });
 
-    test(
-      'should create new batch',
-      () async {
-        final originalBatch = testBatch.batch;
+    test('should create new batch', () async {
+      final originalBatch = testBatch.batch;
 
+      await testBatch.create(batman);
+
+      await testBatch.commit();
+
+      final newBatch = testBatch.batch;
+
+      expect(originalBatch, isNot(newBatch));
+    });
+
+    test('should auto-commit after the transactionLimit', () async {
+      final overSize = testBatch.transactionLimit + 1;
+
+      for (var i = 0; i < overSize; i++) {
         await testBatch.create(batman);
+      }
 
-        await testBatch.commit();
-
-        final newBatch = testBatch.batch;
-
-        expect(originalBatch, isNot(newBatch));
-      },
-    );
+      expect(testBatch.transactionSize, 1);
+    });
   });
 
   group('#create', () {
