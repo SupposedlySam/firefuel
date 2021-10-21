@@ -1,18 +1,17 @@
 # Getting Started
 
-?> In order to start using firefuel you must have Firebase configured for your application. See the [FlutterFire Docs](https://firebase.flutter.dev/docs/overview/) before you continue.
+!> In order to start using firefuel you must have Firebase configured for your application. See the [FlutterFire Docs](https://firebase.flutter.dev/docs/overview/) before you continue.
 
 ## Overview
 
-Firefuel consists of several pub packages:
+The firefuel repository consists of several pub packages:
 
-- [firefuel](https://pub.dev/packages/firefuel) - Core firefuel library.
-- [firefuel_core](https://pub.dev/packages/firefuel_core) - The core files required for firefuel to function. Core can be used on its own to provide DocumentId, UID, Serializable, and Failure to your app.
-- [firefuel_env](https://pub.dev/packages/firefuel_env) - A standalone Firebase environment organizer for your application.
+- [firefuel](https://pub.dev/packages/firefuel) - The firefuel library.
+- [firefuel_core](https://pub.dev/packages/firefuel_core) - The files required for firefuel to function. Core can be used on its own to provide DocumentId, UID, Serializable, and Failure to your app.
 
 ## Installation
 
-For a [Dart](https://dart.dev/) application, we need to add the `firefuel` package to our `pubspec.yaml` as a dependency.
+For a [Flutter](https://flutter.dev/) application, we need to add the `firefuel` package to our `pubspec.yaml` as a dependency.
 
 [pubspec.yaml](_snippets/getting_started/firefuel_pubspec.yaml.md ':include')
 
