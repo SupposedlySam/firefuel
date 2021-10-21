@@ -1,16 +1,14 @@
 # Why Firefuel?
 
-> Firefuel makes it easy to separate Cloud Firestore access from business logic, making your code _fast_, _easy to test_, and _reusable_.
+> Firefuel makes it easy to separate Cloud Firestore access from business logic, making your code _simple_, _intuitive_, and _consistent_.
 
 When building production quality applications, managing user data becomes critical.
 
-As developers we want to:
+As developers, we want to:
 
-- know what collections and subcollections they have access to
-- know our data will get converted into type safe code
-- catch and handle errors with confidence
+- know our data will get converted into type-safe code
 - have a simple, intuitive, and consistent way to interact with data.
-- have many developers seamlessly working within a single code base following the same patterns and conventions.
+- know what collections and subcollections you have access to
 - develop fast and reactive apps.
 
 Firefuel was designed to meet all of these needs and many more.
