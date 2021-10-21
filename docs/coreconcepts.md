@@ -20,8 +20,6 @@ To make your Documents type safe, you'll want to convert then from a `Map` to a 
 
 ## Streamlining Type Safety with Collections
 
-### Quick Reference
-
 You'll create a new Collection that extends FirefuelCollection for each top level collection, and subcollection in your Firebase project.
 
 ### Collection Detail
@@ -34,27 +32,145 @@ As developers, we always want to work with type safe code. This is why Firefuel 
 ?> Note: snapshots are included so you can get access to all parts of the `DocumentSnapshot`, but `snapshot.data()` is what you'll use to access the `Map` needed to call your `fromJson` method on your model.
 
 
-## Repositories
+## Subcollections
 
-### Quick Reference
+### Summary
+Subcollections have all the same functionality as a top level collection, but are nested inside of a document. 
+### Subcollection vs Array
+Subcollections are used as a replacement for an array when you need the ability to filter, paginate, or get a single element. Arrays are all or nothing in Firebase, when you access your document, every item in the array will also be retrieved. If you expect for your array to become large, you should use a subcollection instead.
 
-You'll create a new Repository that extends FirefuelRepository for each top level collection in your Firestore project.
+### Subcollection Setup
 
-### Repository Detail
+Since subcollections are located on a document, you need the document id to access its subcollections. 
 
-A Repository in Firefuel is equivalent to a top level collection (TLC) in your Firebase project. The Repository is responsible for containing the subcollections within the TLC and any specific behavior on the TLC the repository represents. All FirefuelRepositories are required to provide a Collection to be used as the TLC.
+#### Add Document Id to Model
+With firefuel, you're able to add the document id to your model in the `fromFirestore` method of a FirefuelCollection. There are two suggested approaches to take:
+
+1. Pass the `snapshot.id` into your Model's `fromJson` method separately
+
+```dart
+ @override
+  YourModel? fromFirestore(
+    DocumentSnapshot<Map<String, dynamic>> snapshot,
+    SnapshotOptions? options,
+  ) {
+    final data = snapshot.data();
+
+    return data == null ? null : YourModel.fromJson(data, snapshot.id);
+  }
+```
+
+2. Create a new JSON object with the document id included
+
+```dart
+@override
+  YourModel? fromFirestore(
+    DocumentSnapshot<Map<String, dynamic>> snapshot,
+    SnapshotOptions? options,
+  ) {
+    final data = snapshot.data();
+
+    final dataWithId = { ...data, 'id': snapshot.id };
+
+    return YourModel.fromJson(dataWithId);
+  }
+```
+
+with option #2 you'd then access the docId with by the key 'id' inside your model.
+
+#### Defining Collection Names
+
+With a top level collection, your collection path is simple; it's just the name of your collection. For example, let's assume you're creating a `UserCollection` that extends `FirefuelCollection<User>`. When you create your constructor, you'll then pass the collection name to your parent (aka `super`, aka `FirefuelCollection`). 
+
+```dart
+class UserCollection extends FirefuelCollection<User> {
+    UserCollection() : super('users');
+
+    ...
+
+}
+```
+
+but with a subcollection, the collection path would need to be `users/myDocumentId/mySubCollectionName`. For the purpose of this example, let's assume you're a person who has friends :people_holding_hands:. In case you become an influencer, we'd like to store these friends as a subcollection so we don't return too much data at once.
+
+Let's refactor the previous example a little bit so we can access our `UserCollection` from our subcollection.
+
+```dart
+class UserCollection extends FirefuelCollection<User> {
+    UserCollection() : super(name);
+
+    static const String name = 'users';
+    ...
+
+}
+```
+
+Now we can create our subcollection and require the docId to be passed in, where we'll then interpolate that into our collection path.
+
+```dart
+class FriendCollection extends FirefuelCollection<Friend> {
+    FriendCollection(this.docId) : 
+        super('${UserCollection.name}/${docId.docId}/$name');
+
+    static const String name = 'friends'
+    final DocumentId docId;
+
+    ...
+
+}
+```
+
+#### Connect Your Subcollection With Extensions
+
+
+Now, let's tie it all together. We'll create an extension method on `User` called `friends` so we can easily build a subcollection for any `User` model we have.
+
+```dart
+extension UserSubcollectionX on User {
+  FriendCollection get friends {
+    // The docId below is a property on the User
+    return FriendCollection(docId!);
+  }
+}
+```
+
+Make sure to `export` the `UserSubcollectionX` class from the `User` model or you'll have to manually type in the `import` to the extension yourself.
+
+user.dart
+```dart
+export 'package:your_app_name/path/to/user_subcollection_x.dart';
+```
+
+#### Access A Subcollection From A Model
+
+Then, anywhere you get a `User` back you can access any method on your `friends` subcollection!
+
+```dart
+final UserCollection userCollection = UserCollection();
+
+final User user = await userCollection.read(DocumentId('celebrity'));
+
+final List<Friend> friends = await user.friends.readAll();
+```
+
+
+!> Firestore does not support recursively deleting subcollections. If you delete a document that has subcollections, the subcollections still exist in your database and can be reference by url. They will not be visible in the firebase console. See [Delete Collections](https://firebase.google.com/docs/firestore/manage-data/delete-data#collections) and [this SO answer](https://stackoverflow.com/questions/49286764/delete-a-document-with-all-subcollections-and-nested-subcollections-in-firestore/57623425#57623425) for how to handle deleting subcollections.
+
+
+## Repositories (Optional)
+### Summary
+
+You'll create a new Repository that extends FirefuelRepository for each FirefuelCollection in your Firestore project.
+
+### Detail
+
+A Repository in Firefuel is responsible for the business logic of your data layer. The FirefuelRepository automatically handles catching any errors from the FirefuelCollection and returning them as an `Either` type (see Handling Errors below). Another example of data layer business logic could be be when to cache data locally vs online.
+
+### Repository Example
 
 [repository.dart](_snippets/architecture/repository.dart.md ':include')
 
-### Subcollections
-
-As mentioned previously, Firestore has the ability to contain subcollections. Subcollections have all the same functionality as a top level collection, but are nested inside of a top level collection (TLC). 
-
-[repository_subcollections.dart](_snippets/core_concepts/repository_subcollections.dart.md ':include')
-
-As seen in the previous snippet, you can provide methods or getters to access your subcollections directly from the Repository.
-
-### Handling Errors
+## Handling Errors
 
 Firefuel is opinionated on how you should handle errors. Firefuel exposes the [dartz package](https://pub.dev/packages/dartz) [Either type](https://pub.dev/documentation/dartz/latest/dartz/Either-class.html), and requires that Repositories handle any error from the Collection and return "Either" a `Failure` or the success type for the function. 
 

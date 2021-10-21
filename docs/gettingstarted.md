@@ -13,6 +13,16 @@ The firefuel repository consists of several pub packages:
 
 For a [Flutter](https://flutter.dev/) application, we need to add the `firefuel` package to our `pubspec.yaml` as a dependency.
 
+### Dependencies
+| package | version |
+| -- | -- | 
+| cloud_firestore |  [![pub package](https://img.shields.io/pub/v/cloud_firestore.svg)](https://pub.dev/packages/cloud_firestore) |
+| equatable |  [![pub package](https://img.shields.io/pub/v/equatable.svg)](https://pub.dev/packages/equatable) |
+| firebase_core |  [![pub package](https://img.shields.io/pub/v/firebase_core.svg)](https://pub.dev/packages/firebase_core) |
+| firefuel |  [![pub package](https://img.shields.io/pub/v/firefuel.svg)](https://pub.dev/packages/firefuel) |
+
+Use the above versions to populate your `pubspec.yaml` file. It should look something like this:
+
 [pubspec.yaml](_snippets/getting_started/firefuel_pubspec.yaml.md ':include')
 
 Next we need to install firefuel.
