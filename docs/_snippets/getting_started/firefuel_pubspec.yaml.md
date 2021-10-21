@@ -1,4 +1,4 @@
 ```yaml
 dependencies:
-  firefuel: ^0.0.1
+  firefuel: ^0.1.0
 ```
