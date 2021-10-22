@@ -1,3 +1,6 @@
+## 0.1.0+1
+docs: update readme
+
 ## 0.1.0
 feat: Batches, filtering, and auto-gen docs!
   - add ability to create batches with `FirefuelBatch` (#45)
