@@ -125,4 +125,4 @@ The maintainers for `firefuel` are [Jonah Walker](https://github.com/SupposedlyS
 
 ## Logo Creator
 
-Our logo was created by Shawn Meek
+Our logo was created by [Shawn Meek](https://shawnmeek.com/)
