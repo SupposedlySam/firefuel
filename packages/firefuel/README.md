@@ -102,11 +102,11 @@ class UserCollection extends FirefuelCollection<User> {
 ## Profit
 That's it! Now you can access your data through the `UserCollection` with any of [the following methods](https://pub.dev/documentation/firefuel/latest/firefuel/FirefuelCollection-class.html).
 
-### Related Links
+# Related Links
 
-See the [firefuel documentation](https://firefuel.dev/#/coreconcepts) to walk through the core concepts of using `firefuel`.
+Follow the [official walkthrough](https://supposedlysam.medium.com/firefuel-basics-e4d97f1685c9) on Medium 
 
-See also: [Handling Errors](https://firefuel.dev/#/coreconcepts?id=handling-errors)
+See the [firefuel documentation](https://firefuel.dev/#/coreconcepts) to learn the core concepts of using `firefuel`.
 
 
 # Issues and feedback
