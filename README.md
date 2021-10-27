@@ -6,22 +6,20 @@ Firebase Cloud Firestore libraries to help you fuel your applications growth!
 | -- | -- |
 | [firefuel](https://github.com/SupposedlySam/firefuel/tree/main/packages/firefuel)           | [![pub package](https://img.shields.io/pub/v/firefuel.svg)](https://pub.dev/packages/firefuel) |
 | [firefuel_core](https://github.com/SupposedlySam/firefuel/tree/main/packages/firefuel_core) | [![pub package](https://img.shields.io/pub/v/firefuel_core.svg)](https://pub.dev/packages/firefuel_core)         |
-| [firefuel_env](https://github.com/SupposedlySam/firefuel/tree/main/packages/firefuel_env)   | [![pub package](https://img.shields.io/pub/v/firefuel_env.svg)](https://pub.dev/packages/firefuel_env)   |
 
 ---
 
 ### Firefuel
 
-Kickstart development with the Firefuel Library. This library gets you started with `Collection`s and `Repositories` with predefined `CRUD` (create, read, update, and delete) methods. Simply create a new class that extends `FirefuelCollection` for each collection you'll need to work with in your Firestore project and you're off and running!
+Kickstart development with the Firefuel Library. Simply create a `FirefuelCollection` for your model and instantly get predefined `CRUD` (create, read, update, and delete) operations. 
 
-Want more structure? Need subcollection support?
+View the [full README](https://github.com/SupposedlySam/firefuel/tree/main/packages/firefuel), get access to [detailed documentation](http://firefuel.dev), and see the [API Reference](https://pub.dev/documentation/firefuel/latest/)
 
-Extend the `FirefuelRepository` and pass in the `Collection` you want to use as the main collection. Then, add all other subcollections as properties of the repository. Any commonly accessed methods can be added to a `Collection` or to the `Repository` when they span multiple subcollections.
+#### Want more?
+See the [Medium article](https://supposedlysam.medium.com/firefuel-basics-e4d97f1685c9) where we walk you through how to install, setup, and use the package (including using subcollections).
 
-### Firefuel Core
+
+
+### Firefuel Core (for internal use)
 
 The `core` classes used in our `firefuel` library. Released as a standalone package for those wanting access to core, without all the bells and whistles of `firefuel`.
-
-### Firefuel Environments
-
-Coming Soon!
