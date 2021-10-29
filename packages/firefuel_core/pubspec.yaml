@@ -1,6 +1,6 @@
 name: firefuel_core
 description: The core classes required to run firefuel
-version: 0.0.1
+version: 0.1.0
 repository: https://github.com/SupposedlySam/firefuel/tree/main/packages/firefuel_core
 
 environment:

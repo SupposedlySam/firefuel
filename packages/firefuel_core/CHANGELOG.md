@@ -1,3 +1,8 @@
+## 0.1.0
+feat: Add web support
+- replace dart:io with univarsal_io
+
 ## 0.0.1
 
-- Export DocumentId, UID, Serializable and Failure
+Initial Release
+- feat: export DocumentId, UID, Serializable and Failure
