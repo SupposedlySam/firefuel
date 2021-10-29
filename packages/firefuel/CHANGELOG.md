@@ -1,3 +1,7 @@
+## 0.1.1
+feat: add web support
+- replace dart:io with universal_io
+
 ## 0.1.0+1
 docs: update readme
 
