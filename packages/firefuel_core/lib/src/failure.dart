@@ -1,4 +1,4 @@
-import 'dart:io';
+import 'package:universal_io/io.dart';
 
 import 'package:equatable/equatable.dart';
 import 'package:stack_trace/stack_trace.dart';
