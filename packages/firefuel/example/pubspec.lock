@@ -193,10 +193,10 @@ packages:
   firefuel:
     dependency: transitive
     description:
-      path: "../.."
+      path: ".."
       relative: true
     source: path
-    version: "0.0.1"
+    version: "0.1.0+1"
   firefuel_core:
     dependency: transitive
     description:
@@ -207,7 +207,7 @@ packages:
   firefuel_counter:
     dependency: "direct main"
     description:
-      path: "../packages/firefuel_counter"
+      path: "packages/firefuel_counter"
       relative: true
     source: path
     version: "0.0.1"
