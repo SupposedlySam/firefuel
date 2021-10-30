@@ -10,7 +10,7 @@ dependencies:
   bloc: ^7.2.1
   fake_cloud_firestore: ^1.1.3
   firefuel_counter:
-    path: ../packages/firefuel_counter
+    path: ./packages/firefuel_counter
   flutter:
     sdk: flutter
   flutter_bloc: ^7.3.0

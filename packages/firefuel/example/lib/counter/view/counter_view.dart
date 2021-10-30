@@ -13,6 +13,13 @@ class CounterView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
+
+    // No firefuel code is needed here. This is Flutter and bloc only.
+    //
+    // firefuel code is located in `counter_page.dart` and in the
+    // `packages/firefuel_counter` package created for this example. You can
+    // create your own packages and import them into your own applications with
+    // the `pubspec.yaml` file.
     return Scaffold(
       appBar: AppBar(title: const Text('Counter')),
       body: Center(
