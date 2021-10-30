@@ -1,4 +1,4 @@
-import 'dart:io';
+import 'package:universal_io/io.dart';
 
 class FilePathUtil {
   /// Provide a [Platform] agnostic file path
