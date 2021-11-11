@@ -1,3 +1,7 @@
+## 0.1.2
+fix: better error reporting
+  - use the stack trace from the failure in the try rather than using the current stack trace inside the catch
+
 ## 0.1.1
 feat: add web support
 - replace dart:io with universal_io
