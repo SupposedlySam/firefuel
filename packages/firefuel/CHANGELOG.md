@@ -1,3 +1,7 @@
+## 0.2.0
+BREAKING chore: Upgrade Dependencies
+- cloud_firestore v3.1.1: 
+  - BREAKING FEAT: update Android minSdk version to 19 as this is required by Firebase Android SDK 29.0.0 (#7298).
 ## 0.1.1
 feat: add web support
 - replace dart:io with universal_io

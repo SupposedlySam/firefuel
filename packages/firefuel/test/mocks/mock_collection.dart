@@ -33,7 +33,7 @@ extension MockCollectionX<T extends Serializable> on MockCollection<T> {
     T? Function()? onWhereById,
   }) {
     registerFallbackValue(DocumentId('fallbackValue'));
-    registerFallbackValue<Serializable>(TestUser('fallbackValue'));
+    registerFallbackValue(TestUser('fallbackValue'));
     registerFallbackValue(
       Chunk<TestUser>(orderBy: [OrderBy(field: TestUser.fieldName)]),
     );
