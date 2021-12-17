@@ -1,3 +1,6 @@
+## 0.2.1
+- fix: stack trace to show caught stack instead of creating a new one inside of the catch block
+
 ## 0.2.0
 BREAKING chore: Upgrade Dependencies
 - cloud_firestore v3.1.1: 
