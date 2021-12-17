@@ -20,7 +20,7 @@ mixin FirefuelFetchMixin {
       final result = await callback();
 
       return Right(result);
-    } catch (e) {
+    } catch (e, stack) {
       if (e is FormatException) {
         print('Format Exception: ${e.message}');
       }
@@ -28,7 +28,7 @@ mixin FirefuelFetchMixin {
       return Left(
         FirestoreFailure(
           error: e,
-          stackTrace: Chain.current(),
+          stackTrace: Chain.forTrace(stack),
         ),
       );
     }
@@ -47,7 +47,7 @@ mixin FirefuelFetchMixin {
       await for (var result in streamCallback()) {
         yield Right(result);
       }
-    } catch (e) {
+    } catch (e, stack) {
       if (e is FormatException) {
         print('Format Exception: ${e.message}');
       }
@@ -55,7 +55,7 @@ mixin FirefuelFetchMixin {
       yield Left(
         FirestoreFailure(
           error: e,
-          stackTrace: Chain.current(),
+          stackTrace: Chain.forTrace(stack),
         ),
       );
     }
