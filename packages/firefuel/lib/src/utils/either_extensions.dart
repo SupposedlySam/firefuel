@@ -1,5 +1,3 @@
-import 'package:dartz/dartz.dart';
-
 import 'package:firefuel/firefuel.dart';
 
 extension EitherExtension<T> on Either<Failure, T> {

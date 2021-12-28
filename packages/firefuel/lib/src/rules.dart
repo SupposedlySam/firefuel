@@ -1,5 +1,3 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-
 import 'package:firefuel/firefuel.dart';
 
 /// Read a `List` of [T] from the Collection

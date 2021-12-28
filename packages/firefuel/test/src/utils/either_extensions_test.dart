@@ -1,4 +1,3 @@
-import 'package:dartz/dartz.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:firefuel/firefuel.dart';
@@ -14,8 +13,7 @@ void main() {
       expect(right, isA<String>());
     });
 
-    test('should throw $MissingValueException when Right does not exist',
-        () {
+    test('should throw $MissingValueException when Right does not exist', () {
       final Either<Failure, String> result = Left(ExpectedFailure());
 
       expect(
