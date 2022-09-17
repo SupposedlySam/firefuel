@@ -34,6 +34,9 @@ build/
 coverage/
 flutter_export_environment.sh
 
+# Flutter Version Manager
+**/.fvm/flutter_sdk
+
 #MacOS related
 **/macos/Flutter/ephemeral/Flutter-Generated.xcconfig
 
