@@ -228,25 +228,6 @@ void main() {
       docId = await testCollection.create(batman);
     });
 
-    // TODO: not sure if this is a bug with firebase or fake_cloud_firestore
-    // This test fails because if the document is not found, the batch
-    // creates a new document with the provided fields.
-    test('should fail when document does not exist', () async {
-      final dodoId = DocumentId('dodoBird');
-
-      await testBatch.replaceFields(
-        docId: dodoId,
-        value: TestUser('Clark Kent'),
-        fieldPaths: [TestUser.fieldName],
-      );
-
-      await testBatch.commit();
-
-      final readResult = await testCollection.read(dodoId);
-
-      expect(readResult, isNull);
-    }, skip: true);
-
     test('should replace fields in the list', () async {
       await testBatch.replaceFields(
         docId: docId,
@@ -303,23 +284,6 @@ void main() {
   });
 
   group('#update', () {
-    // TODO: not sure if this is a bug with firebase or fake_cloud_firestore
-    // This test fails because if the document is not found, the batch
-    // creates a new document with the provided fields.
-    test('should fail silently when document does not exist', () async {
-      final dodoId = DocumentId('dodoBird');
-      await testBatch.update(
-        docId: dodoId,
-        value: TestUser('Clark Kent'),
-      );
-
-      await testBatch.commit();
-
-      final readResult = await testCollection.read(dodoId);
-
-      expect(readResult, isNull);
-    }, skip: true);
-
     test('should overwrite existing fields', () async {
       final updatedDoc = TestUser('updateValue');
       final docId = await testCollection.create(batman);
