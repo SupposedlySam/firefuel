@@ -5,9 +5,10 @@ repository: https://github.com/SupposedlySam/firefuel/tree/main/packages/firefue
 homepage: https://github.com/SupposedlySam/firefuel
 documentation: https://firefuel.dev
 
+# Flutter/Dart versions: https://docs.flutter.dev/development/tools/sdk/releases?tab=macos
 environment:
   sdk: ">=2.16.0 <3.0.0"
-  flutter: ">=1.12.13+hotfix.5"
+  flutter: ">=2.10.0"
 
 dependencies:
   cloud_firestore: ^3.4.8
