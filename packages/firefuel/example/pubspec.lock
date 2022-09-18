@@ -182,7 +182,7 @@ packages:
       path: ".."
       relative: true
     source: path
-    version: "0.2.1"
+    version: "0.2.2"
   firefuel_core:
     dependency: transitive
     description:
@@ -597,5 +597,5 @@ packages:
     source: hosted
     version: "3.1.1"
 sdks:
-  dart: ">=2.18.0 <3.0.0"
-  flutter: ">=3.3.2"
+  dart: ">=2.17.0 <3.0.0"
+  flutter: ">=1.17.0"
