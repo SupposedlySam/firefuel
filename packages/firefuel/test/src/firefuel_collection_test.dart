@@ -143,7 +143,7 @@ void main() {
       final newUser2 = TestUser('newUser2');
       final newUser3 = TestUser('newUser3');
 
-      expect(stream, emitsInOrder([newUser1, newUser2, newUser3]));
+      expect(stream, emitsInOrder([defaultUser, newUser1, newUser2, newUser3]));
 
       await testCollection.update(docId: docId, value: newUser1);
       await testCollection.update(docId: docId, value: newUser2);
@@ -153,7 +153,7 @@ void main() {
     test('should output null when doc no longer exists', () async {
       final newUser = TestUser('newUser');
 
-      expect(stream, emitsInOrder([newUser, null]));
+      expect(stream, emitsInOrder([defaultUser, newUser, null]));
 
       await testCollection.update(docId: docId, value: newUser);
       await testCollection.delete(docId);
@@ -696,16 +696,6 @@ void main() {
       docId = await testCollection.create(defaultUser);
     });
 
-    test('should fail silently when document does not exist', () async {
-      final updateResult = await testCollection.replaceFields(
-        docId: DocumentId('dodoBird'),
-        value: TestUser('Clark Kent'),
-        fieldPaths: [TestUser.fieldName],
-      );
-
-      expect(updateResult, isNull);
-    });
-
     test('should replace fields in the list', () async {
       await testCollection.replaceFields(
         docId: docId,
@@ -735,15 +725,6 @@ void main() {
   });
 
   group('#update', () {
-    test('should fail silently when document does not exist', () async {
-      final updateResult = await testCollection.update(
-        docId: DocumentId('dodoBird'),
-        value: TestUser('Clark Kent'),
-      );
-
-      expect(updateResult, isNull);
-    });
-
     test('should overwrite existing fields', () async {
       final updatedDoc = TestUser('updateValue');
       final docId = await testCollection.create(defaultUser);
