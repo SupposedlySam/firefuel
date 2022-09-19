@@ -17,37 +17,69 @@ void main() {
     });
   });
 
-  group('#env', () {
+  group('when firestore is initialized', () {
     late FakeFirebaseFirestore firestore;
 
     setUp(() {
       firestore = FakeFirebaseFirestore();
     });
 
-    test('should return an empty string when not initialized', () {
-      expect(Firefuel.env, isEmpty);
+    group('#env', () {
+      test('should return an empty string when not initialized', () {
+        expect(Firefuel.env, isEmpty);
+      });
+
+      test('should return an empty string when not provided', () {
+        Firefuel.initialize(firestore);
+
+        expect(Firefuel.env, isEmpty);
+      });
+
+      test('should return string starting with prefix when provided', () {
+        const env = 'test';
+
+        Firefuel.initialize(firestore, env: env);
+
+        expect(Firefuel.env, startsWith(env));
+      });
+
+      test('should return prefix with "-" when provided', () {
+        const env = 'test';
+
+        Firefuel.initialize(firestore, env: env);
+
+        expect(Firefuel.env, '$env-');
+      });
     });
 
-    test('should return an empty string when not provided', () {
-      Firefuel.initialize(firestore);
+    group('#isOnline', () {
+      test('should default to true', () {
+        Firefuel.initialize(firestore);
 
-      expect(Firefuel.env, isEmpty);
-    });
+        expect(Firefuel.isOnline, isTrue);
+      });
 
-    test('should return string starting with prefix when provided', () {
-      const env = 'test';
+      test('should accept initial value', () {
+        Firefuel.initialize(firestore, isOnline: false);
 
-      Firefuel.initialize(firestore, env: env);
+        expect(Firefuel.isOnline, isFalse);
 
-      expect(Firefuel.env, startsWith(env));
-    });
+        Firefuel.initialize(firestore, isOnline: true);
 
-    test('should return prefix with "-" when provided', () {
-      const env = 'test';
+        expect(Firefuel.isOnline, isTrue);
+      });
 
-      Firefuel.initialize(firestore, env: env);
+      test('should allow changes through static setter', () {
+        Firefuel.initialize(firestore);
 
-      expect(Firefuel.env, '$env-');
+        Firefuel.isOnline = false;
+
+        expect(Firefuel.isOnline, isFalse);
+
+        Firefuel.isOnline = true;
+
+        expect(Firefuel.isOnline, isTrue);
+      });
     });
   });
 }
