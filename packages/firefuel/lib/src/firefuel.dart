@@ -39,6 +39,9 @@ class Firefuel {
   /// 3. Offline queries are SLOOOW, local data does not get indexed and all
   /// actions taken while offline need to be replayed with each additional
   /// query, leading to seemingly exponential wait times for simple actions.
+  ///
+  /// See https://firebase.google.com/docs/firestore/manage-data/enable-offline
+  /// for more info.
   static bool isOnline = true;
 
   /// Initializes Firefuel with instance of [FirebaseFirestore]
