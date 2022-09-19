@@ -7,7 +7,7 @@ documentation: https://firefuel.dev
 
 # Flutter/Dart versions: https://docs.flutter.dev/development/tools/sdk/releases?tab=macos
 environment:
-  sdk: ">=2.16.0 <3.0.0"
+  sdk: ">=2.17.0 <3.0.0"
   flutter: ">=2.10.0"
 
 dependencies:

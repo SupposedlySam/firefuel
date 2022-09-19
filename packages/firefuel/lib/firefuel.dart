@@ -19,7 +19,7 @@ export 'package:firefuel/src/order_by.dart';
 export 'package:firefuel/src/repository.dart';
 export 'package:firefuel/src/firefuel.dart';
 export 'package:firefuel/src/firefuel_batch.dart';
-export 'package:firefuel/src/firefuel_collection.dart';
+export 'package:firefuel/src/firefuel_collection/firefuel_collection.dart';
 export 'package:firefuel/src/firefuel_failure.dart';
 export 'package:firefuel/src/firefuel_fetch_mixin.dart';
 export 'package:firefuel/src/firefuel_repository.dart';
