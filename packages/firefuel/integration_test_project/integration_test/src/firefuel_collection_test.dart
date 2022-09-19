@@ -508,7 +508,7 @@ void main() {
 
     test('should throw when no orderBys are given', () async {
       expect(
-        () async => await testCollection.orderBy([]),
+        () => testCollection.orderBy([]),
         throwsA(isA<MissingValueException>()),
       );
     });
@@ -816,7 +816,7 @@ void main() {
         'should throw a $TooManyArgumentsException when more than one option is chosen',
         () {
           expect(
-            () async => await testCollection.where(
+            () => testCollection.where(
               [
                 Clause(
                   TestUser.fieldName,
@@ -832,7 +832,7 @@ void main() {
 
       test('should throw when no clauses are given', () async {
         expect(
-          () async => await testCollection.where([]),
+          () => testCollection.where([]),
           throwsA(isA<MissingValueException>()),
         );
       });

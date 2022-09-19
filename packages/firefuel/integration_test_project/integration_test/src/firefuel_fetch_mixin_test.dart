@@ -35,7 +35,7 @@ void main() {
 
   group('#guardStream', () {
     test('should return Right on success', () async {
-      final result = await testFetchMixin.guardStream(
+      final result = testFetchMixin.guardStream(
         () => Stream.fromIterable(['successValue!']),
       );
 
@@ -43,7 +43,7 @@ void main() {
     });
 
     test('should return Left on failure', () async {
-      final result = await testFetchMixin.guardStream<String>(
+      final result = testFetchMixin.guardStream<String>(
         () => throw FormatException(),
       );
 
@@ -51,7 +51,7 @@ void main() {
     });
 
     test('should return $FirestoreFailure on failure', () async {
-      final result = await testFetchMixin.guardStream<String>(
+      final result = testFetchMixin.guardStream<String>(
         () => throw FormatException('some output'),
       );
 
