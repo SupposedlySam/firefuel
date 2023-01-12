@@ -11,7 +11,7 @@ environment:
   flutter: ">=2.10.0"
 
 dependencies:
-  cloud_firestore: ^3.4.8
+  cloud_firestore: ">3.4.8 <5.0.0"
   dartz: ^0.10.0
   equatable: ^2.0.5
   firefuel_core: ^0.1.0
