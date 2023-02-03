@@ -14,6 +14,34 @@ void main() {
     testCollection = TestCollection();
   });
 
+  group('#count', () {
+    setUp(() async {
+      await testCollection.create(defaultUser);
+      await testCollection.create(defaultUser);
+      await testCollection.create(defaultUser);
+    });
+
+    test('should return the amount of documents in the collection', () async {
+      final actual = await testCollection.count();
+
+      expect(actual, 3);
+    });
+
+    test(
+      'should return the amount of documents in the collection, filtered by the provided clauses',
+      () async {
+        final newUserName = 'newUser';
+        await testCollection.create(TestUser(newUserName));
+
+        final actual = await testCollection.countWhere([
+          Clause(TestUser.fieldName, isEqualTo: newUserName),
+        ]);
+
+        expect(actual, 1);
+      },
+    );
+  });
+
   group('#create', () {
     test('should return a new document', () async {
       final originalDocId = await testCollection.create(defaultUser);
