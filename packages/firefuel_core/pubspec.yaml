@@ -1,10 +1,10 @@
 name: firefuel_core
 description: The core classes required to run firefuel
-version: 0.1.0
+version: 0.1.1
 repository: https://github.com/SupposedlySam/firefuel/tree/main/packages/firefuel_core
 
 environment:
-  sdk: ">=2.12.0 <3.0.0"
+  sdk: '>=2.12.0 <3.0.0'
 
 dependencies:
   equatable: ^2.0.3

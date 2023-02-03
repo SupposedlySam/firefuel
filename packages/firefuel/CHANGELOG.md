@@ -1,3 +1,44 @@
+## 0.2.3
+
+Our API has not changed so this is only a patch for `firefuel`. However, `cloud_firestore` and `firebase_core` both have breaking changes.
+
+- chore: bump versions to align with latest cloud_firestore
+
+### General Upgrade Path from `cloud_firestore` 3 to 4
+
+See the changelogs for `cloud_firestore` and `firebase_core` on `pub.dev` for more details.
+
+---
+
+#### Android
+
+android>app>build.gradle:
+`compileSdkVersion 31`
+`minSdkVersion 19`
+`targetSdkVersion 31`
+
+android>build.gradle:
+`ext.kotlin_version = '1.6.10'`
+`classpath 'com.android.tools.build:gradle:7.1.2'`
+
+android>gradle>wrapper>gradle-wrapper.properties:
+`distributionUrl=https\://services.gradle.org/distributions/gradle-7.2-bin.zip`
+
+android>app>src>main>AndroidManifest.xml:
+Add this attribute inside of the manifest>application>activity node
+`android:exported="true"`
+
+---
+
+#### iOS
+
+ios>Podfile:
+`platform :ios, '11.0'`
+
+Open your Flutter project in XCode and update the Minimum Deployment Target for the Runner Target to version 11.
+
+`cd` into your `ios` directory and run `pod update`
+
 ## 0.2.2
 
 - chore: bump versions to align with latest cloud_firestore
@@ -15,13 +56,13 @@ BREAKING chore: Upgrade Dependencies
 
 ## 0.1.1
 
-feat: add web support
+- feat: add web support
 
-- replace dart:io with universal_io
+  - replace dart:io with universal_io
 
 ## 0.1.0+1
 
-docs: update readme
+- docs: update readme
 
 ## 0.1.0
 
@@ -33,24 +74,21 @@ feat: Batches, filtering, and auto-gen docs!
 
 ## 0.0.2+2
 
-docs(fix): fix broken code in readme
-
-- update code example for model
+- docs(fix): fix broken code in readme
+  - update code example for model
 
 ## 0.0.2+1
 
-docs: update readme
-
-- add code example of creating a model and collection
+- docs: update readme
+  - add code example of creating a model and collection
 
 ## 0.0.2
 
-docs: update package links in pubspec
-
-- add homepage link
-- change repository link to direcly link to package
-- add documentation link
+- docs: update package links in pubspec
+  - add homepage link
+  - change repository link to direcly link to package
+  - add documentation link
 
 ## 0.0.1
 
-initial release
+- feat: initial release
