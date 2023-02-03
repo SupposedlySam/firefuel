@@ -1,3 +1,28 @@
+## 0.3.0
+
+### Adds `count` method
+
+Adds `count` and `countWhere` to all `Collection`s:
+
+Uses the count feature introduced in v4.0.0 of `cloud_firestore` to count
+documents on the server without retrieving documents.
+
+> ## Firebase Release Notes
+>
+> Cloud Firestore now supports a count() aggregation query that allows you
+> to determine the number of documents in a collection. The server
+> calculates the count, and transmits only the result, a single integer,
+> back to your app, saving on both billed document reads and bytes
+> transferred, compared to executing the full query.
+
+> Source: https://firebase.google.com/support/releases#firestore-count-queries
+
+---
+
+Adds `streamCount` and `streamCountWhere` to all `Collection`s:
+
+These methods DO NOT use the server side count function provided by v4.0.0 of `cloud_firestore` as they do not currenly support streams. These methods works by streaming documents from Firestore and accessing the size property once the full query is executed. This method will incur document reads and bytes transferred.
+
 ## 0.2.3
 
 Our API has not changed so this is only a patch for `firefuel`. However, `cloud_firestore` and `firebase_core` both have breaking changes.

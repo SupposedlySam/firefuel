@@ -2,6 +2,7 @@ import 'package:firefuel/firefuel.dart';
 
 abstract class Repository<T extends Serializable>
     implements
+        CollectionCount<Either<Failure, int>>,
         CollectionRead<Either<Failure, List<T>>, T>,
         CollectionPaginate<Either<Failure, Chunk<T>>, T>,
         DocCreate<Either<Failure, DocumentId>, T>,

@@ -2,8 +2,9 @@ import 'package:firefuel/firefuel.dart';
 
 abstract class Collection<T extends Serializable>
     implements
-        CollectionRead<List<T>, T>,
+        CollectionCount<int>,
         CollectionPaginate<Chunk<T>, T>,
+        CollectionRead<List<T>, T>,
         DocCreate<DocumentId, T>,
         DocCreateIfNotExist<T, T>,
         DocDelete<Null>,

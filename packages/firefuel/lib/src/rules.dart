@@ -1,5 +1,70 @@
 import 'package:firefuel/firefuel.dart';
 
+/// Methods used to retrieve primitive values from a collection
+abstract class CollectionCount<T> {
+  /// {@template firefuel.rules.count.definition}
+  /// Gets the amount of all documents within the collection.
+  /// {@endtemplate}
+  ///
+  /// {@template firefuel.rules.count.footer}
+  /// See also: [countWhere]
+  /// {@endtemplate}
+  Future<T> count();
+
+  /// {@template firefuel.rules.countwhere.definition}
+  /// Gets the amount of documents filtered by the provided clauses.
+  /// {@endtemplate}
+  ///
+  /// {@template firefuel.rules.countwhere.footer}
+  /// See also: [count]
+  /// {@endtemplate}
+  Future<T> countWhere(List<Clause> clauses);
+
+  /// {@template firefuel.rules.streamcount.definition}
+  /// Gets the amount of all documents from the collection
+  ///
+  /// Refreshes automatically when new data is added/removed from the collection
+  /// {@endtemplate}
+  ///
+  /// {@template firefuel.rules.streamcount.footer}
+  /// See also: [streamCountWhere]
+  /// {@endtemplate}
+  Stream<T> streamCount();
+
+  /// {@template firefuel.rules.streamcountwhere.definition}
+  /// Gets the amount of documents from the collection, filtered by the provided
+  /// clauses
+  ///
+  /// Refreshes automatically when new data is added/removed from the collection
+  /// {@endtemplate}
+  ///
+  /// {@template firefuel.rules.streamcountwhere.footer}
+  /// See also: [streamCount]
+  /// {@endtemplate}
+  Stream<T> streamCountWhere(List<Clause> clauses);
+}
+
+/// Get a number of Documents from the Collection
+///
+/// /// [R]: should return a [T] or some subset,
+/// i.e. `Either<Failure, T>`
+///
+/// {@macro firefuel.rules.subclasses}
+/// {@macro firefuel.rules.implementations}
+abstract class CollectionPaginate<R, T extends Serializable> {
+  /// Get a number of Documents from the Collection specified by the [chunk]
+  ///
+  /// Store the [Chunk] you get back from calling this method and pass it back
+  /// to the [paginate] method to get the next [Chunk]
+  ///
+  /// You can continue to do this until the `Chunk.status` equals
+  /// [ChunkStatus.last].
+  ///
+  /// Passing in a [Chunk] with the status of [ChunkStatus.last] will result in
+  /// a [Chunk] with empty data.
+  Future<R> paginate(Chunk<T> chunk);
+}
+
 /// Read a `List` of [T] from the Collection
 ///
 /// [R]: should return a `List<T>` or some subset,
@@ -102,27 +167,6 @@ abstract class CollectionRead<R, T extends Serializable> {
   ///
   /// {@macro firefuel.rules.whereExceptions}
   Future<R> where(List<Clause> clauses, {List<OrderBy>? orderBy, int? limit});
-}
-
-/// Get a number of Documents from the Collection
-///
-/// /// [R]: should return a [T] or some subset,
-/// i.e. `Either<Failure, T>`
-///
-/// {@macro firefuel.rules.subclasses}
-/// {@macro firefuel.rules.implementations}
-abstract class CollectionPaginate<R, T extends Serializable> {
-  /// Get a number of Documents from the Collection specified by the [chunk]
-  ///
-  /// Store the [Chunk] you get back from calling this method and pass it back
-  /// to the [paginate] method to get the next [Chunk]
-  ///
-  /// You can continue to do this until the `Chunk.status` equals
-  /// [ChunkStatus.last].
-  ///
-  /// Passing in a [Chunk] with the status of [ChunkStatus.last] will result in
-  /// a [Chunk] with empty data.
-  Future<R> paginate(Chunk<T> chunk);
 }
 
 /// Create a new Document

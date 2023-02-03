@@ -14,6 +14,42 @@ void main() {
     testCollection = TestCollection();
   });
 
+  group('#count', () {
+    setUp(() async {
+      await testCollection.create(defaultUser);
+      await testCollection.create(defaultUser);
+      await testCollection.create(defaultUser);
+    });
+
+    test('should return the amount of documents in the collection', () async {
+      final actual = await testCollection.count();
+
+      expect(actual, 3);
+    });
+  });
+
+  group('#countWhere', () {
+    setUp(() async {
+      await testCollection.create(defaultUser);
+      await testCollection.create(defaultUser);
+      await testCollection.create(defaultUser);
+    });
+
+    test(
+      'should return the amount of documents in the collection, filtered by the provided clauses',
+      () async {
+        final newUserName = 'newUser';
+        await testCollection.create(TestUser(newUserName));
+
+        final actual = await testCollection.countWhere([
+          Clause(TestUser.fieldName, isEqualTo: newUserName),
+        ]);
+
+        expect(actual, 1);
+      },
+    );
+  });
+
   group('#create', () {
     test('should return a new document', () async {
       final originalDocId = await testCollection.create(defaultUser);
@@ -197,6 +233,29 @@ void main() {
     });
   });
 
+  group('#streamCount', () {
+    late Stream<int> stream;
+    late DocumentId docId;
+
+    setUp(() async {
+      docId = await testCollection.create(defaultUser);
+
+      stream = testCollection.streamCount();
+    });
+
+    test('should output new value when new doc is created', () async {
+      expect(stream, emitsInOrder([1, 2]));
+
+      await testCollection.create(defaultUser);
+    });
+
+    test('should output 0 when docs no longer exists', () async {
+      expect(stream, emitsInOrder([0]));
+
+      await testCollection.delete(docId);
+    });
+  });
+
   group('#streamLimited', () {
     setUp(() async {
       await testCollection.create(defaultUser);
@@ -291,6 +350,45 @@ void main() {
       );
 
       await testCollection.delete(docId);
+    });
+  });
+
+  group('#streamCountWhere', () {
+    late Stream<int> stream;
+    late DocumentId docId;
+
+    setUp(() async {
+      docId = await testCollection.create(defaultUser);
+
+      stream = testCollection.streamCountWhere([
+        Clause(TestUser.fieldName, isEqualTo: defaultUser.name),
+      ]);
+    });
+
+    test(
+      'should output new value when new doc is created matching the clause',
+      () async {
+        expect(stream, emitsInOrder([1, 2]));
+
+        await testCollection.create(TestUser('newUser1')); // no emit
+        await testCollection.create(TestUser('newUser1')); // no emit
+        await testCollection.create(defaultUser); // emit
+      },
+    );
+
+    test('should output 0 when matching docs no longer exists', () async {
+      final nonVisibleUser = TestUser('newUser1');
+
+      expect(stream, emitsInOrder([1, 0]));
+
+      // If this was visible it would emit 2
+      final docIdToDelete = await testCollection.create(nonVisibleUser);
+      // If this was visible it would emit 1
+      await testCollection.delete(docIdToDelete);
+      // If this was visible it would emit 2 again
+      await testCollection.create(nonVisibleUser);
+      // Should actually emit 0
+      await testCollection.delete(docId); // emit
     });
   });
 

@@ -9,6 +9,16 @@ abstract class FirefuelRepository<T extends Serializable>
       : _collection = collection;
 
   @override
+  Future<Either<Failure, int>> count() {
+    return guard(() => _collection.count());
+  }
+
+  @override
+  Future<Either<Failure, int>> countWhere(List<Clause> clauses) {
+    return guard(() => _collection.countWhere(clauses));
+  }
+
+  @override
   Future<Either<Failure, DocumentId>> create(T value) {
     return guard(() => _collection.create(value));
   }
@@ -39,6 +49,16 @@ abstract class FirefuelRepository<T extends Serializable>
   @override
   Stream<Either<Failure, List<T>>> streamAll() {
     return guardStream(() => _collection.streamAll());
+  }
+
+  @override
+  Stream<Either<Failure, int>> streamCount() {
+    return guardStream(() => _collection.streamCount());
+  }
+
+  @override
+  Stream<Either<Failure, int>> streamCountWhere(List<Clause> clauses) {
+    return guardStream(() => _collection.streamCountWhere(clauses));
   }
 
   @override

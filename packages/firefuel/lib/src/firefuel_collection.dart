@@ -24,6 +24,42 @@ abstract class FirefuelCollection<T extends Serializable>
     return firestore.collection(path);
   }
 
+  /// {@macro firefuel.rules.count.definition}
+  ///
+  /// {@template firefuel.collection.count}
+  /// Uses the count feature introduced in v4.0.0 of `cloud_firestore` to count
+  /// documents on the server without retrieving documents.
+  ///
+  /// > ## Firestore Release Notes
+  /// > Cloud Firestore now supports a count() aggregation query that allows you
+  /// > to determine the number of documents in a collection. The server
+  /// > calculates the count, and transmits only the result, a single integer,
+  /// > back to your app, saving on both billed document reads and bytes
+  /// > transferred, compared to executing the full query.
+  ///
+  /// > Source: https://firebase.google.com/support/releases#firestore-count-queries
+  /// {@endtemplate}
+  ///
+  /// {@macro firefuel.rules.count.footer}
+  @override
+  Future<int> count() async {
+    final snapshot = await untypedRef.count().get();
+
+    return snapshot.count;
+  }
+
+  /// {@macro firefuel.rules.countwhere.definition}
+  ///
+  /// {@macro firefuel.collection.count}
+  ///
+  /// {@macro firefuel.rules.countwhere.footer}
+  @override
+  Future<int> countWhere(List<Clause> clauses) async {
+    final snapshot = await untypedRef.filter(clauses).count().get();
+
+    return snapshot.count;
+  }
+
   @override
   Future<DocumentId> create(T value) async {
     final documentRef = await ref.add(value);
@@ -165,6 +201,43 @@ abstract class FirefuelCollection<T extends Serializable>
   @override
   Stream<List<T>> streamAll() {
     return ref.snapshots().toListT();
+  }
+
+  /// {@macro firefuel.rules.streamcount.definition}
+  ///
+  /// {@template firefuel.collection.streamcount}
+  /// This method DOES NOT use the server side count function provided by
+  /// v4.0.0 of `cloud_firestore` as they do not currenly support streams.
+  ///
+  /// See [count] and [countWhere] for more details.
+  ///
+  /// This method works by streaming documents from Firestore and accessing the
+  /// size property once the full query is executed. This method will incur
+  /// document reads and bytes transferred.
+  ///
+  /// As per the Google's recommendation, you shouldn't need to worry about
+  /// optimnizing for reads until it becomes a problem. Depending on the size of
+  /// your app, it may never need to be optimized.
+  /// {@endtemplate}
+  ///
+  /// {@macro firefuel.rules.streamcount.footer}
+  @override
+  Stream<int> streamCount() {
+    final snapshots = ref.snapshots();
+
+    return snapshots.map((querySnapshot) => querySnapshot.size);
+  }
+
+  /// {@macro firefuel.rules.streamcountwhere.definition}
+  ///
+  /// {@macro firefuel.collection.streamcount}
+  ///
+  /// {@macro firefuel.rules.streamcountwhere.footer}
+  @override
+  Stream<int> streamCountWhere(List<Clause> clauses) {
+    final snapshots = ref.filter(clauses).snapshots();
+
+    return snapshots.map((querySnapshot) => querySnapshot.size);
   }
 
   @override
