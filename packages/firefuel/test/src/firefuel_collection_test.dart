@@ -26,6 +26,14 @@ void main() {
 
       expect(actual, 3);
     });
+  });
+
+  group('#countWhere', () {
+    setUp(() async {
+      await testCollection.create(defaultUser);
+      await testCollection.create(defaultUser);
+      await testCollection.create(defaultUser);
+    });
 
     test(
       'should return the amount of documents in the collection, filtered by the provided clauses',
