@@ -1,4 +1,4 @@
-## 0.2.2
+## 0.2.3
 
 Our API has not changed so this is only a patch for `firefuel`. However, `cloud_firestore` and `firebase_core` both have breaking changes.
 
@@ -38,6 +38,14 @@ ios>Podfile:
 Open your Flutter project in XCode and update the Minimum Deployment Target for the Runner Target to version 11.
 
 `cd` into your `ios` directory and run `pod update`
+
+---
+
+---
+
+## 0.2.2
+
+- chore: bump versions to align with latest cloud_firestore
 
 ---
 
