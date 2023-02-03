@@ -23,31 +23,46 @@ abstract class CollectionPaginate<R, T extends Serializable> {
 
 /// Methods used to retrieve primitive values from a collection
 abstract class CollectionPrimitives {
+  /// {@template firefuel.rules.count.definition}
   /// Gets the amount of all documents within the collection.
-  ///
-  /// {@template firefuel.collection.count}
-  /// Uses the count feature introduced in v4.0.0 of `cloud_firestore` to count
-  /// documents on the server without retrieving documents.
-  ///
-  /// > ## Firestore Release Notes
-  /// > Cloud Firestore now supports a count() aggregation query that allows you
-  /// > to determine the number of documents in a collection. The server
-  /// > calculates the count, and transmits only the result, a single integer,
-  /// > back to your app, saving on both billed document reads and bytes
-  /// > transferred, compared to executing the full query.
-  ///
-  /// > Source: https://firebase.google.com/support/releases#firestore-count-queries
   /// {@endtemplate}
   ///
-  /// Related: [countWhere]
+  /// {@template firefuel.rules.count.footer}
+  /// See also: [countWhere]
+  /// {@endtemplate}
   Future<int> count();
 
+  /// {@template firefuel.rules.countwhere.definition}
   /// Gets the amount of documents filtered by the provided clauses.
+  /// {@endtemplate}
   ///
-  /// {@macro firefuel.collection.count}
-  ///
-  /// Related: [count]
+  /// {@template firefuel.rules.countwhere.footer}
+  /// See also: [count]
+  /// {@endtemplate}
   Future<int> countWhere(List<Clause> clauses);
+
+  /// {@template firefuel.rules.streamcount.definition}
+  /// Gets the amount of all documents from the collection
+  ///
+  /// Refreshes automatically when new data is added/removed from the collection
+  /// {@endtemplate}
+  ///
+  /// {@template firefuel.rules.streamcount.footer}
+  /// See also: [streamCountWhere]
+  /// {@endtemplate}
+  Stream<int> streamCount();
+
+  /// {@template firefuel.rules.streamcountwhere.definition}
+  /// Gets the amount of documents from the collection, filtered by the provided
+  /// clauses
+  ///
+  /// Refreshes automatically when new data is added/removed from the collection
+  /// {@endtemplate}
+  ///
+  /// {@template firefuel.rules.streamcountwhere.footer}
+  /// See also: [streamCount]
+  /// {@endtemplate}
+  Stream<int> streamCountWhere(List<Clause> clauses);
 }
 
 /// Read a `List` of [T] from the Collection
