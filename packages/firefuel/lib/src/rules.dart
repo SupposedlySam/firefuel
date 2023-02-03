@@ -1,28 +1,7 @@
 import 'package:firefuel/firefuel.dart';
 
-/// Get a number of Documents from the Collection
-///
-/// /// [R]: should return a [T] or some subset,
-/// i.e. `Either<Failure, T>`
-///
-/// {@macro firefuel.rules.subclasses}
-/// {@macro firefuel.rules.implementations}
-abstract class CollectionPaginate<R, T extends Serializable> {
-  /// Get a number of Documents from the Collection specified by the [chunk]
-  ///
-  /// Store the [Chunk] you get back from calling this method and pass it back
-  /// to the [paginate] method to get the next [Chunk]
-  ///
-  /// You can continue to do this until the `Chunk.status` equals
-  /// [ChunkStatus.last].
-  ///
-  /// Passing in a [Chunk] with the status of [ChunkStatus.last] will result in
-  /// a [Chunk] with empty data.
-  Future<R> paginate(Chunk<T> chunk);
-}
-
 /// Methods used to retrieve primitive values from a collection
-abstract class CollectionPrimitives<T> {
+abstract class CollectionCount<T> {
   /// {@template firefuel.rules.count.definition}
   /// Gets the amount of all documents within the collection.
   /// {@endtemplate}
@@ -63,6 +42,27 @@ abstract class CollectionPrimitives<T> {
   /// See also: [streamCount]
   /// {@endtemplate}
   Stream<T> streamCountWhere(List<Clause> clauses);
+}
+
+/// Get a number of Documents from the Collection
+///
+/// /// [R]: should return a [T] or some subset,
+/// i.e. `Either<Failure, T>`
+///
+/// {@macro firefuel.rules.subclasses}
+/// {@macro firefuel.rules.implementations}
+abstract class CollectionPaginate<R, T extends Serializable> {
+  /// Get a number of Documents from the Collection specified by the [chunk]
+  ///
+  /// Store the [Chunk] you get back from calling this method and pass it back
+  /// to the [paginate] method to get the next [Chunk]
+  ///
+  /// You can continue to do this until the `Chunk.status` equals
+  /// [ChunkStatus.last].
+  ///
+  /// Passing in a [Chunk] with the status of [ChunkStatus.last] will result in
+  /// a [Chunk] with empty data.
+  Future<R> paginate(Chunk<T> chunk);
 }
 
 /// Read a `List` of [T] from the Collection
