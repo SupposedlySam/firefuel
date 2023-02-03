@@ -25,6 +25,20 @@ abstract class FirefuelCollection<T extends Serializable>
   }
 
   @override
+  Future<int> count() async {
+    final snapshot = await untypedRef.count().get();
+
+    return snapshot.count;
+  }
+
+  @override
+  Future<int> countWhere(List<Clause> clauses) async {
+    final snapshot = await untypedRef.filter(clauses).count().get();
+
+    return snapshot.count;
+  }
+
+  @override
   Future<DocumentId> create(T value) async {
     final documentRef = await ref.add(value);
 
