@@ -22,7 +22,7 @@ abstract class CollectionPaginate<R, T extends Serializable> {
 }
 
 /// Methods used to retrieve primitive values from a collection
-abstract class CollectionPrimitives {
+abstract class CollectionPrimitives<T> {
   /// {@template firefuel.rules.count.definition}
   /// Gets the amount of all documents within the collection.
   /// {@endtemplate}
@@ -30,7 +30,7 @@ abstract class CollectionPrimitives {
   /// {@template firefuel.rules.count.footer}
   /// See also: [countWhere]
   /// {@endtemplate}
-  Future<int> count();
+  Future<T> count();
 
   /// {@template firefuel.rules.countwhere.definition}
   /// Gets the amount of documents filtered by the provided clauses.
@@ -39,7 +39,7 @@ abstract class CollectionPrimitives {
   /// {@template firefuel.rules.countwhere.footer}
   /// See also: [count]
   /// {@endtemplate}
-  Future<int> countWhere(List<Clause> clauses);
+  Future<T> countWhere(List<Clause> clauses);
 
   /// {@template firefuel.rules.streamcount.definition}
   /// Gets the amount of all documents from the collection
@@ -50,7 +50,7 @@ abstract class CollectionPrimitives {
   /// {@template firefuel.rules.streamcount.footer}
   /// See also: [streamCountWhere]
   /// {@endtemplate}
-  Stream<int> streamCount();
+  Stream<T> streamCount();
 
   /// {@template firefuel.rules.streamcountwhere.definition}
   /// Gets the amount of documents from the collection, filtered by the provided
@@ -62,7 +62,7 @@ abstract class CollectionPrimitives {
   /// {@template firefuel.rules.streamcountwhere.footer}
   /// See also: [streamCount]
   /// {@endtemplate}
-  Stream<int> streamCountWhere(List<Clause> clauses);
+  Stream<T> streamCountWhere(List<Clause> clauses);
 }
 
 /// Read a `List` of [T] from the Collection
