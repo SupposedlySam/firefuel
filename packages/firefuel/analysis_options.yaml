@@ -8,6 +8,8 @@ analyzer:
     missing_return: error
     unused_element: ignore
     uri_has_not_been_generated: ignore
+    public_member_api_docs: ignore
+    one_member_abstracts: ignore
 
   exclude:
     - '**/*.freezed.dart'
