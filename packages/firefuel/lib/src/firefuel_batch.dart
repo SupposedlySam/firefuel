@@ -6,12 +6,9 @@ import 'package:firefuel/src/utils/serializable_extensions.dart';
 import 'package:flutter/foundation.dart';
 
 class FirefuelBatch<T extends Serializable> extends Batch<T> with _BatchMixin {
-
-  FirefuelBatch(this.collection) : super(collection) {
+  FirefuelBatch(super.collection) {
     _createNewBatch();
   }
-  @override
-  final FirefuelCollection<T> collection;
 
   @override
   Future<void> commit() async {

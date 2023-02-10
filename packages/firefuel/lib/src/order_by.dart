@@ -13,7 +13,6 @@ import 'package:equatable/equatable.dart';
 /// An OrderBy clause also filters for existence of the given fields. The
 /// result set will not include documents that do not contain the given fields.
 class OrderBy extends Equatable {
-
   OrderBy({
     required this.field,
     OrderDirection direction = OrderDirection.asc,
@@ -22,9 +21,8 @@ class OrderBy extends Equatable {
 
   /// Creates a condition to order your collection by document id
   const OrderBy.docId([
-    OrderDirection direction = OrderDirection.asc,
+    this.direction = OrderDirection.asc,
   ])  : field = 'unused',
-        direction = direction,
         byId = true;
   final String field;
   final OrderDirection direction;
