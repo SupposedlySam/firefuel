@@ -16,4 +16,3 @@ analyzer:
     - '**/*.g.dart'
     - '**/*.mocks.dart'
     - '**/lib/*generated*'
-    - brick_oven/**
