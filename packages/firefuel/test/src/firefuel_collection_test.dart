@@ -607,14 +607,16 @@ void main() {
 
     test('should return results in ascending order', () async {
       final usersResult = await testCollection.orderBy(
-          [OrderBy(field: TestUser.fieldName, direction: OrderDirection.aToZ)],);
+        [OrderBy(field: TestUser.fieldName, direction: OrderDirection.aToZ)],
+      );
 
       expect(usersResult, [testUser1, testUser2, testUser3]);
     });
 
     test('should return results in descending order', () async {
       final usersResult = await testCollection.orderBy(
-          [OrderBy(field: TestUser.fieldName, direction: OrderDirection.zToA)],);
+        [OrderBy(field: TestUser.fieldName, direction: OrderDirection.zToA)],
+      );
 
       expect(usersResult, [testUser3, testUser2, testUser1]);
     });
@@ -627,7 +629,9 @@ void main() {
 
       await Future.wait(
         List.generate(
-            seedCount, (i) => testCollection.create(TestUser('User$i')),),
+          seedCount,
+          (i) => testCollection.create(TestUser('User$i')),
+        ),
       );
     });
 
@@ -745,7 +749,9 @@ void main() {
 
     test('should create the doc when it does not exist', () async {
       final result = await testCollection.readOrCreate(
-          docId: documentId, createValue: defaultUser,);
+        docId: documentId,
+        createValue: defaultUser,
+      );
 
       expect(result, defaultUser);
     });
@@ -754,7 +760,9 @@ void main() {
       final docId = await testCollection.create(defaultUser);
 
       final testUser = await testCollection.readOrCreate(
-          docId: docId, createValue: defaultUser,);
+        docId: docId,
+        createValue: defaultUser,
+      );
 
       expect(docId.docId, testUser.docId);
     });
@@ -764,12 +772,25 @@ void main() {
     final originalDocId = DocumentId('originalDocId');
 
     test('should fail silently when document does not exist', () async {
-      final updateResult = await testCollection.replace(
-        docId: DocumentId('dodoBird'),
-        value: const TestUser('Clark Kent'),
+      final nonExistentDoc = DocumentId('dodoBird');
+      const newValue = TestUser('Clark Kent');
+
+      final nonExistentDocReadBeforeReplace = await testCollection.read(
+        nonExistentDoc,
       );
 
-      expect(updateResult, isNull);
+      expect(nonExistentDocReadBeforeReplace, isNull);
+
+      await testCollection.replace(
+        docId: nonExistentDoc,
+        value: newValue,
+      );
+
+      final nonExistentDocReadAfterReplace = await testCollection.read(
+        nonExistentDoc,
+      );
+
+      expect(nonExistentDocReadAfterReplace, isNull);
     });
 
     test('should overwrite all values in document', () async {
