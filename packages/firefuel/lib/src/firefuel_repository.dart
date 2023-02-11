@@ -3,14 +3,14 @@ import 'package:firefuel/firefuel.dart';
 abstract class FirefuelRepository<T extends Serializable>
     with FirefuelFetchMixin
     implements Repository<T> {
-  final Collection<T> _collection;
 
   const FirefuelRepository({required Collection<T> collection})
       : _collection = collection;
+  final Collection<T> _collection;
 
   @override
   Future<Either<Failure, int>> count() {
-    return guard(() => _collection.count());
+    return guard(_collection.count);
   }
 
   @override
@@ -32,7 +32,7 @@ abstract class FirefuelRepository<T extends Serializable>
   }
 
   @override
-  Future<Either<Failure, Null>> delete(DocumentId docId) {
+  Future<Either<Failure, void>> delete(DocumentId docId) {
     return guard(() => _collection.delete(docId));
   }
 
@@ -48,12 +48,12 @@ abstract class FirefuelRepository<T extends Serializable>
 
   @override
   Stream<Either<Failure, List<T>>> streamAll() {
-    return guardStream(() => _collection.streamAll());
+    return guardStream(_collection.streamAll);
   }
 
   @override
   Stream<Either<Failure, int>> streamCount() {
-    return guardStream(() => _collection.streamCount());
+    return guardStream(_collection.streamCount);
   }
 
   @override
@@ -100,7 +100,7 @@ abstract class FirefuelRepository<T extends Serializable>
 
   @override
   Future<Either<Failure, List<T>>> readAll() async {
-    return guard(() => _collection.readAll());
+    return guard(_collection.readAll);
   }
 
   @override
@@ -117,7 +117,7 @@ abstract class FirefuelRepository<T extends Serializable>
   }
 
   @override
-  Future<Either<Failure, Null>> replace({
+  Future<Either<Failure, void>> replace({
     required DocumentId docId,
     required T value,
   }) {
@@ -125,7 +125,7 @@ abstract class FirefuelRepository<T extends Serializable>
   }
 
   @override
-  Future<Either<Failure, Null>> replaceFields({
+  Future<Either<Failure, void>> replaceFields({
     required DocumentId docId,
     required T value,
     required List<String> fieldPaths,
@@ -140,7 +140,7 @@ abstract class FirefuelRepository<T extends Serializable>
   }
 
   @override
-  Future<Either<Failure, Null>> update({
+  Future<Either<Failure, void>> update({
     required DocumentId docId,
     required T value,
   }) async {

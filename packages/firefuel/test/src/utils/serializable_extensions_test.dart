@@ -5,7 +5,7 @@ import '../../utils/test_user.dart';
 
 void main() {
   group('#toIsolatedJson', () {
-    final testUser = TestUser('Asian Jim', age: 25);
+    const testUser = TestUser('Asian Jim', age: 25);
 
     test('should return an empty map when no field paths provided', () {
       final fieldPaths = <String>[];

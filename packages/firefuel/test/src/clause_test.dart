@@ -12,7 +12,7 @@ void main() {
 
   final equalityOrInComparisons = [
     Clause('name', isEqualTo: 'Trinity'),
-    Clause('name', whereIn: ['Smith', 'Anderson']),
+    Clause('name', whereIn: const ['Smith', 'Anderson']),
     Clause('name', isNull: true),
   ];
 
@@ -73,10 +73,10 @@ void main() {
         Clause('age7', isGreaterThan: 20),
         Clause('age8', isGreaterThanOrEqualTo: 20),
         Clause('age9', arrayContains: 20),
-        Clause('age10', arrayContainsAny: [20]),
-        Clause('age11', whereNotIn: [20]),
+        Clause('age10', arrayContainsAny: const [20]),
+        Clause('age11', whereNotIn: const [20]),
         Clause(equalToAge, isEqualTo: 20),
-        Clause(whereInAge, whereIn: [20]),
+        Clause(whereInAge, whereIn: const [20]),
         Clause(nullAge, isNull: true),
       ];
 

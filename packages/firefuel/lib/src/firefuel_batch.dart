@@ -6,11 +6,12 @@ import 'package:firefuel/src/utils/serializable_extensions.dart';
 import 'package:flutter/foundation.dart';
 
 class FirefuelBatch<T extends Serializable> extends Batch<T> with _BatchMixin {
-  final FirefuelCollection<T> collection;
 
   FirefuelBatch(this.collection) : super(collection) {
     _createNewBatch();
   }
+  @override
+  final FirefuelCollection<T> collection;
 
   @override
   Future<void> commit() async {
@@ -45,7 +46,7 @@ class FirefuelBatch<T extends Serializable> extends Batch<T> with _BatchMixin {
     await _addToBatch((batch) async {
       final existingDoc = await collection.read(docId);
 
-      if (existingDoc == null) return null;
+      if (existingDoc == null) return;
 
       batch.set(collection.ref.doc(docId.docId), value);
     });

@@ -4,14 +4,6 @@ enum ChunkStatus { nextAvailable, last }
 
 /// Used to keep track of state when paginating
 class Chunk<T> {
-  static const int defaultLimit = 25;
-
-  final DocumentSnapshot<T?>? cursor;
-  final List<T> data;
-  final int limit;
-  final List<OrderBy>? orderBy;
-  final List<Clause>? clauses;
-  final ChunkStatus status;
 
   Chunk({
     required this.orderBy,
@@ -36,4 +28,12 @@ class Chunk<T> {
     this.clauses,
     this.limit = defaultLimit,
   }) : status = ChunkStatus.last;
+  static const int defaultLimit = 25;
+
+  final DocumentSnapshot<T?>? cursor;
+  final List<T> data;
+  final int limit;
+  final List<OrderBy>? orderBy;
+  final List<Clause>? clauses;
+  final ChunkStatus status;
 }

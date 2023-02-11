@@ -9,7 +9,7 @@ class TestCollection extends FirefuelCollection<TestUser> {
 
   @override
   TestUser? fromFirestore(DocumentSnapshot<Map<String, dynamic>> snapshot,
-      SnapshotOptions? options) {
+      SnapshotOptions? options,) {
     final data = snapshot.data();
     return data == null
         ? null

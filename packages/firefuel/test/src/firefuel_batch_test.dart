@@ -8,7 +8,7 @@ import '../utils/test_user.dart';
 void main() {
   late FirefuelBatch<TestUser> testBatch;
   late TestCollection testCollection;
-  final batman = TestUser('Bruce Wayne');
+  const batman = TestUser('Bruce Wayne');
 
   setUp(() {
     Firefuel.initialize(FakeFirebaseFirestore());
@@ -74,9 +74,9 @@ void main() {
       });
 
       test('when manually committing', () async {
-        final batchedTransactionCount = 20;
-        final batches = 2;
-        final expectedCount = batches * batchedTransactionCount;
+        const batchedTransactionCount = 20;
+        const batches = 2;
+        const expectedCount = batches * batchedTransactionCount;
 
         for (var b = 0; b < batches; b++) {
           for (var t = 0; t < batchedTransactionCount; t++) {
@@ -189,7 +189,7 @@ void main() {
 
       await testBatch.replace(
         docId: dodoId,
-        value: TestUser('Clark Kent'),
+        value: const TestUser('Clark Kent'),
       );
 
       await testBatch.commit();
@@ -200,8 +200,8 @@ void main() {
     });
 
     test('should overwrite all values in document', () async {
-      final newUser = TestUser('newUser');
-      final updatedUser = TestUser('updatedUser');
+      const newUser = TestUser('newUser');
+      const updatedUser = TestUser('updatedUser');
 
       await testBatch.createById(value: newUser, docId: originalDocId);
       await testBatch.commit();
@@ -222,7 +222,7 @@ void main() {
   group('#replaceFields', () {
     late DocumentId docId;
     const replacementName = 'someNewValue';
-    final replacement = TestUser(replacementName);
+    const replacement = TestUser(replacementName);
 
     setUp(() async {
       docId = await testCollection.create(batman);
@@ -244,7 +244,7 @@ void main() {
 
     test('should not replace fields missing from the list', () async {
       const replacementName = 'someNewValue';
-      final replacement = TestUser(replacementName);
+      const replacement = TestUser(replacementName);
 
       await testBatch.replaceFields(
         docId: docId,
@@ -285,7 +285,7 @@ void main() {
 
   group('#update', () {
     test('should overwrite existing fields', () async {
-      final updatedDoc = TestUser('updateValue');
+      const updatedDoc = TestUser('updateValue');
       final docId = await testCollection.create(batman);
 
       await testBatch.update(
@@ -304,7 +304,7 @@ void main() {
   group('#updateOrCreate', () {
     test('should create new document when document does not exist', () async {
       final originalDocId = DocumentId('originalDocId');
-      final newUser = TestUser('newUser');
+      const newUser = TestUser('newUser');
 
       await testBatch.updateOrCreate(
         docId: originalDocId,
@@ -319,7 +319,7 @@ void main() {
     });
 
     test('should overwrite existing fields', () async {
-      final updatedDoc = TestUser('updateValue');
+      const updatedDoc = TestUser('updateValue');
       final docId = await testCollection.create(batman);
 
       await testBatch.updateOrCreate(

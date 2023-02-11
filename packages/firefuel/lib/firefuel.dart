@@ -1,16 +1,14 @@
-library firefuel;
-
 export 'package:cloud_firestore/cloud_firestore.dart'
     show
         CollectionReference,
         DocumentSnapshot,
         FieldPath,
         Query,
-        QuerySnapshot,
         QueryDocumentSnapshot,
+        QuerySnapshot,
         SetOptions,
         SnapshotOptions;
-export 'package:dartz/dartz.dart' show Either, Left, left, Right, right;
+export 'package:dartz/dartz.dart' show Either, Left, Right, left, right;
 export 'package:firefuel/src/batch.dart';
 export 'package:firefuel/src/chunk.dart';
 export 'package:firefuel/src/clause.dart';

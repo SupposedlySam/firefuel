@@ -6,7 +6,7 @@ import '../../utils/expected_failure.dart';
 void main() {
   group('#getRight', () {
     test('should return Right when Right exists', () {
-      final Either<Failure, String> result = Right('testValue');
+      const Either<Failure, String> result = Right('testValue');
 
       final right = result.getRight();
 
@@ -17,7 +17,7 @@ void main() {
       final Either<Failure, String> result = Left(ExpectedFailure());
 
       expect(
-        () => result.getRight(),
+        result.getRight,
         throwsA(isA<MissingValueException>()),
       );
     });
@@ -34,10 +34,10 @@ void main() {
 
     test('should throw $MissingValueException when $Failure does not exist',
         () {
-      final Either<Failure, String> result = Right('testValue');
+      const Either<Failure, String> result = Right('testValue');
 
       expect(
-        () => result.getLeft(),
+        result.getLeft,
         throwsA(isA<MissingValueException>()),
       );
     });
@@ -45,7 +45,7 @@ void main() {
 
   group('#getRightOrElseNull', () {
     test('should return a nullable Right', () {
-      final Either<Failure, String> right = Right('testValue');
+      const Either<Failure, String> right = Right('testValue');
 
       final result = right.getRightOrElseNull();
 
@@ -53,8 +53,8 @@ void main() {
     });
 
     test('should return Right value when Right exists', () {
-      final success = 'testValue';
-      final Either<Failure, String> right = Right(success);
+      const success = 'testValue';
+      const Either<Failure, String> right = Right(success);
 
       final result = right.getRightOrElseNull();
 
@@ -89,7 +89,7 @@ void main() {
     });
 
     test('should return null when $Failure does not exist', () {
-      final Either<Failure, String> result = Right('testValue');
+      const Either<Failure, String> result = Right('testValue');
 
       final left = result.getLeftOrElseNull();
 

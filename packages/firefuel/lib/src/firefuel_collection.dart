@@ -5,12 +5,12 @@ import 'package:firefuel/src/utils/serializable_extensions.dart';
 
 abstract class FirefuelCollection<T extends Serializable>
     implements Collection<T> {
+
+  FirefuelCollection(String path, {bool useEnv = true})
+      : path = _buildPath(path, useEnv);
   final String path;
 
   final firestore = Firefuel.firestore;
-
-  FirefuelCollection(String path, {bool useEnv = true})
-      : this.path = _buildPath(path, useEnv);
 
   @override
   CollectionReference<T?> get ref {
@@ -78,10 +78,10 @@ abstract class FirefuelCollection<T extends Serializable>
   }
 
   @override
-  Future<Null> delete(DocumentId docId) async {
+  Future<void> delete(DocumentId docId) async {
     await ref.doc(docId.docId).delete();
 
-    return null;
+    return;
   }
 
   /// Converts a [DocumentSnapshot] to a [T?]
@@ -167,21 +167,21 @@ abstract class FirefuelCollection<T extends Serializable>
   }
 
   @override
-  Future<Null> replace({
+  Future<void> replace({
     required DocumentId docId,
     required T value,
   }) async {
     final existingDoc = await read(docId);
 
-    if (existingDoc == null) return null;
+    if (existingDoc == null) return;
 
     await ref.doc(docId.docId).set(value);
 
-    return null;
+    return;
   }
 
   @override
-  Future<Null> replaceFields({
+  Future<void> replaceFields({
     required DocumentId docId,
     required T value,
     required List<String> fieldPaths,
@@ -190,7 +190,7 @@ abstract class FirefuelCollection<T extends Serializable>
 
     await untypedRef.doc(docId.docId).update(replacement);
 
-    return null;
+    return;
   }
 
   @override
@@ -272,13 +272,13 @@ abstract class FirefuelCollection<T extends Serializable>
   );
 
   @override
-  Future<Null> update({
+  Future<void> update({
     required DocumentId docId,
     required T value,
   }) async {
     await ref.doc(docId.docId).update(value.toJson());
 
-    return null;
+    return;
   }
 
   @override
@@ -329,7 +329,7 @@ abstract class FirefuelCollection<T extends Serializable>
   ///
   /// Orders and limits the [ref] and returns the [QuerySnapshot]
   Future<QuerySnapshot<T?>> _buildPaginationSnapshot(Chunk<T> chunk) async {
-    var query = ref
+    final query = ref
         .filterIfNotNull(chunk.clauses)
         .sortIfNotNull(chunk.orderBy)
         .startAfterIfNotNull(chunk.cursor)

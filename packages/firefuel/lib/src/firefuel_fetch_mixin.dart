@@ -42,7 +42,7 @@ mixin FirefuelFetchMixin {
     Stream<R> Function() streamCallback,
   ) async* {
     try {
-      await for (var result in streamCallback()) {
+      await for (final result in streamCallback()) {
         yield Right(result);
       }
     } catch (e, stack) {

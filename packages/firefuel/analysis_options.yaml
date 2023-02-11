@@ -1,0 +1,17 @@
+include: package:very_good_analysis/analysis_options.yaml
+
+analyzer:
+  errors:
+    directives_ordering: ignore
+    invalid_implementation_override: warning
+    missing_required_param: error
+    missing_return: error
+    unused_element: ignore
+    uri_has_not_been_generated: ignore
+
+  exclude:
+    - '**/*.freezed.dart'
+    - '**/*.g.dart'
+    - '**/*.mocks.dart'
+    - '**/lib/*generated*'
+    - brick_oven/**
