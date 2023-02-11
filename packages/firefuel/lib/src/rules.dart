@@ -269,7 +269,7 @@ abstract class DocRead<R> {
 abstract class DocReplace<R, T extends Serializable> {
   /// Replaces the document at [docId] with [value].
   ///
-  /// If no document exists yet, the replace will fail.
+  /// If no document exists yet, the replace will fail silently.
   ///
   /// *Requires 1 read of doc to perform replace*
   Future<R> replace({required DocumentId docId, required T value});
