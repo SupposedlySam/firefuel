@@ -7,12 +7,14 @@ import '../utils/test_user.dart';
 
 void main() {
   late TestCollection testCollection;
-  final defaultUser = TestUser('testName');
+  const defaultUser = TestUser('testName');
 
   setUp(() {
     Firefuel.initialize(FakeFirebaseFirestore());
     testCollection = TestCollection();
   });
+
+  tearDown(Firefuel.reset);
 
   group('#count', () {
     setUp(() async {
@@ -36,10 +38,11 @@ void main() {
     });
 
     test(
-      'should return the amount of documents in the collection, filtered by the provided clauses',
+      'should return the amount of documents in the collection, filtered by '
+      'the provided clauses',
       () async {
-        final newUserName = 'newUser';
-        await testCollection.create(TestUser(newUserName));
+        const newUserName = 'newUser';
+        await testCollection.create(const TestUser(newUserName));
 
         final actual = await testCollection.countWhere([
           Clause(TestUser.fieldName, isEqualTo: newUserName),
@@ -59,7 +62,7 @@ void main() {
     });
 
     test('should create a new document with the values provided', () async {
-      final newUser = TestUser('overwrittenUser');
+      const newUser = TestUser('overwrittenUser');
       final createdDocId = await testCollection.create(newUser);
 
       final updatedUser = await testCollection.read(createdDocId);
@@ -83,10 +86,10 @@ void main() {
     });
 
     test('should overwrite the document with the values provided', () async {
-      final newUser = TestUser('newUser');
+      const newUser = TestUser('newUser');
       final createdDocId = await testCollection.create(newUser);
 
-      final updatedUser = TestUser('updatedUser');
+      const updatedUser = TestUser('updatedUser');
       await testCollection.createById(
         value: updatedUser,
         docId: createdDocId,
@@ -175,9 +178,9 @@ void main() {
     });
 
     test('should output new value when doc updates', () async {
-      final newUser1 = TestUser('newUser1');
-      final newUser2 = TestUser('newUser2');
-      final newUser3 = TestUser('newUser3');
+      const newUser1 = TestUser('newUser1');
+      const newUser2 = TestUser('newUser2');
+      const newUser3 = TestUser('newUser3');
 
       expect(stream, emitsInOrder([defaultUser, newUser1, newUser2, newUser3]));
 
@@ -187,7 +190,7 @@ void main() {
     });
 
     test('should output null when doc no longer exists', () async {
-      final newUser = TestUser('newUser');
+      const newUser = TestUser('newUser');
 
       expect(stream, emitsInOrder([defaultUser, newUser, null]));
 
@@ -199,8 +202,8 @@ void main() {
   group('#streamAll', () {
     late Stream<List<TestUser>> stream;
     late DocumentId docId;
-    final newUser1 = TestUser('newUser1');
-    final newUser2 = TestUser('newUser2');
+    const newUser1 = TestUser('newUser1');
+    const newUser2 = TestUser('newUser2');
 
     setUp(() async {
       docId = await testCollection.create(defaultUser);
@@ -225,6 +228,7 @@ void main() {
       expect(
         stream,
         emitsInOrder([
+          [defaultUser, newUser1],
           [newUser1],
         ]),
       );
@@ -250,7 +254,7 @@ void main() {
     });
 
     test('should output 0 when docs no longer exists', () async {
-      expect(stream, emitsInOrder([0]));
+      expect(stream, emitsInOrder([1, 0]));
 
       await testCollection.delete(docId);
     });
@@ -306,9 +310,9 @@ void main() {
   group('#streamOrdered', () {
     late Stream<List<TestUser>> stream;
     late DocumentId docId;
-    final newUser1 = TestUser('Alfred');
-    final newUser2 = TestUser('Batman');
-    final newUser3 = TestUser('Catwoman');
+    const newUser1 = TestUser('Alfred');
+    const newUser2 = TestUser('Batman');
+    const newUser3 = TestUser('Catwoman');
 
     setUp(() async {
       docId = await testCollection.create(newUser1);
@@ -345,6 +349,7 @@ void main() {
       expect(
         stream,
         emitsInOrder([
+          [newUser1, newUser3],
           [newUser3],
         ]),
       );
@@ -370,14 +375,14 @@ void main() {
       () async {
         expect(stream, emitsInOrder([1, 2]));
 
-        await testCollection.create(TestUser('newUser1')); // no emit
-        await testCollection.create(TestUser('newUser1')); // no emit
+        await testCollection.create(const TestUser('newUser1')); // no emit
+        await testCollection.create(const TestUser('newUser1')); // no emit
         await testCollection.create(defaultUser); // emit
       },
     );
 
     test('should output 0 when matching docs no longer exists', () async {
-      final nonVisibleUser = TestUser('newUser1');
+      const nonVisibleUser = TestUser('newUser1');
 
       expect(stream, emitsInOrder([1, 0]));
 
@@ -393,17 +398,17 @@ void main() {
   });
 
   group('#streamWhere', () {
-    const String expectedName = 'expectedName';
-    final expectedUser = TestUser(expectedName);
+    const expectedName = 'expectedName';
+    const expectedUser = TestUser(expectedName);
 
     group('with clause', () {
-      const String unexpectedName1 = 'unexpectedName1',
-          unexpectedName2 = 'unexpectedName2';
+      const unexpectedName1 = 'unexpectedName1';
+      const unexpectedName2 = 'unexpectedName2';
 
       setUp(() async {
-        await testCollection.create(TestUser(unexpectedName1));
+        await testCollection.create(const TestUser(unexpectedName1));
         await testCollection.create(expectedUser);
-        await testCollection.create(TestUser(unexpectedName2));
+        await testCollection.create(const TestUser(unexpectedName2));
       });
 
       test('should return a subset of the existing list', () {
@@ -443,7 +448,8 @@ void main() {
       });
 
       test(
-        'should throw $MoreThanOneFieldInRangeClauseException when more than one field is used in multiple range clauses',
+        'should throw $MoreThanOneFieldInRangeClauseException when more than '
+        'one field is used in multiple range clauses',
         () {
           expect(
             () => testCollection.streamWhere([
@@ -457,9 +463,9 @@ void main() {
     });
 
     group('with orderBy should return a subset of the existing list', () {
-      final leela = TestUser('Leela', age: 25, occupation: 'Pilot');
-      final bender = TestUser('Bender', age: 4, occupation: 'Soldier');
-      final fry = TestUser('Fry', age: 25, occupation: 'Delivery Boy');
+      const leela = TestUser('Leela', age: 25, occupation: 'Pilot');
+      const bender = TestUser('Bender', age: 4, occupation: 'Soldier');
+      const fry = TestUser('Fry', age: 25, occupation: 'Delivery Boy');
 
       setUp(() async {
         await testCollection.create(leela);
@@ -484,7 +490,7 @@ void main() {
       group(
         'when using a range comparison',
         () {
-          final oldFry = TestUser('Fry', age: 1025, occupation: 'Delivery Boy');
+          const oldFry = TestUser('Fry', age: 1025, occupation: 'Delivery Boy');
 
           setUp(() async {
             await testCollection.create(oldFry);
@@ -519,7 +525,8 @@ void main() {
           });
         },
         skip: true,
-      ); // Skipping due to a regression with the fake_cloud_firestore version causing ordering to fail
+      ); // Skipping due to a regression with the fake_cloud_firestore
+      // version causing ordering to fail
 
       group('when using a equality comparison', () {
         test('and has matching $OrderBy field', () {
@@ -541,7 +548,7 @@ void main() {
               orderBy: [OrderBy(field: TestUser.fieldAge)],
             ),
             emitsInOrder([
-              [],
+              <String>[],
             ]),
           );
         });
@@ -552,7 +559,7 @@ void main() {
           expect(
             testCollection.streamWhere(
               [
-                Clause(TestUser.fieldAge, whereIn: [4, 25])
+                Clause(TestUser.fieldAge, whereIn: const [4, 25])
               ],
               orderBy: [OrderBy(field: TestUser.fieldAge)],
             ),
@@ -585,12 +592,12 @@ void main() {
   });
 
   group('#orderBy', () {
-    const testUsername1 = 'Alfred',
-        testUsername2 = 'Batman',
-        testUsername3 = 'Catwoman';
-    final testUser1 = TestUser(testUsername1),
-        testUser2 = TestUser(testUsername2),
-        testUser3 = TestUser(testUsername3);
+    const testUsername1 = 'Alfred';
+    const testUsername2 = 'Batman';
+    const testUsername3 = 'Catwoman';
+    const testUser1 = TestUser(testUsername1);
+    const testUser2 = TestUser(testUsername2);
+    const testUser3 = TestUser(testUsername3);
 
     setUp(() async {
       await testCollection.create(testUser1);
@@ -600,21 +607,23 @@ void main() {
 
     test('should throw when no orderBys are given', () async {
       expect(
-        () async => await testCollection.orderBy([]),
+        () async => testCollection.orderBy([]),
         throwsA(isA<MissingValueException>()),
       );
     });
 
     test('should return results in ascending order', () async {
       final usersResult = await testCollection.orderBy(
-          [OrderBy(field: TestUser.fieldName, direction: OrderDirection.aToZ)]);
+        [OrderBy(field: TestUser.fieldName, direction: OrderDirection.aToZ)],
+      );
 
       expect(usersResult, [testUser1, testUser2, testUser3]);
     });
 
     test('should return results in descending order', () async {
       final usersResult = await testCollection.orderBy(
-          [OrderBy(field: TestUser.fieldName, direction: OrderDirection.zToA)]);
+        [OrderBy(field: TestUser.fieldName, direction: OrderDirection.zToA)],
+      );
 
       expect(usersResult, [testUser3, testUser2, testUser1]);
     });
@@ -627,7 +636,9 @@ void main() {
 
       await Future.wait(
         List.generate(
-            seedCount, (i) => testCollection.create(TestUser('User$i'))),
+          seedCount,
+          (i) => testCollection.create(TestUser('User$i')),
+        ),
       );
     });
 
@@ -640,7 +651,8 @@ void main() {
     });
 
     test(
-      'should have status of $ChunkStatus.nextAvailable when receiving the middle chunk',
+      'should have status of $ChunkStatus.nextAvailable when receiving the '
+      'middle chunk',
       () async {
         final middleChunk = await testCollection.paginate(
           Chunk(orderBy: [OrderBy(field: TestUser.fieldName)]),
@@ -670,7 +682,7 @@ void main() {
         );
         final lastChunk = await testCollection.paginate(middleChunk);
 
-        assert(lastChunk.status == ChunkStatus.last);
+        assert(lastChunk.status == ChunkStatus.last, 'should be last');
 
         final emptyLastChunk2 = await testCollection.paginate(lastChunk);
 
@@ -685,7 +697,7 @@ void main() {
       () async {
         // We're starting with minus document to make a full chunk so adding one
         // more user will allow two full chunks
-        await testCollection.create(TestUser('LastUser'));
+        await testCollection.create(const TestUser('LastUser'));
 
         final middleChunk = await testCollection.paginate(
           Chunk(orderBy: [OrderBy(field: TestUser.fieldName)]),
@@ -718,9 +730,9 @@ void main() {
   });
 
   group('#readAll', () {
-    final expectedUser1 = TestUser('expectedUser');
-    final expectedUser2 = TestUser('expectedUser');
-    final expectedUser3 = TestUser('expectedUser');
+    const expectedUser1 = TestUser('expectedUser');
+    const expectedUser2 = TestUser('expectedUser');
+    const expectedUser3 = TestUser('expectedUser');
     final userList = [expectedUser1, expectedUser2, expectedUser3];
 
     test('should return all items', () async {
@@ -736,7 +748,7 @@ void main() {
     test('should return emtpy list when no items in collection', () async {
       final readResult = await testCollection.readAll();
 
-      expect(readResult, []);
+      expect(readResult, <String>[]);
     });
   });
 
@@ -745,7 +757,9 @@ void main() {
 
     test('should create the doc when it does not exist', () async {
       final result = await testCollection.readOrCreate(
-          docId: documentId, createValue: defaultUser);
+        docId: documentId,
+        createValue: defaultUser,
+      );
 
       expect(result, defaultUser);
     });
@@ -754,7 +768,9 @@ void main() {
       final docId = await testCollection.create(defaultUser);
 
       final testUser = await testCollection.readOrCreate(
-          docId: docId, createValue: defaultUser);
+        docId: docId,
+        createValue: defaultUser,
+      );
 
       expect(docId.docId, testUser.docId);
     });
@@ -764,17 +780,30 @@ void main() {
     final originalDocId = DocumentId('originalDocId');
 
     test('should fail silently when document does not exist', () async {
-      final updateResult = await testCollection.replace(
-        docId: DocumentId('dodoBird'),
-        value: TestUser('Clark Kent'),
+      final nonExistentDoc = DocumentId('dodoBird');
+      const newValue = TestUser('Clark Kent');
+
+      final nonExistentDocReadBeforeReplace = await testCollection.read(
+        nonExistentDoc,
       );
 
-      expect(updateResult, isNull);
+      expect(nonExistentDocReadBeforeReplace, isNull);
+
+      await testCollection.replace(
+        docId: nonExistentDoc,
+        value: newValue,
+      );
+
+      final nonExistentDocReadAfterReplace = await testCollection.read(
+        nonExistentDoc,
+      );
+
+      expect(nonExistentDocReadAfterReplace, isNull);
     });
 
     test('should overwrite all values in document', () async {
-      final newUser = TestUser('newUser');
-      final updatedUser = TestUser('updatedUser');
+      const newUser = TestUser('newUser');
+      const updatedUser = TestUser('updatedUser');
 
       await testCollection.createById(value: newUser, docId: originalDocId);
 
@@ -792,7 +821,7 @@ void main() {
   group('#replaceFields', () {
     late DocumentId docId;
     const replacementName = 'someNewValue';
-    final replacement = TestUser(replacementName);
+    const replacement = TestUser(replacementName);
 
     setUp(() async {
       docId = await testCollection.create(defaultUser);
@@ -812,7 +841,7 @@ void main() {
 
     test('should not replace fields missing from the list', () async {
       const replacementName = 'someNewValue';
-      final replacement = TestUser(replacementName);
+      const replacement = TestUser(replacementName);
 
       await testCollection.replaceFields(
         docId: docId,
@@ -828,7 +857,7 @@ void main() {
 
   group('#update', () {
     test('should overwrite existing fields', () async {
-      final updatedDoc = TestUser('updateValue');
+      const updatedDoc = TestUser('updateValue');
       final docId = await testCollection.create(defaultUser);
 
       await testCollection.update(
@@ -845,7 +874,7 @@ void main() {
   group('#updateOrCreate', () {
     test('should create new document when document does not exist', () async {
       final originalDocId = DocumentId('originalDocId');
-      final newUser = TestUser('newUser');
+      const newUser = TestUser('newUser');
 
       await testCollection.updateOrCreate(
         docId: originalDocId,
@@ -858,7 +887,7 @@ void main() {
     });
 
     test('should overwrite existing fields', () async {
-      final updatedDoc = TestUser('updateValue');
+      const updatedDoc = TestUser('updateValue');
       final docId = await testCollection.create(defaultUser);
 
       await testCollection.updateOrCreate(
@@ -873,16 +902,16 @@ void main() {
   });
 
   group('#where', () {
-    const String expectedName = 'expectedName';
-    final expectedUser = TestUser(expectedName),
-        unexpectedName1 = 'unexpectedName1',
-        unexpectedName2 = 'unexpectedName2';
+    const expectedName = 'expectedName';
+    const expectedUser = TestUser(expectedName);
+    const unexpectedName1 = 'unexpectedName1';
+    const unexpectedName2 = 'unexpectedName2';
 
     group('with clauses', () {
       setUp(() async {
-        await testCollection.create(TestUser(unexpectedName1));
+        await testCollection.create(const TestUser(unexpectedName1));
         await testCollection.create(expectedUser);
-        await testCollection.create(TestUser(unexpectedName2));
+        await testCollection.create(const TestUser(unexpectedName2));
       });
 
       test('should return a subset of the existing list', () async {
@@ -905,10 +934,11 @@ void main() {
       });
 
       test(
-        'should throw a $TooManyArgumentsException when more than one option is chosen',
+        'should throw a $TooManyArgumentsException when more than one option '
+        'is chosen',
         () {
           expect(
-            () async => await testCollection.where(
+            () async => testCollection.where(
               [
                 Clause(
                   TestUser.fieldName,
@@ -924,13 +954,14 @@ void main() {
 
       test('should throw when no clauses are given', () async {
         expect(
-          () async => await testCollection.where([]),
+          () async => testCollection.where([]),
           throwsA(isA<MissingValueException>()),
         );
       });
 
       test(
-        'should throw $MoreThanOneFieldInRangeClauseException when more than one field is used in multiple range clauses',
+        'should throw $MoreThanOneFieldInRangeClauseException when more than '
+        'one field is used in multiple range clauses',
         () {
           expect(
             () => testCollection.streamWhere([
@@ -944,9 +975,9 @@ void main() {
     });
 
     group('with orderBy should return a subset of the existing list', () {
-      final leela = TestUser('Leela', age: 25, occupation: 'Pilot');
-      final bender = TestUser('Bender', age: 4, occupation: 'Soldier');
-      final fry = TestUser('Fry', age: 25, occupation: 'Delivery Boy');
+      const leela = TestUser('Leela', age: 25, occupation: 'Pilot');
+      const bender = TestUser('Bender', age: 4, occupation: 'Soldier');
+      const fry = TestUser('Fry', age: 25, occupation: 'Delivery Boy');
 
       setUp(() async {
         await testCollection.create(leela);
@@ -964,7 +995,7 @@ void main() {
       });
 
       group('when using a range comparison', () {
-        final oldFry = TestUser('Fry', age: 1025, occupation: 'Delivery Boy');
+        const oldFry = TestUser('Fry', age: 1025, occupation: 'Delivery Boy');
 
         setUp(() async {
           await testCollection.create(oldFry);
@@ -1021,7 +1052,7 @@ void main() {
           await expectLater(
             testCollection.where(
               [
-                Clause(TestUser.fieldAge, whereIn: [4, 25])
+                Clause(TestUser.fieldAge, whereIn: const [4, 25])
               ],
               orderBy: [OrderBy(field: TestUser.fieldAge)],
             ),

@@ -15,4 +15,5 @@ String fixture(String path) => File(testPath(path)).readAsStringSync();
 /// ```dart
 /// Map<String, dynamic> json = fixtureAsJson('fixtures/my_file.json');
 /// ```
-Map<String, dynamic> fixtureAsJson(String path) => json.decode(fixture(path));
+Map<String, dynamic> fixtureAsJson(String path) =>
+    json.decode(fixture(path)) as Map<String, dynamic>;

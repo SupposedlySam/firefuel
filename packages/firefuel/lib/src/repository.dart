@@ -7,9 +7,9 @@ abstract class Repository<T extends Serializable>
         CollectionPaginate<Either<Failure, Chunk<T>>, T>,
         DocCreate<Either<Failure, DocumentId>, T>,
         DocCreateIfNotExist<Either<Failure, T>, T>,
-        DocDelete<Either<Failure, Null>>,
+        DocDelete<Either<Failure, void>>,
         DocRead<Either<Failure, T?>>,
-        DocReplace<Either<Failure, Null>, T>,
-        DocUpdate<Either<Failure, Null>, T> {
+        DocReplace<Either<Failure, void>, T>,
+        DocUpdate<Either<Failure, void>, T> {
   const Repository(); // coverage:ignore-line
 }

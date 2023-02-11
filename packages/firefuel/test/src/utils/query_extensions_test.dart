@@ -15,6 +15,8 @@ void main() {
     ref = testCollection.ref;
   });
 
+  tearDown(Firefuel.reset);
+
   group('#filterIfNotNull', () {
     test('should return the original query when null', () {
       final result = ref.filterIfNotNull(null);
@@ -61,7 +63,7 @@ void main() {
     });
 
     test('should return a new query when not null', () async {
-      final defaultUser = TestUser('testUser');
+      const defaultUser = TestUser('testUser');
       final docId = await testCollection.create(defaultUser);
       final documentSnapshot = await testCollection.ref.doc(docId.docId).get();
       final result = ref.startAfterIfNotNull(documentSnapshot);

@@ -74,7 +74,8 @@ abstract class CollectionPaginate<R, T extends Serializable> {
 /// - Subclasses: [Collection] and [Repository] for subclasses
 /// {@endtemplate}
 /// {@template firefuel.rules.implementations}
-/// - Implementations: [FirefuelCollection] and [FirefuelRepository] for subclasses
+/// - Implementations: [FirefuelCollection] and [FirefuelRepository] for
+/// subclasses
 /// {@endtemplate}
 abstract class CollectionRead<R, T extends Serializable> {
   /// Get a list of all documents from the collection as a list
@@ -119,12 +120,12 @@ abstract class CollectionRead<R, T extends Serializable> {
   /// - any clause is a range operator and the first orderBy's field doesn't
   /// match the first where clause's field, the orderBy criteria will be moved
   /// if it exists or created if it doesn't exist
-  /// - any clause is an equality or in (contains) operator, the orderBy criteria
-  /// will be removed
+  /// - any clause is an equality or in (contains) operator, the orderBy
+  /// criteria will be removed
   ///
   /// #### Rules
-  /// - If you include a filter with a range comparison, your first ordering must
-  /// be on the same field
+  /// - If you include a filter with a range comparison, your first ordering
+  /// must be on the same field
   /// - You cannot order your query by any field included in an equality or in
   /// clause
   /// {@endtemplate}
@@ -142,7 +143,8 @@ abstract class CollectionRead<R, T extends Serializable> {
     int? limit,
   });
 
-  /// Get a list of documents from the collection as a list ordered by the [orderBy]
+  /// Get a list of documents from the collection as a list ordered by the
+  /// [orderBy]
   ///
   /// limit: optionally provide a maximum value of items to be returned
   ///
@@ -267,7 +269,7 @@ abstract class DocRead<R> {
 abstract class DocReplace<R, T extends Serializable> {
   /// Replaces the document at [docId] with [value].
   ///
-  /// If no document exists yet, the replace will fail.
+  /// If no document exists yet, the replace will fail silently.
   ///
   /// *Requires 1 read of doc to perform replace*
   Future<R> replace({required DocumentId docId, required T value});

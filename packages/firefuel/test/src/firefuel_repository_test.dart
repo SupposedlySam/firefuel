@@ -6,7 +6,7 @@ import '../utils/test_user.dart';
 
 void main() {
   final docId = DocumentId('h34jfhg43fiuy3gv4');
-  final defaultUser = TestUser('testUser');
+  const defaultUser = TestUser('testUser');
 
   RepositoryTestUtil.runTests<DocumentId, TestUser>(
     methodName: 'create',
@@ -34,7 +34,7 @@ void main() {
     },
   );
 
-  RepositoryTestUtil.runTests<Null, TestUser>(
+  RepositoryTestUtil.runTests<void, TestUser>(
     methodName: 'delete',
     mockCollection: MockCollection(),
     initHappyPath: (mockCollection) async {
@@ -52,10 +52,10 @@ void main() {
     initHappyPath: (mockCollection) async {
       mockCollection.initialize(
         onLimit: () => [
-          TestUser('unexpectedUser1'),
-          TestUser('expectedUser'),
-          TestUser('expectedUser'),
-          TestUser('unexpectedUser2'),
+          const TestUser('unexpectedUser1'),
+          const TestUser('expectedUser'),
+          const TestUser('expectedUser'),
+          const TestUser('unexpectedUser2'),
         ],
       );
     },
@@ -70,7 +70,7 @@ void main() {
     mockCollection: MockCollection(),
     initHappyPath: (mockCollection) async {
       mockCollection.initialize(
-        onStream: () => Stream.fromIterable([TestUser('streamUser')]),
+        onStream: () => Stream.fromIterable([const TestUser('streamUser')]),
       );
     },
     initSadPath: (mockCollection) async {
@@ -85,7 +85,7 @@ void main() {
     initHappyPath: (mockCollection) async {
       mockCollection.initialize(
         onStreamAll: () => Stream.fromIterable([
-          [TestUser('streamUser')]
+          [const TestUser('streamUser')]
         ]),
       );
     },
@@ -101,7 +101,7 @@ void main() {
     initHappyPath: (mockCollection) async {
       mockCollection.initialize(
         onStreamLimited: () => Stream.fromIterable([
-          [TestUser('streamUser')]
+          [const TestUser('streamUser')]
         ]),
       );
     },
@@ -117,7 +117,7 @@ void main() {
     initHappyPath: (mockCollection) async {
       mockCollection.initialize(
         onStreamOrdered: () => Stream.fromIterable([
-          [TestUser('streamUser')]
+          [const TestUser('streamUser')]
         ]),
       );
     },
@@ -136,9 +136,9 @@ void main() {
         onStreamWhere: () => Stream.fromIterable(
           [
             [
-              TestUser('unexpectedUser1'),
-              TestUser('expectedUser'),
-              TestUser('unexpectedUser2'),
+              const TestUser('unexpectedUser1'),
+              const TestUser('expectedUser'),
+              const TestUser('unexpectedUser2'),
             ]
           ],
         ),
@@ -162,10 +162,10 @@ void main() {
         onStreamWhere: () => Stream.fromIterable(
           [
             [
-              TestUser('unexpectedUser1'),
-              TestUser('expectedUser'),
-              TestUser('expectedUser'),
-              TestUser('unexpectedUser2'),
+              const TestUser('unexpectedUser1'),
+              const TestUser('expectedUser'),
+              const TestUser('expectedUser'),
+              const TestUser('unexpectedUser2'),
             ]
           ],
         ),
@@ -190,10 +190,10 @@ void main() {
         onStreamWhere: () => Stream.fromIterable(
           [
             [
-              TestUser('unexpectedUser1'),
-              TestUser('expectedUser'),
-              TestUser('expectedUser'),
-              TestUser('unexpectedUser2'),
+              const TestUser('unexpectedUser1'),
+              const TestUser('expectedUser'),
+              const TestUser('expectedUser'),
+              const TestUser('unexpectedUser2'),
             ]
           ],
         ),
@@ -216,10 +216,10 @@ void main() {
     initHappyPath: (mockCollection) async {
       mockCollection.initialize(
         onOrderBy: () => [
-          TestUser('unexpectedUser1'),
-          TestUser('expectedUser'),
-          TestUser('expectedUser'),
-          TestUser('unexpectedUser2'),
+          const TestUser('unexpectedUser1'),
+          const TestUser('expectedUser'),
+          const TestUser('expectedUser'),
+          const TestUser('unexpectedUser2'),
         ],
       );
     },
@@ -236,10 +236,10 @@ void main() {
     initHappyPath: (mockCollection) async {
       mockCollection.initialize(
         onOrderBy: () => [
-          TestUser('unexpectedUser1'),
-          TestUser('expectedUser'),
-          TestUser('expectedUser'),
-          TestUser('unexpectedUser2'),
+          const TestUser('unexpectedUser1'),
+          const TestUser('expectedUser'),
+          const TestUser('expectedUser'),
+          const TestUser('unexpectedUser2'),
         ],
       );
     },
@@ -259,8 +259,8 @@ void main() {
           OrderBy(
             field: TestUser.fieldName,
           )
-        ]);
-      });
+        ],);
+      },);
     },
     initSadPath: (mockCollection) async {
       mockCollection.initialize(onPaginate: () => throw ExpectedFailure());
@@ -271,7 +271,7 @@ void main() {
           OrderBy(
             field: TestUser.fieldName,
           )
-        ]),
+        ],),
       );
     },
   );
@@ -317,7 +317,7 @@ void main() {
     },
   );
 
-  RepositoryTestUtil.runTests<Null, TestUser>(
+  RepositoryTestUtil.runTests<void, TestUser>(
     methodName: 'replace',
     mockCollection: MockCollection(),
     initHappyPath: (mockCollection) async {
@@ -328,11 +328,11 @@ void main() {
     },
     methodCallback: (testRepository) => testRepository.replace(
       docId: docId,
-      value: TestUser('replacedUser'),
+      value: const TestUser('replacedUser'),
     ),
   );
 
-  RepositoryTestUtil.runTests<Null, TestUser>(
+  RepositoryTestUtil.runTests<void, TestUser>(
     methodName: 'replaceFields',
     mockCollection: MockCollection(),
     initHappyPath: (mockCollection) async {
@@ -343,12 +343,12 @@ void main() {
     },
     methodCallback: (testRepository) => testRepository.replaceFields(
       docId: docId,
-      value: TestUser('replacedUserField'),
+      value: const TestUser('replacedUserField'),
       fieldPaths: [TestUser.fieldName],
     ),
   );
 
-  RepositoryTestUtil.runTests<Null, TestUser>(
+  RepositoryTestUtil.runTests<void, TestUser>(
     methodName: 'update',
     mockCollection: MockCollection(),
     initHappyPath: (mockCollection) async {
@@ -360,7 +360,7 @@ void main() {
     methodCallback: (testRepository) {
       return testRepository.update(
         docId: docId,
-        value: TestUser('updatedUser'),
+        value: const TestUser('updatedUser'),
       );
     },
   );
@@ -373,12 +373,12 @@ void main() {
     },
     initSadPath: (mockCollection) async {
       mockCollection.initialize(
-          onUpdateOrCreate: () => throw ExpectedFailure());
+          onUpdateOrCreate: () => throw ExpectedFailure(),);
     },
     methodCallback: (testRepository) {
       return testRepository.updateOrCreate(
         docId: docId,
-        value: TestUser('updatedUser'),
+        value: const TestUser('updatedUser'),
       );
     },
   );
@@ -389,9 +389,9 @@ void main() {
     initHappyPath: (mockCollection) async {
       mockCollection.initialize(
         onWhere: () => [
-          TestUser('unexpectedUser1'),
-          TestUser('expectedUser'),
-          TestUser('unexpectedUser2'),
+          const TestUser('unexpectedUser1'),
+          const TestUser('expectedUser'),
+          const TestUser('unexpectedUser2'),
         ],
       );
     },
@@ -411,10 +411,10 @@ void main() {
     initHappyPath: (mockCollection) async {
       mockCollection.initialize(
         onWhere: () => [
-          TestUser('unexpectedUser1'),
-          TestUser('expectedUser'),
-          TestUser('expectedUser'),
-          TestUser('unexpectedUser2'),
+          const TestUser('unexpectedUser1'),
+          const TestUser('expectedUser'),
+          const TestUser('expectedUser'),
+          const TestUser('unexpectedUser2'),
         ],
       );
     },
@@ -435,10 +435,10 @@ void main() {
     initHappyPath: (mockCollection) async {
       mockCollection.initialize(
         onWhere: () => [
-          TestUser('unexpectedUser1'),
-          TestUser('expectedUser'),
-          TestUser('expectedUser'),
-          TestUser('unexpectedUser2'),
+          const TestUser('unexpectedUser1'),
+          const TestUser('expectedUser'),
+          const TestUser('expectedUser'),
+          const TestUser('unexpectedUser2'),
         ],
       );
     },

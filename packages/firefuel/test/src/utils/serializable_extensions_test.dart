@@ -5,11 +5,11 @@ import '../../utils/test_user.dart';
 
 void main() {
   group('#toIsolatedJson', () {
-    final testUser = TestUser('Asian Jim', age: 25);
+    const testUser = TestUser('Asian Jim', age: 25);
 
     test('should return an empty map when no field paths provided', () {
       final fieldPaths = <String>[];
-      final expected = {};
+      final expected = <String, dynamic>{};
       final actual = testUser.toIsolatedJson(fieldPaths);
 
       expect(actual, expected);
@@ -33,7 +33,7 @@ void main() {
 
     test('should return an empty map when fields are wrongly formatted', () {
       final fieldPaths = <String>['Name', 'Age'];
-      final expected = {};
+      final expected = <String, dynamic>{};
       final actual = testUser.toIsolatedJson(fieldPaths);
 
       expect(actual, expected);

@@ -30,7 +30,16 @@ class Firefuel {
     FirebaseFirestore firestore, {
     String? env,
   }) {
-    _firestore = firestore;
     _env = env;
+    _firestore = firestore;
+  }
+
+  /// Clears all local properties
+  ///
+  /// This is not required for normal use, but can be used if needing to reset
+  ///  Firefuel
+  static void reset() {
+    _env = null;
+    _firestore = null;
   }
 }

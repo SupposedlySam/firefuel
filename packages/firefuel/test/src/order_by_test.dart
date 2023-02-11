@@ -3,11 +3,11 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:firefuel/firefuel.dart';
 
 void main() {
-  const String testField = 'testField';
+  const testField = 'testField';
   group('$OrderBy', () {
     group('@docId', () {
       test('should set byId to true ', () {
-        final instance = OrderBy.docId(OrderDirection.aToZ);
+        const instance = OrderBy.docId(OrderDirection.aToZ);
 
         expect(instance.byId, isTrue);
       });

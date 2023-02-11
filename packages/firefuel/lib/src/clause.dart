@@ -25,21 +25,6 @@ import 'package:firefuel/firefuel.dart';
 /// Clause(MyModel.fieldVehicle, isEqualTo: 'Mazda', isNotEqualTo: 'Honda');
 /// ```
 class Clause extends Equatable {
-  final String field;
-
-  final Object? isEqualTo;
-  final Object? isNotEqualTo;
-  final Object? isLessThan;
-  final Object? isLessThanOrEqualTo;
-  final Object? isGreaterThan;
-  final Object? isGreaterThanOrEqualTo;
-  final Object? arrayContains;
-  final List<Object?>? arrayContainsAny;
-  final List<Object?>? whereIn;
-  final List<Object?>? whereNotIn;
-  final bool? isNull;
-  final bool isRangeComparison;
-  final bool isEqualityOrInComparison;
 
   Clause(
     this.field, {
@@ -81,6 +66,21 @@ class Clause extends Equatable {
       isNull
     ]);
   }
+  final String field;
+
+  final Object? isEqualTo;
+  final Object? isNotEqualTo;
+  final Object? isLessThan;
+  final Object? isLessThanOrEqualTo;
+  final Object? isGreaterThan;
+  final Object? isGreaterThanOrEqualTo;
+  final Object? arrayContains;
+  final List<Object?>? arrayContainsAny;
+  final List<Object?>? whereIn;
+  final List<Object?>? whereNotIn;
+  final bool? isNull;
+  final bool isRangeComparison;
+  final bool isEqualityOrInComparison;
 
   // coverage:ignore-start
   @override

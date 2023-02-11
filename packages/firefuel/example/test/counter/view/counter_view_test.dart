@@ -28,6 +28,8 @@ void main() {
     Firefuel.initialize(FakeFirebaseFirestore());
   });
 
+  tearDown(Firefuel.reset);
+
   group('CounterView', () {
     testWidgets('renders current CounterCubit state', (tester) async {
       when(() => counterCubit.state).thenReturn(

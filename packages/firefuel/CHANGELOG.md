@@ -1,3 +1,9 @@
+## 0.3.1
+
+feat: adds `Firefuel.reset` to clear internal property values without needing to re-initialize.
+
+This is useful in teardown methods in your tests so you can ensure a clean state.
+
 ## 0.3.0
 
 ### Adds `count` method

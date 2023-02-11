@@ -1,7 +1,7 @@
 class MissingValueException implements Exception {
-  final Type type;
 
   MissingValueException(this.type);
+  final Type type;
 
   @override
   String toString() {
