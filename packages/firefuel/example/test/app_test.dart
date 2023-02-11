@@ -10,6 +10,8 @@ import 'package:flutter_counter/counter/counter.dart';
 void main() {
   setUp(() => Firefuel.initialize(FakeFirebaseFirestore()));
 
+  tearDown(Firefuel.reset);
+
   group('CounterApp', () {
     testWidgets('is a MaterialApp', (tester) async {
       expect(CounterApp(), isA<MaterialApp>());

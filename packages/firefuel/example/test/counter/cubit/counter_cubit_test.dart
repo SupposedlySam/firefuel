@@ -29,6 +29,8 @@ void main() {
     );
   });
 
+  tearDown(Firefuel.reset);
+
   group('CounterCubit', () {
     test('initial state is 0', () {
       expect(counterCubit.state, const Counter(0));

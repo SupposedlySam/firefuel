@@ -15,6 +15,8 @@ void main() {
     ref = testCollection.ref;
   });
 
+  tearDown(Firefuel.reset);
+
   group('#filterIfNotNull', () {
     test('should return the original query when null', () {
       final result = ref.filterIfNotNull(null);

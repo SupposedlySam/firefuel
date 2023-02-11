@@ -10,6 +10,8 @@ import 'package:flutter_counter/counter/view/counter_view.dart';
 void main() {
   setUp(() => Firefuel.initialize(FakeFirebaseFirestore()));
 
+  tearDown(Firefuel.reset);
+
   group('CounterPage', () {
     testWidgets('renders CounterView', (tester) async {
       await tester.pumpWidget(MaterialApp(home: CounterPage()));

@@ -6,6 +6,10 @@ import 'package:firefuel/firefuel.dart';
 
 void main() {
   group('#firestore', () {
+    setUp(Firefuel.reset);
+
+    tearDown(Firefuel.reset);
+
     test('should throw an exception when not initialized', () {
       expect(() => Firefuel.firestore, throwsA(isA<AssertionError>()));
     });
@@ -32,6 +36,8 @@ void main() {
       Firefuel.initialize(firestore);
 
       expect(Firefuel.env, isEmpty);
+
+      Firefuel.reset();
     });
 
     test('should return string starting with prefix when provided', () {
@@ -40,6 +46,8 @@ void main() {
       Firefuel.initialize(firestore, env: env);
 
       expect(Firefuel.env, startsWith(env));
+
+      Firefuel.reset();
     });
 
     test('should return prefix with "-" when provided', () {
@@ -48,6 +56,8 @@ void main() {
       Firefuel.initialize(firestore, env: env);
 
       expect(Firefuel.env, '$env-');
+
+      Firefuel.reset();
     });
   });
 }

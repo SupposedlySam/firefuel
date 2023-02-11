@@ -14,6 +14,8 @@ void main() {
     testCollection = TestCollection();
   });
 
+  tearDown(Firefuel.reset);
+
   group('#count', () {
     setUp(() async {
       await testCollection.create(defaultUser);
@@ -226,6 +228,7 @@ void main() {
       expect(
         stream,
         emitsInOrder([
+          [defaultUser, newUser1],
           [newUser1],
         ]),
       );
@@ -251,7 +254,7 @@ void main() {
     });
 
     test('should output 0 when docs no longer exists', () async {
-      expect(stream, emitsInOrder([0]));
+      expect(stream, emitsInOrder([1, 0]));
 
       await testCollection.delete(docId);
     });
@@ -346,6 +349,7 @@ void main() {
       expect(
         stream,
         emitsInOrder([
+          [newUser1, newUser3],
           [newUser3],
         ]),
       );

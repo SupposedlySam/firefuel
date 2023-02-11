@@ -17,6 +17,8 @@ void main() {
     testBatch = FirefuelBatch(testCollection);
   });
 
+  tearDown(Firefuel.reset);
+
   group('#size', () {
     test('should start at 0', () {
       expect(testBatch.transactionSize, 0);
