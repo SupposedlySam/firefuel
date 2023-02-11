@@ -64,7 +64,9 @@ void main() {
 
   group('.getEqualityOrInComparisonFields', () {
     test('should filter out all non-equality or in comparison fields', () {
-      const String equalToAge = 'age1', whereInAge = 'age2', nullAge = 'age3';
+      const equalToAge = 'age1';
+      const whereInAge = 'age2';
+      const nullAge = 'age3';
 
       final clauses = [
         Clause('age4', isNotEqualTo: 20),

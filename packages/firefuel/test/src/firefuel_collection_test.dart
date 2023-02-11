@@ -36,7 +36,8 @@ void main() {
     });
 
     test(
-      'should return the amount of documents in the collection, filtered by the provided clauses',
+      'should return the amount of documents in the collection, filtered by '
+      'the provided clauses',
       () async {
         const newUserName = 'newUser';
         await testCollection.create(const TestUser(newUserName));
@@ -397,8 +398,8 @@ void main() {
     const expectedUser = TestUser(expectedName);
 
     group('with clause', () {
-      const String unexpectedName1 = 'unexpectedName1',
-          unexpectedName2 = 'unexpectedName2';
+      const unexpectedName1 = 'unexpectedName1';
+      const unexpectedName2 = 'unexpectedName2';
 
       setUp(() async {
         await testCollection.create(const TestUser(unexpectedName1));
@@ -443,7 +444,8 @@ void main() {
       });
 
       test(
-        'should throw $MoreThanOneFieldInRangeClauseException when more than one field is used in multiple range clauses',
+        'should throw $MoreThanOneFieldInRangeClauseException when more than '
+        'one field is used in multiple range clauses',
         () {
           expect(
             () => testCollection.streamWhere([
@@ -519,7 +521,8 @@ void main() {
           });
         },
         skip: true,
-      ); // Skipping due to a regression with the fake_cloud_firestore version causing ordering to fail
+      ); // Skipping due to a regression with the fake_cloud_firestore
+      // version causing ordering to fail
 
       group('when using a equality comparison', () {
         test('and has matching $OrderBy field', () {
@@ -541,7 +544,7 @@ void main() {
               orderBy: [OrderBy(field: TestUser.fieldAge)],
             ),
             emitsInOrder([
-              [],
+              <String>[],
             ]),
           );
         });
@@ -585,12 +588,12 @@ void main() {
   });
 
   group('#orderBy', () {
-    const testUsername1 = 'Alfred',
-        testUsername2 = 'Batman',
-        testUsername3 = 'Catwoman';
-    const testUser1 = TestUser(testUsername1),
-        testUser2 = TestUser(testUsername2),
-        testUser3 = TestUser(testUsername3);
+    const testUsername1 = 'Alfred';
+    const testUsername2 = 'Batman';
+    const testUsername3 = 'Catwoman';
+    const testUser1 = TestUser(testUsername1);
+    const testUser2 = TestUser(testUsername2);
+    const testUser3 = TestUser(testUsername3);
 
     setUp(() async {
       await testCollection.create(testUser1);
@@ -600,7 +603,7 @@ void main() {
 
     test('should throw when no orderBys are given', () async {
       expect(
-        () async => await testCollection.orderBy([]),
+        () async => testCollection.orderBy([]),
         throwsA(isA<MissingValueException>()),
       );
     });
@@ -644,7 +647,8 @@ void main() {
     });
 
     test(
-      'should have status of $ChunkStatus.nextAvailable when receiving the middle chunk',
+      'should have status of $ChunkStatus.nextAvailable when receiving the '
+      'middle chunk',
       () async {
         final middleChunk = await testCollection.paginate(
           Chunk(orderBy: [OrderBy(field: TestUser.fieldName)]),
@@ -674,7 +678,7 @@ void main() {
         );
         final lastChunk = await testCollection.paginate(middleChunk);
 
-        assert(lastChunk.status == ChunkStatus.last);
+        assert(lastChunk.status == ChunkStatus.last, 'should be last');
 
         final emptyLastChunk2 = await testCollection.paginate(lastChunk);
 
@@ -740,7 +744,7 @@ void main() {
     test('should return emtpy list when no items in collection', () async {
       final readResult = await testCollection.readAll();
 
-      expect(readResult, []);
+      expect(readResult, <String>[]);
     });
   });
 
@@ -895,9 +899,9 @@ void main() {
 
   group('#where', () {
     const expectedName = 'expectedName';
-    const expectedUser = TestUser(expectedName),
-        unexpectedName1 = 'unexpectedName1',
-        unexpectedName2 = 'unexpectedName2';
+    const expectedUser = TestUser(expectedName);
+    const unexpectedName1 = 'unexpectedName1';
+    const unexpectedName2 = 'unexpectedName2';
 
     group('with clauses', () {
       setUp(() async {
@@ -926,10 +930,11 @@ void main() {
       });
 
       test(
-        'should throw a $TooManyArgumentsException when more than one option is chosen',
+        'should throw a $TooManyArgumentsException when more than one option '
+        'is chosen',
         () {
           expect(
-            () async => await testCollection.where(
+            () async => testCollection.where(
               [
                 Clause(
                   TestUser.fieldName,
@@ -945,13 +950,14 @@ void main() {
 
       test('should throw when no clauses are given', () async {
         expect(
-          () async => await testCollection.where([]),
+          () async => testCollection.where([]),
           throwsA(isA<MissingValueException>()),
         );
       });
 
       test(
-        'should throw $MoreThanOneFieldInRangeClauseException when more than one field is used in multiple range clauses',
+        'should throw $MoreThanOneFieldInRangeClauseException when more than '
+        'one field is used in multiple range clauses',
         () {
           expect(
             () => testCollection.streamWhere([
