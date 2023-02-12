@@ -16,3 +16,4 @@ analyzer:
     - '**/*.g.dart'
     - '**/*.mocks.dart'
     - '**/lib/*generated*'
+    - bricks/**

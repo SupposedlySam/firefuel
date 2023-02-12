@@ -1,0 +1,31 @@
+name: firefuel
+description: Creates a Collection, Model Stub and optional Repository for the firefuel library.
+
+version: 0.1.0
+
+environment:
+  mason: '>=0.1.0-dev.41 <0.1.0'
+
+vars:
+  collection_name:
+    type: string
+    description: |
+      The name of a Firebase Cloud Firestore Collection (plural form)
+    default: 'Users'
+    prompt: Collection name?
+  document_name:
+    type: string
+    description: |
+      The name of a Firebase Cloud Firestore Document (singular form)
+    default: 'User'
+    prompt: Document name? Commonly the singular form of your Collection name.
+  generate_repository:
+    type: boolean
+    description: |
+      Whether to create a Repository class to contain your data
+      layer business logic.
+
+      i.e. persist data both locally and remote,
+      create a readable name for multiple collection access, etc.
+    default: true
+    prompt: Would you like to generate a Repository?
