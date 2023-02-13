@@ -37,6 +37,9 @@ flutter_export_environment.sh
 # Flutter Version Manager
 **/.fvm/flutter_sdk
 
+# Very Good CLI
+**/.test_runner.dart
+
 # Mason Code Generator
 .mason
 
