@@ -11,11 +11,12 @@
 
 # Overview
 
-The goal of this package is to make it easy to interact with [Cloud Firestore API](https://firebase.google.com/docs/firestore/). The `firefuel` community aims to always make this package simple, intuitive, and consistent. `firefuel` wraps the [cloud_firestore](https://pub.dev/packages/cloud_firestore) plugin, and provides conventions to help jump-start your development. 
+The goal of this package is to make it easy to interact with [Cloud Firestore](https://firebase.google.com/docs/firestore/) database. The `firefuel` community aims to always make this package simple, intuitive, and consistent. `firefuel` wraps the [cloud_firestore](https://pub.dev/packages/cloud_firestore) plugin, and provides conventions to help jump-start your development.
 
 Still not convinced? See our documentation on why we thing you should [choose firefuel](https://firefuel.dev/#/whyfirefuel)
 
 # Scope
+
 `firefuel` focuses on simplifying the edge of your data layer, meaning this package pairs well with all ui, state management, model generation, and injection packages.
 
 # Getting Started
@@ -26,7 +27,7 @@ Read the full walkthrough in our [docs](https://firefuel.dev/#/gettingstarted?id
 
 # Quick Start
 
-Choose a collection from your Firestore db and create a class to model your document. For this example let's assume you have a collection of users with a username, first name, last name, and favorite color. 
+Choose a collection from your Firestore db and create a class to model your document. For this example let's assume you have a collection of users with a username, first name, last name, and favorite color.
 
 Each model needs to extend `Serializable` so `firefuel` is able to automatically convert the model to JSON. We'll also want to add a `fromJson` method that we'll use to convert it from json into an instance of the model.
 
@@ -36,37 +37,37 @@ Most of the time, when comparing two models of the same type, you want to know w
 
 ```dart
 class User extends Serializable with EquatableMixin {
-  static const String fieldDocId = 'docId',
-      fieldUsername = 'username',
-      fieldFavoriteColor = 'favoriteColor';
-
   const User({
     required this.docId,
-    required this.username,
     required this.favoriteColor,
+    required this.username,
   });
-
-  final String docId;
-  final String username;
-  final String favoriteColor;
-
-  @override
-  List<Object?> get props => [docId, username, favoriteColor];
 
   factory User.fromJson(Map<String, dynamic> json, String docId) {
     return User(
       docId: docId,
-      username: json[fieldUsername],
-      favoriteColor: json[fieldFavoriteColor],
+      favoriteColor: json[fieldFavoriteColor] as String,
+      username: json[fieldUsername] as String,
     );
   }
+
+  static const String fieldDocId = 'docId';
+  static const String fieldFavoriteColor = 'favoriteColor';
+  static const String fieldUsername = 'username';
+
+  final String docId;
+  final String favoriteColor;
+  final String username;
+
+  @override
+  List<Object?> get props => [docId, username, favoriteColor];
 
   @override
   Map<String, dynamic> toJson() {
     return {
       fieldDocId: docId, // optionally add this to your document
-      fieldUsername: username,
       fieldFavoriteColor: favoriteColor,
+      fieldUsername: username,
     };
   }
 }
@@ -76,8 +77,8 @@ class User extends Serializable with EquatableMixin {
 
 ```dart
 class UserCollection extends FirefuelCollection<User> {
-  Collection() : super(collectionName);
-  
+  UserCollection() : super(collectionName);
+
   static const collectionName = 'users';
 
   @override
@@ -99,15 +100,23 @@ class UserCollection extends FirefuelCollection<User> {
 }
 ```
 
+## Code Generation
+
+[![Powered by Mason](https://img.shields.io/endpoint?url=https%3A%2F%2Ftinyurl.com%2Fmason-badge)](https://github.com/felangel/mason)
+
+You can write out the above classes manually or generate them using the Mason CLI
+
+See the docs for more information: [firefuel brick](https://firefuel.dev/#/firefuelbrick)
+
 ## Profit
+
 That's it! Now you can access your data through the `UserCollection` with any of [the following methods](https://pub.dev/documentation/firefuel/latest/firefuel/FirefuelCollection-class.html).
 
 # Related Links
 
-Follow the [official walkthrough](https://supposedlysam.medium.com/firefuel-basics-e4d97f1685c9) on Medium 
+Follow the [official walkthrough](https://supposedlysam.medium.com/firefuel-basics-e4d97f1685c9) on Medium
 
 See the [firefuel documentation](https://firefuel.dev/#/coreconcepts) to learn the core concepts of using `firefuel`.
-
 
 # Issues and feedback
 
@@ -115,12 +124,11 @@ Please file all `firefuel` specific issues, bugs, or feature requests in our [is
 
 Please file `FlutterFire` specific issues, bugs, or feature requests in their [issue tracker](https://github.com/FirebaseExtended/flutterfire/issues/new).
 
-Plugin issues that are *not specific* to FlutterFire can be filed in the [Flutter issue tracker](https://github.com/flutter/flutter/issues/new).
-
+Plugin issues that are _not specific_ to FlutterFire can be filed in the [Flutter issue tracker](https://github.com/flutter/flutter/issues/new).
 
 ## Maintainers
 
-The maintainers for `firefuel` are [Jonah Walker](https://github.com/SupposedlySam) and 
+The maintainers for `firefuel` are [Jonah Walker](https://github.com/SupposedlySam) and
 [Morgan Hunt](https://github.com/mrgnhnt96)
 
 ## Logo Creator

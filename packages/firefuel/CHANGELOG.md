@@ -1,3 +1,23 @@
+## 0.3.2
+
+feat: adds a firefuel brick that can be used through Mason.
+
+To install the `firefuel` brick, add (or create) a `mason.yaml` file inside of your Flutter app with the following contents.
+
+```yaml
+bricks:
+  firefuel:
+    git:
+      url: "https://github.com/SupposedlySam/firefuel"
+      path: packages/firefuel/bricks/firefuel
+```
+
+**note**: Pending publish on [BrickHub](https://brickhub.dev/bricks/firefuel/0.1.0)
+
+Afterwards, run `mason get` and `mason make firefuel` in the directory you'd like your FirefuelCollection and Model generated.
+
+For more information, see the brick's [README](https://github.com/SupposedlySam/firefuel/blob/main/packages/firefuel/bricks/firefuel/README.md)
+
 ## 0.3.1
 
 feat: adds `Firefuel.reset` to clear internal property values without needing to re-initialize.

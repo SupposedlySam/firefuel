@@ -1,0 +1,4 @@
+bricks:
+  firefuel:
+    path: ./bricks/firefuel
+  mit_license: ^0.1.0+1
