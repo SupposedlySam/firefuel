@@ -38,6 +38,8 @@ Whether to create a Repository class to contain your data layer business logic.
 
 i.e. persist data both locally and remote, create a readable name for multiple collection access, etc.
 
+For more information, see [the docs](https://firefuel.dev/#/firefuelbrick)
+
 ---
 
 ## Mason Resources 🧱

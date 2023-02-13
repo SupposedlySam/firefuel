@@ -18,17 +18,7 @@ For more information on Collections and Repositories, review the [Core Concepts]
 
 ## Using the Firefuel Brick
 
-To install the `firefuel` brick, add (or create) a `mason.yaml` file inside of your Flutter app with the following contents.
-
-```yaml
-bricks:
-  firefuel:
-    git:
-      url: "https://github.com/SupposedlySam/firefuel"
-      path: packages/firefuel/bricks/firefuel
-```
-
-?> **Note** Pending publish on [BrickHub](https://brickhub.dev/bricks/firefuel/0.1.0). If the link above exists, you can install the `firefuel` brick directly from BrickHub using `mason add firefuel`.
+To install the `firefuel` brick, run `mason add firefuel`.
 
 Afterwards, run `mason get` and `mason make firefuel` in the directory you'd like your FirefuelCollection and Model generated.
 

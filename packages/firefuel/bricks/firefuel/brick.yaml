@@ -1,5 +1,6 @@
 name: firefuel
 description: Creates a Collection, Model Stub and optional Repository for the firefuel library.
+repository: https://github.com/SupposedlySam/firefuel/tree/main/packages/firefuel/bricks/firefuel
 
 version: 0.1.0
 
