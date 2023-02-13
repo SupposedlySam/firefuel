@@ -5,7 +5,6 @@ import 'package:firefuel/src/utils/serializable_extensions.dart';
 
 abstract class FirefuelCollection<T extends Serializable>
     implements Collection<T> {
-
   FirefuelCollection(String path, {bool useEnv = true})
       : path = _buildPath(path, useEnv);
   final String path;
@@ -42,7 +41,7 @@ abstract class FirefuelCollection<T extends Serializable>
   ///
   /// {@macro firefuel.rules.count.footer}
   @override
-  Future<int> count() async {
+  Future<int> countAll() async {
     final snapshot = await untypedRef.count().get();
 
     return snapshot.count;
@@ -209,7 +208,7 @@ abstract class FirefuelCollection<T extends Serializable>
   /// This method DOES NOT use the server side count function provided by
   /// v4.0.0 of `cloud_firestore` as they do not currenly support streams.
   ///
-  /// See [count] and [countWhere] for more details.
+  /// See [countAll] and [countWhere] for more details.
   ///
   /// This method works by streaming documents from Firestore and accessing the
   /// size property once the full query is executed. This method will incur
@@ -222,7 +221,7 @@ abstract class FirefuelCollection<T extends Serializable>
   ///
   /// {@macro firefuel.rules.streamcount.footer}
   @override
-  Stream<int> streamCount() {
+  Stream<int> streamCountAll() {
     final snapshots = ref.snapshots();
 
     return snapshots.map((querySnapshot) => querySnapshot.size);

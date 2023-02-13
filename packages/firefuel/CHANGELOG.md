@@ -1,3 +1,14 @@
+## 0.4.0
+
+refactor!: renames `count` and `streamCount` to `countAll` and `streamCountAll`
+
+This change was made to be more explicit, aligns with other methods such as `readAll` and `streamAll`, and leads us to look for other options like `countWhere` and `streamCountWhere` when using it in our apps.
+
+BREAKING:
+
+- `count` is now `countAll`
+- `streamCount` is now `streamCountAll`
+
 ## 0.3.2
 
 feat: adds a firefuel brick that can be used through Mason.

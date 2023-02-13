@@ -3,14 +3,13 @@ import 'package:firefuel/firefuel.dart';
 abstract class FirefuelRepository<T extends Serializable>
     with FirefuelFetchMixin
     implements Repository<T> {
-
   const FirefuelRepository({required Collection<T> collection})
       : _collection = collection;
   final Collection<T> _collection;
 
   @override
-  Future<Either<Failure, int>> count() {
-    return guard(_collection.count);
+  Future<Either<Failure, int>> countAll() {
+    return guard(_collection.countAll);
   }
 
   @override
@@ -52,8 +51,8 @@ abstract class FirefuelRepository<T extends Serializable>
   }
 
   @override
-  Stream<Either<Failure, int>> streamCount() {
-    return guardStream(_collection.streamCount);
+  Stream<Either<Failure, int>> streamCountAll() {
+    return guardStream(_collection.streamCountAll);
   }
 
   @override

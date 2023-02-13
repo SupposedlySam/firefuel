@@ -9,14 +9,14 @@ abstract class CollectionCount<T> {
   /// {@template firefuel.rules.count.footer}
   /// See also: [countWhere]
   /// {@endtemplate}
-  Future<T> count();
+  Future<T> countAll();
 
   /// {@template firefuel.rules.countwhere.definition}
   /// Gets the amount of documents filtered by the provided clauses.
   /// {@endtemplate}
   ///
   /// {@template firefuel.rules.countwhere.footer}
-  /// See also: [count]
+  /// See also: [countAll]
   /// {@endtemplate}
   Future<T> countWhere(List<Clause> clauses);
 
@@ -29,7 +29,7 @@ abstract class CollectionCount<T> {
   /// {@template firefuel.rules.streamcount.footer}
   /// See also: [streamCountWhere]
   /// {@endtemplate}
-  Stream<T> streamCount();
+  Stream<T> streamCountAll();
 
   /// {@template firefuel.rules.streamcountwhere.definition}
   /// Gets the amount of documents from the collection, filtered by the provided
@@ -39,7 +39,7 @@ abstract class CollectionCount<T> {
   /// {@endtemplate}
   ///
   /// {@template firefuel.rules.streamcountwhere.footer}
-  /// See also: [streamCount]
+  /// See also: [streamCountAll]
   /// {@endtemplate}
   Stream<T> streamCountWhere(List<Clause> clauses);
 }
