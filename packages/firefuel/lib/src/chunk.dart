@@ -4,7 +4,6 @@ enum ChunkStatus { nextAvailable, last }
 
 /// Used to keep track of state when paginating
 class Chunk<T> {
-
   Chunk({
     required this.orderBy,
     this.clauses,

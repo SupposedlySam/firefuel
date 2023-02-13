@@ -254,24 +254,30 @@ void main() {
     methodName: 'paginate',
     mockCollection: MockCollection(),
     initHappyPath: (mockCollection) async {
-      mockCollection.initialize(onPaginate: () {
-        return Chunk<TestUser>(orderBy: [
-          OrderBy(
-            field: TestUser.fieldName,
-          )
-        ],);
-      },);
+      mockCollection.initialize(
+        onPaginate: () {
+          return Chunk<TestUser>(
+            orderBy: [
+              OrderBy(
+                field: TestUser.fieldName,
+              )
+            ],
+          );
+        },
+      );
     },
     initSadPath: (mockCollection) async {
       mockCollection.initialize(onPaginate: () => throw ExpectedFailure());
     },
     methodCallback: (testRepository) {
       return testRepository.paginate(
-        Chunk<TestUser>(orderBy: [
-          OrderBy(
-            field: TestUser.fieldName,
-          )
-        ],),
+        Chunk<TestUser>(
+          orderBy: [
+            OrderBy(
+              field: TestUser.fieldName,
+            )
+          ],
+        ),
       );
     },
   );
@@ -373,7 +379,8 @@ void main() {
     },
     initSadPath: (mockCollection) async {
       mockCollection.initialize(
-          onUpdateOrCreate: () => throw ExpectedFailure(),);
+        onUpdateOrCreate: () => throw ExpectedFailure(),
+      );
     },
     methodCallback: (testRepository) {
       return testRepository.updateOrCreate(

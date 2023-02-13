@@ -1,5 +1,4 @@
 class MissingValueException implements Exception {
-
   MissingValueException(this.type);
   final Type type;
 

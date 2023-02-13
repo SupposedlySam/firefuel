@@ -25,7 +25,6 @@ import 'package:firefuel/firefuel.dart';
 /// Clause(MyModel.fieldVehicle, isEqualTo: 'Mazda', isNotEqualTo: 'Honda');
 /// ```
 class Clause extends Equatable {
-
   Clause(
     this.field, {
     this.isEqualTo,
