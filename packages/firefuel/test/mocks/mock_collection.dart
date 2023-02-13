@@ -87,10 +87,12 @@ extension MockCollectionX<T extends Serializable> on MockCollection<T> {
     }
 
     if (onOrderBy != null) {
-      when(() => orderBy(
-            any(),
-            limit: any(named: 'limit'),
-          ),).thenAnswer((_) => Future.value(onOrderBy()));
+      when(
+        () => orderBy(
+          any(),
+          limit: any(named: 'limit'),
+        ),
+      ).thenAnswer((_) => Future.value(onOrderBy()));
     }
 
     if (onPaginate != null) {
