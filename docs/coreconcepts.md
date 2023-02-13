@@ -279,7 +279,11 @@ If the `eitherType` is actually a `Left` and not a `Right` like you expected/wan
 
 ### Either Type Extensions
 
-We found that there are many cases where: 1. We don't want to have to provide a default value 2. We want our code to fail if we try to get it and it's not what we're looking for 3. We want to turn a non-nullable type into a nullable type
+We found that there are many cases where:
+
+1. We don't want to have to provide a default value
+2. We want our code to fail if we try to get it and it's not what we're looking for
+3. We want to turn a non-nullable type into a nullable type
 
 For the above cases, we created our own extension methods.
 
