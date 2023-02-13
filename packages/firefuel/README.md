@@ -11,7 +11,7 @@
 
 # Overview
 
-The goal of this package is to make it easy to interact with [Cloud Firestore API](https://firebase.google.com/docs/firestore/). The `firefuel` community aims to always make this package simple, intuitive, and consistent. `firefuel` wraps the [cloud_firestore](https://pub.dev/packages/cloud_firestore) plugin, and provides conventions to help jump-start your development.
+The goal of this package is to make it easy to interact with [Cloud Firestore](https://firebase.google.com/docs/firestore/) database. The `firefuel` community aims to always make this package simple, intuitive, and consistent. `firefuel` wraps the [cloud_firestore](https://pub.dev/packages/cloud_firestore) plugin, and provides conventions to help jump-start your development.
 
 Still not convinced? See our documentation on why we thing you should [choose firefuel](https://firefuel.dev/#/whyfirefuel)
 
@@ -99,6 +99,14 @@ class UserCollection extends FirefuelCollection<User> {
   }
 }
 ```
+
+## Code Generation
+
+[![Powered by Mason](https://img.shields.io/endpoint?url=https%3A%2F%2Ftinyurl.com%2Fmason-badge)](https://github.com/felangel/mason)
+
+You can write out the above classes manually or generate them using the Mason CLI
+
+See the docs for more information: [firefuel brick](https://firefuel.dev/#/firefuelbrick)
 
 ## Profit
 
