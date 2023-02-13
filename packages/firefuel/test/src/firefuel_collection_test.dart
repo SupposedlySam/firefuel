@@ -16,7 +16,7 @@ void main() {
 
   tearDown(Firefuel.reset);
 
-  group('#count', () {
+  group('#countAll', () {
     setUp(() async {
       await testCollection.create(defaultUser);
       await testCollection.create(defaultUser);
@@ -24,7 +24,7 @@ void main() {
     });
 
     test('should return the amount of documents in the collection', () async {
-      final actual = await testCollection.count();
+      final actual = await testCollection.countAll();
 
       expect(actual, 3);
     });
@@ -237,14 +237,14 @@ void main() {
     });
   });
 
-  group('#streamCount', () {
+  group('#streamCountAll', () {
     late Stream<int> stream;
     late DocumentId docId;
 
     setUp(() async {
       docId = await testCollection.create(defaultUser);
 
-      stream = testCollection.streamCount();
+      stream = testCollection.streamCountAll();
     });
 
     test('should output new value when new doc is created', () async {
