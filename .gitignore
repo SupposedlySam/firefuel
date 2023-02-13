@@ -37,6 +37,9 @@ flutter_export_environment.sh
 # Flutter Version Manager
 **/.fvm/flutter_sdk
 
+# Mason Code Generator
+.mason
+
 #MacOS related
 **/macos/Flutter/ephemeral/Flutter-Generated.xcconfig
 
