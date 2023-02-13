@@ -13,32 +13,35 @@ The firefuel repository consists of several pub packages:
 
 For a [Flutter](https://flutter.dev/) application, we need to add the `firefuel` package to our `pubspec.yaml` as a dependency.
 
+Run
+
+```bash
+flutter pub add firefuel;
+```
+
 ### Dependencies
-| package | version |
-| -- | -- | 
-| cloud_firestore |  [![pub package](https://img.shields.io/pub/v/cloud_firestore.svg)](https://pub.dev/packages/cloud_firestore) |
-| equatable |  [![pub package](https://img.shields.io/pub/v/equatable.svg)](https://pub.dev/packages/equatable) |
-| firebase_core |  [![pub package](https://img.shields.io/pub/v/firebase_core.svg)](https://pub.dev/packages/firebase_core) |
-| firefuel |  [![pub package](https://img.shields.io/pub/v/firefuel.svg)](https://pub.dev/packages/firefuel) |
+
+| package         | version                                                                                                      |
+| --------------- | ------------------------------------------------------------------------------------------------------------ |
+| cloud_firestore | [![pub package](https://img.shields.io/pub/v/cloud_firestore.svg)](https://pub.dev/packages/cloud_firestore) |
+| equatable       | [![pub package](https://img.shields.io/pub/v/equatable.svg)](https://pub.dev/packages/equatable)             |
+| firebase_core   | [![pub package](https://img.shields.io/pub/v/firebase_core.svg)](https://pub.dev/packages/firebase_core)     |
+| firefuel        | [![pub package](https://img.shields.io/pub/v/firefuel.svg)](https://pub.dev/packages/firefuel)               |
 
 Use the above versions to populate your `pubspec.yaml` file. It should look something like this:
 
-[pubspec.yaml](_snippets/getting_started/firefuel_pubspec.yaml.md ':include')
+[pubspec.yaml](_snippets/getting_started/firefuel_pubspec.yaml.md ":include")
 
 Next we need to install firefuel.
-
-!> Make sure to run the following command from the same directory as your `pubspec.yaml` file.
-
-- Run `flutter packages get`
 
 ## Import
 
 Now that we have successfully installed firefuel, we can create our `main.dart` and import `firefuel`.
 
-[main.dart](_snippets/getting_started/firefuel_main.dart.md ':include')
+[main.dart](_snippets/getting_started/firefuel_main.dart.md ":include")
 
-For a Flutter application we can import `flutter_firefuel`.
+For a Flutter application we can import `firefuel`.
 
 You'll also want to initialize firefuel with the instance of FirebaseFirestore you want to use.
 
-[main_init.dart](_snippets/getting_started/firefuel_main_init.dart.md ':include')
+[main_init.dart](_snippets/getting_started/firefuel_main_init.dart.md ":include")

@@ -1,9 +1,9 @@
 ```yaml
 dependencies:
-  cloud_firestore: ^3.1.1
+  cloud_firestore: ^4.3.2
   equatable: ^2.0.3 # optional
-  firebase_core: ^1.10.2
-  firefuel: ^0.2.1
+  firebase_core: ^2.5.0
+  firefuel: ^0.3.2
   flutter:
     sdk: flutter
 ```

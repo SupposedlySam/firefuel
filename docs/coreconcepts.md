@@ -10,13 +10,13 @@ In the upcoming sections, we're going to discuss each of them in detail as well 
 
 Firefuel works directly with [Firebase Cloud Firestore](https://firebase.flutter.dev/docs/firestore/overview) and the associated [Cloud Firestore Package](https://pub.dev/packages/cloud_firestore). As described in the usage section of their docs :
 
-> Firestore stores data within "documents", which are contained within "collections". Documents can also contain nested collections. 
+> Firestore stores data within "documents", which are contained within "collections". Documents can also contain nested collections.
 
 Documents are sent and received from Firebase using [JSON](https://www.json.org/json-en.html). Using the cloud firestore package, you receive this data as an untyped collection of type `Map<String, dynamic>`. And although you can immediately access this data using the bracket notation `json['myKey']`, this is not scalable.
 
 ## Type Safe Documents
 
-To make your Documents type safe, you'll want to convert then from a `Map` to a `Type` of your choosing. The most common way of converting a `Map` to a `Type` is to create a `class` with both a static (class level) `fromJson` method and an instance level `toJson` method. Your `class` will normally contain properties that match the type and name of the fields located on the Document in your Firestore Collection and be called a `Model` by convention. You'll then use the `fromJson` method on your model to convert the `Map` from Firestore to a type `T` (your `Model` class) you can use in your application.
+To make your Documents type safe, you'll want to convert them from a `Map` to a `Type` of your choosing. The most common way of converting a `Map` to a `Type` is to create a `class` with both a static (class level) `fromJson` method and an instance level `toJson` method. Your `class` will normally contain properties that match the type and name of the fields located on the Document in your Firestore Collection and be called a `Model` by convention. You'll then use the `fromJson` method on your model to convert the `Map` from Firestore to a type `T` (your `Model` class) you can use in your application.
 
 ## Streamlining Type Safety with Collections
 
@@ -24,26 +24,28 @@ You'll create a new Collection that extends FirefuelCollection for each top leve
 
 ### Collection Detail
 
-As developers, we always want to work with type safe code. This is why Firefuel makes all Firebase interactions type safe by default. Firefuel Collections require you to define `fromFirestore` and `toFirestore` methods that are used to automatically convert your data from a `DocumentSnapshot` (what's returned from Firebase) to type `T` (your model) on every interaction. 
+As developers, we always want to work with type safe code. This is why Firefuel makes all Firebase interactions type safe by default. Firefuel Collections require you to define `fromFirestore` and `toFirestore` methods that are used to automatically convert your data from a `DocumentSnapshot` (what's returned from Firebase) to type `T` (your model) on every interaction.
 
-
-[collection.dart](_snippets/architecture/collection.dart.md ':include')
+[collection.dart](_snippets/architecture/collection.dart.md ":include")
 
 ?> Note: snapshots are included so you can get access to all parts of the `DocumentSnapshot`, but `snapshot.data()` is what you'll use to access the `Map` needed to call your `fromJson` method on your model.
-
 
 ## Subcollections
 
 ### Summary
-Subcollections have all the same functionality as a top level collection, but are nested inside of a document. 
+
+Subcollections have all the same functionality as a top level collection, but are nested inside of a document.
+
 ### Subcollection vs Array
+
 Subcollections are used as a replacement for an array when you need the ability to filter, paginate, or get a single element. Arrays are all or nothing in Firebase, when you access your document, every item in the array will also be retrieved. If you expect for your array to become large, you should use a subcollection instead.
 
 ### Subcollection Setup
 
-Since subcollections are located on a document, you need the document id to access its subcollections. 
+Since subcollections are located on a document, you need the document id to access its subcollections.
 
 #### Add Document Id to Model
+
 With firefuel, you're able to add the document id to your model in the `fromFirestore` method of a FirefuelCollection. There are two suggested approaches to take:
 
 1. Pass the `snapshot.id` into your Model's `fromJson` method separately
@@ -80,7 +82,7 @@ with option #2 you'd then access the docId with by the key 'id' inside your mode
 
 #### Defining Collection Names
 
-With a top level collection, your collection path is simple; it's just the name of your collection. For example, let's assume you're creating a `UserCollection` that extends `FirefuelCollection<User>`. When you create your constructor, you'll then pass the collection name to your parent (aka `super`, aka `FirefuelCollection`). 
+With a top level collection, your collection path is simple; it's just the name of your collection. For example, let's assume you're creating a `UserCollection` that extends `FirefuelCollection<User>`. When you create your constructor, you'll then pass the collection name to your parent (aka `super`, aka `FirefuelCollection`).
 
 ```dart
 class UserCollection extends FirefuelCollection<User> {
@@ -109,7 +111,7 @@ Now we can create our subcollection and require the docId to be passed in, where
 
 ```dart
 class FriendCollection extends FirefuelCollection<Friend> {
-    FriendCollection(this.docId) : 
+    FriendCollection(this.docId) :
         super('${UserCollection.name}/${docId.docId}/$name');
 
     static const String name = 'friends'
@@ -121,7 +123,6 @@ class FriendCollection extends FirefuelCollection<Friend> {
 ```
 
 #### Connect Your Subcollection With Extensions
-
 
 Now, let's tie it all together. We'll create an extension method on `User` called `friends` so we can easily build a subcollection for any `User` model we have.
 
@@ -137,6 +138,7 @@ extension UserSubcollectionX on User {
 Make sure to `export` the `UserSubcollectionX` class from the `User` model or you'll have to manually type in the `import` to the extension yourself.
 
 user.dart
+
 ```dart
 export 'package:your_app_name/path/to/user_subcollection_x.dart';
 ```
@@ -153,14 +155,13 @@ final User user = await userCollection.read(DocumentId('celebrity'));
 final List<Friend> friends = await user.friends.readAll();
 ```
 
-
 !> Firestore does not support recursively deleting subcollections. If you delete a document that has subcollections, the subcollections still exist in your database and can be reference by url. They will not be visible in the firebase console. See [Delete Collections](https://firebase.google.com/docs/firestore/manage-data/delete-data#collections) and [this SO answer](https://stackoverflow.com/questions/49286764/delete-a-document-with-all-subcollections-and-nested-subcollections-in-firestore/57623425#57623425) for how to handle deleting subcollections.
 
-
 ## Repositories (Optional)
+
 ### Summary
 
-You'll create a new Repository that extends FirefuelRepository for each FirefuelCollection in your Firestore project.
+You'll create a new Repository that extends FirefuelRepository for each FirefuelCollection in your project.
 
 ### Detail
 
@@ -168,14 +169,13 @@ A Repository in Firefuel is responsible for the business logic of your data laye
 
 ### Repository Example
 
-[repository.dart](_snippets/architecture/repository.dart.md ':include')
+[repository.dart](_snippets/architecture/repository.dart.md ":include")
 
 ## Handling Errors
 
-Firefuel is opinionated on how you should handle errors. Firefuel exposes the [dartz package](https://pub.dev/packages/dartz) [Either type](https://pub.dev/documentation/dartz/latest/dartz/Either-class.html), and requires that Repositories handle any error from the Collection and return "Either" a `Failure` or the success type for the function. 
+Firefuel is opinionated on how you should handle errors. Firefuel exposes the [dartz package](https://pub.dev/packages/dartz) [Either type](https://pub.dev/documentation/dartz/latest/dartz/Either-class.html), and requires that Repositories handle any error from the Collection and return "Either" a `Failure` or the success type for the function.
 
-
-Before we get too far ahead of ourselves, all methods inherited from the `FirefuelRepository` already take care of returning the `Either` type for you. 
+Before we get too far ahead of ourselves, all methods inherited from the `FirefuelRepository` already take care of returning the `Either` type for you.
 
 ## Either Types (via dartz package)
 
@@ -234,14 +234,14 @@ final readResult = repository.read(DocumentId('someExistingDocId'));
 readResult.fold(
     (failure) {
         print(failure.toString());
-    }, 
+    },
     (success) {
         print(success.toString());
     },
 );
 ```
 
-"Folding" the result of the `Either` type allows for you to handle both sides at once. It's common to handle one side and just pass through the other side. 
+"Folding" the result of the `Either` type allows for you to handle both sides at once. It's common to handle one side and just pass through the other side.
 
 ```dart
 readResult.fold(left, (success) => print(success.toString()));
@@ -261,7 +261,7 @@ The `map` method is considered "right bias", which means the value being passed 
 
 The last two methods provided by the `dartz` library that you should know about are the `getOrElse` and the `swap` methods.
 
-`swap` switches the sides of your `Either` type so that what was on the left is now on the right and vice versa. 
+`swap` switches the sides of your `Either` type so that what was on the left is now on the right and vice versa.
 
 ```dart
 final Either<Failure, MyClass> eitherType;
@@ -269,7 +269,7 @@ final Either<Failure, MyClass> eitherType;
 final swappedEither = eitherType.swap(); // Either<MyClass, Failure>
 ```
 
-Where `getOrElse` just tries to return to you the `Right` side of the `Either`. 
+Where `getOrElse` just tries to return to you the `Right` side of the `Either`.
 
 ```dart
 eitherType.getOrElse(() => MyClass.default());
@@ -277,13 +277,9 @@ eitherType.getOrElse(() => MyClass.default());
 
 If the `eitherType` is actually a `Left` and not a `Right` like you expected/wanted it to be then the callback is triggered and your default value is returned.
 
-
 ### Either Type Extensions
 
-We found that there are many cases where:
-    1. We don't want to have to provide a default value
-    2. We want our code to fail if we try to get it and it's not what we're looking for
-    3. We want to turn a non-nullable type into a nullable type
+We found that there are many cases where: 1. We don't want to have to provide a default value 2. We want our code to fail if we try to get it and it's not what we're looking for 3. We want to turn a non-nullable type into a nullable type
 
 For the above cases, we created our own extension methods.
 
@@ -320,7 +316,3 @@ import 'package:firefuel/firefuel.dart';
 
 final maybeFailure = eitherType.getLeftOrElseNull();
 ```
-
-
-
-
