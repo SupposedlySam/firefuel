@@ -1,13 +1,13 @@
 bricks:
   firefuel:
     source: brick_oven/firefuel
-    dirs:
     files:
       repository.dart: # file name under source directory
         # name: provides object with config for this file
         name:
           format: snakeCase
           suffix: _repository
+          # mason variable name
           value: document_name
         # indlude_if: adds conditional logic to file name
         include_if: generate_repository
@@ -15,3 +15,18 @@ bricks:
           collection_name: __COLLECTION_NAME__
           document_name: __DOCUMENT_NAME__
           generate_repository: __GENERATE_REPOSITORY__
+      document_model.dart: # file name under source directory
+        # name: provides object with config for this file
+        name:
+          format: snakeCase
+          value: document_name
+        vars:
+          document_name: __DOCUMENT_NAME__
+      collection.dart: # file name under source directory
+        # name: provides object with config for this file
+        name:
+          format: snakeCase
+          value: document_name
+          suffix: _collection
+        vars:
+          document_name: __DOCUMENT_NAME__
