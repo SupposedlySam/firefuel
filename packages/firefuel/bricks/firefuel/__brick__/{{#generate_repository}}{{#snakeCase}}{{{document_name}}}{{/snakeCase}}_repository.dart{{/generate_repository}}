@@ -1,0 +1,22 @@
+import 'package:firefuel/firefuel.dart';
+
+import './{{#snakeCase}}{{{document_name}}}{{/snakeCase}}.dart';
+import './{{#snakeCase}}{{{document_name}}}{{/snakeCase}}_collection.dart';
+
+/// Used to encapsulate business logic for your data layer
+///
+/// For instance, you can create a method called `delete` on a
+/// `MessageRepository`. The Repository would be responsible for deleting the
+/// message both locally, and remotely. The rest of your application
+/// doesn't need to worry about the data implementation detail.
+///
+/// Additionally, you may need to use multiple methods from your collection
+/// to successfully perform an action you commonly use. Combining those actions
+/// into one method means you don't have to duplicate the same logic elsewhere.
+class {{#pascalCase}}{{{document_name}}}{{/pascalCase}}RepositoryImpl
+    extends FirefuelRepository<{{#pascalCase}}{{{document_name}}}{{/pascalCase}}> {
+  {{#pascalCase}}{{{document_name}}}{{/pascalCase}}RepositoryImpl(this.{{#camelCase}}{{{document_name}}}{{/camelCase}}Collection)
+      : super(collection: {{#camelCase}}{{{document_name}}}{{/camelCase}}Collection);
+
+  final {{#pascalCase}}{{{document_name}}}{{/pascalCase}}Collection {{#camelCase}}{{{document_name}}}{{/camelCase}}Collection;
+}
