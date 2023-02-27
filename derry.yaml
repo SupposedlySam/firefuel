@@ -1,4 +1,7 @@
-sort: dart pub global run import_sorter:main
+cook:
+  - brick_oven cook all -o bricks
+  - rm -rf brick_oven_dev
+cook:dev: brick_oven cook all -o brick_oven_dev -w
 coverage: # requires `brew install lcov`
   - flutter test --coverage
   - genhtml -o coverage coverage/lcov.info
@@ -6,3 +9,4 @@ coverage: # requires `brew install lcov`
 cproj:
   - flutter clean
   - flutter pub upgrade
+sort: dart pub global run import_sorter:main
