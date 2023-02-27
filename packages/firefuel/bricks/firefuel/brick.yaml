@@ -2,7 +2,7 @@ name: firefuel
 description: Creates a Collection, Model Stub and optional Repository for the firefuel library.
 repository: https://github.com/SupposedlySam/firefuel/tree/main/packages/firefuel/bricks/firefuel
 
-version: 0.1.0
+version: 0.1.1
 
 environment:
   mason: '>=0.1.0-dev.41 <0.1.0'
@@ -12,8 +12,8 @@ vars:
     type: string
     description: |
       The name of a Firebase Cloud Firestore Collection (plural form)
-    default: 'Users'
-    prompt: Collection name?
+    default: 'users'
+    prompt: Collection identifier? (the exact spelling / casing of your collection)
   document_name:
     type: string
     description: |
