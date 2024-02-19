@@ -1,3 +1,11 @@
+## 0.4.1
+
+chore!: upgrade dependencies
+- Environment
+  - dart: 2.19.0 > 3.3.0
+- Dependencies
+  - [cloud_firestore](https://pub.dev/packages/cloud_firestore/changelog): 4.3.2 > 4.15.5
+
 ## 0.4.0
 
 refactor!: renames `count` and `streamCount` to `countAll` and `streamCountAll`

@@ -273,7 +273,7 @@ void main() {
       expect(
         stream,
         emitsInOrder([
-          [defaultUser, defaultUser, defaultUser]
+          [defaultUser, defaultUser, defaultUser],
         ]),
       );
     });
@@ -286,7 +286,7 @@ void main() {
         expect(
           stream,
           emitsInOrder([
-            [defaultUser, defaultUser]
+            [defaultUser, defaultUser],
           ]),
         );
       },
@@ -300,7 +300,7 @@ void main() {
         expect(
           stream,
           emitsInOrder([
-            [defaultUser, defaultUser, defaultUser]
+            [defaultUser, defaultUser, defaultUser],
           ]),
         );
       },
@@ -454,7 +454,7 @@ void main() {
           expect(
             () => testCollection.streamWhere([
               Clause('firstField', isGreaterThan: 44),
-              Clause('secondField', isLessThan: 22)
+              Clause('secondField', isLessThan: 22),
             ]),
             throwsA(isA<MoreThanOneFieldInRangeClauseException>()),
           );
@@ -482,7 +482,7 @@ void main() {
         expect(
           filteredList,
           emitsInOrder([
-            [bender, fry, leela]
+            [bender, fry, leela],
           ]),
         );
       });
@@ -515,7 +515,7 @@ void main() {
                 [Clause(TestUser.fieldAge, isGreaterThan: 4)],
                 orderBy: [
                   OrderBy(field: TestUser.fieldName),
-                  OrderBy(field: TestUser.fieldAge)
+                  OrderBy(field: TestUser.fieldAge),
                 ],
               ),
               emitsInOrder([
@@ -559,7 +559,7 @@ void main() {
           expect(
             testCollection.streamWhere(
               [
-                Clause(TestUser.fieldAge, whereIn: const [4, 25])
+                Clause(TestUser.fieldAge, whereIn: const [4, 25]),
               ],
               orderBy: [OrderBy(field: TestUser.fieldAge)],
             ),
@@ -966,7 +966,7 @@ void main() {
           expect(
             () => testCollection.streamWhere([
               Clause('firstField', isGreaterThan: 44),
-              Clause('secondField', isLessThan: 22)
+              Clause('secondField', isLessThan: 22),
             ]),
             throwsA(isA<MoreThanOneFieldInRangeClauseException>()),
           );
@@ -1017,7 +1017,7 @@ void main() {
               [Clause(TestUser.fieldAge, isGreaterThan: 4)],
               orderBy: [
                 OrderBy(field: TestUser.fieldName),
-                OrderBy(field: TestUser.fieldAge)
+                OrderBy(field: TestUser.fieldAge),
               ],
             ),
             completes,
@@ -1052,7 +1052,7 @@ void main() {
           await expectLater(
             testCollection.where(
               [
-                Clause(TestUser.fieldAge, whereIn: const [4, 25])
+                Clause(TestUser.fieldAge, whereIn: const [4, 25]),
               ],
               orderBy: [OrderBy(field: TestUser.fieldAge)],
             ),

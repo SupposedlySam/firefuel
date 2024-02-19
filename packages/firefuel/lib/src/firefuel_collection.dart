@@ -44,7 +44,7 @@ abstract class FirefuelCollection<T extends Serializable>
   Future<int> countAll() async {
     final snapshot = await untypedRef.count().get();
 
-    return snapshot.count;
+    return snapshot.count ?? 0;
   }
 
   /// {@macro firefuel.rules.countwhere.definition}
@@ -56,7 +56,7 @@ abstract class FirefuelCollection<T extends Serializable>
   Future<int> countWhere(List<Clause> clauses) async {
     final snapshot = await untypedRef.filter(clauses).count().get();
 
-    return snapshot.count;
+    return snapshot.count ?? 0;
   }
 
   @override

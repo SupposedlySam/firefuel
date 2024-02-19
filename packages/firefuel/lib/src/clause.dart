@@ -62,7 +62,7 @@ class Clause extends Equatable {
       arrayContainsAny,
       whereIn,
       whereNotIn,
-      isNull
+      isNull,
     ]);
   }
   final String field;

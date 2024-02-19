@@ -85,7 +85,7 @@ void main() {
     initHappyPath: (mockCollection) async {
       mockCollection.initialize(
         onStreamAll: () => Stream.fromIterable([
-          [const TestUser('streamUser')]
+          [const TestUser('streamUser')],
         ]),
       );
     },
@@ -101,7 +101,7 @@ void main() {
     initHappyPath: (mockCollection) async {
       mockCollection.initialize(
         onStreamLimited: () => Stream.fromIterable([
-          [const TestUser('streamUser')]
+          [const TestUser('streamUser')],
         ]),
       );
     },
@@ -117,7 +117,7 @@ void main() {
     initHappyPath: (mockCollection) async {
       mockCollection.initialize(
         onStreamOrdered: () => Stream.fromIterable([
-          [const TestUser('streamUser')]
+          [const TestUser('streamUser')],
         ]),
       );
     },
@@ -260,7 +260,7 @@ void main() {
             orderBy: [
               OrderBy(
                 field: TestUser.fieldName,
-              )
+              ),
             ],
           );
         },
@@ -275,7 +275,7 @@ void main() {
           orderBy: [
             OrderBy(
               field: TestUser.fieldName,
-            )
+            ),
           ],
         ),
       );
