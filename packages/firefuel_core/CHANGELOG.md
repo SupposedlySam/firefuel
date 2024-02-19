@@ -1,3 +1,11 @@
+## 0.1.2
+chore: bump deps
+- Environment
+  - dart: 2.19.0 > 3.3.0
+- Dependencies
+  - stack_trace: 1.11.0 > 1.11.1
+  - universal_io: 2.0.4 > 2.2.2
+
 ## 0.1.1
 
 chore: bump deps
