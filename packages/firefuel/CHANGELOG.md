@@ -1,3 +1,37 @@
+## 0.4.2
+chore: upgrade dependencies
+
+Output from `flutter pub upgrade --major-versions`
+```sh
+> _flutterfire_internals 1.3.30 (was 1.3.22)
+> cloud_firestore 4.17.0 (was 4.15.5)
+> cloud_firestore_platform_interface 6.2.0 (was 6.1.6)
+> cloud_firestore_web 3.12.0 (was 3.10.5)
+> fake_cloud_firestore 2.4.9 (was 2.4.8)
+> firebase_core 2.30.0 (was 2.25.4)
+> firebase_core_web 2.15.0 (was 2.11.4)
+  leak_tracker 10.0.0 (10.0.5 available)
+  leak_tracker_flutter_testing 2.0.1 (3.0.5 available)
+  leak_tracker_testing 2.0.1 (3.0.1 available)
+> firefuel_core 0.1.3 (was 0.1.2)
+  leak_tracker 10.0.0 (10.0.5 available)
+  leak_tracker_flutter_testing 2.0.1 (3.0.5 available)
+  leak_tracker_testing 2.0.1 (3.0.1 available)
+  material_color_utilities 0.8.0 (0.11.1 available)
+  meta 1.11.0 (1.14.0 available)
+  rx 0.3.0 (0.4.0 available)
+  test_api 0.6.1 (0.7.1 available)
+> logger 2.2.0 (was 2.0.2+1)
+  material_color_utilities 0.8.0 (0.11.1 available)
+  meta 1.11.0 (1.14.0 available)
+  rx 0.3.0 (0.4.0 available)
+  test_api 0.6.1 (0.7.1 available)
+  vm_service 13.0.0 (14.2.1 available)
+> web 0.5.1 (was 0.4.2)
+These packages are no longer being depended on:
+- js 0.6.7
+```
+
 ## 0.4.1
 
 chore!: upgrade dependencies

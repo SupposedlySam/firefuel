@@ -20,6 +20,7 @@ mixin FirefuelFetchMixin {
       return Right(result);
     } catch (e, stack) {
       if (e is FormatException) {
+        // ignore: avoid_print
         print('Format Exception: ${e.message}');
       }
 
@@ -47,6 +48,7 @@ mixin FirefuelFetchMixin {
       }
     } catch (e, stack) {
       if (e is FormatException) {
+        // ignore: avoid_print
         print('Format Exception: ${e.message}');
       }
 
