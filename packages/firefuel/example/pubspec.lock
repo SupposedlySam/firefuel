@@ -249,10 +249,10 @@ packages:
     dependency: transitive
     description:
       name: firefuel_core
-      sha256: "38feedc4a1f4fa44931572f519da5cfbe0c474b87bcc6b994357f6f86ab1293f"
+      sha256: "72f4874838a05296a553134aab169ef480e62174711e6063d4a337ba24b0ca2e"
       url: "https://pub.dev"
     source: hosted
-    version: "0.1.3"
+    version: "0.1.4"
   firefuel_counter:
     dependency: "direct main"
     description:
