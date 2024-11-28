@@ -1,3 +1,6 @@
+## 0.1.4
+chore: bump deps
+
 ## 0.1.3
 chore: bump deps
 
