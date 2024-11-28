@@ -14,15 +14,15 @@ void main() {
 
   group('CounterApp', () {
     testWidgets('is a MaterialApp', (tester) async {
-      expect(CounterApp(), isA<MaterialApp>());
+      expect(const CounterApp(), isA<MaterialApp>());
     });
 
     testWidgets('home is CounterPage', (tester) async {
-      expect(CounterApp().home, isA<CounterPage>());
+      expect(const CounterApp().home, isA<CounterPage>());
     });
 
     testWidgets('renders CounterPage', (tester) async {
-      await tester.pumpWidget(CounterApp());
+      await tester.pumpWidget(const CounterApp());
       expect(find.byType(CounterPage), findsOneWidget);
     });
   });

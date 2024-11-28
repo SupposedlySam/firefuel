@@ -4,8 +4,8 @@ import 'package:firefuel/firefuel.dart';
 import 'package:firefuel_counter/firefuel_counter.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../counter.dart';
-import 'counter_view.dart';
+import 'package:flutter_counter/counter/counter.dart';
+import 'package:flutter_counter/counter/view/counter_view.dart';
 
 /// {@template counter_page}
 /// A [StatelessWidget] which is responsible for providing a
@@ -26,7 +26,7 @@ class CounterPage extends StatelessWidget {
     // calls the CounterCollection)
     final getInitialCounter = counterRepo.readOrCreate(
       docId: DocumentId('counter'),
-      createValue: Counter.initial(),
+      createValue: const Counter.initial(),
     );
 
     return FutureBuilder<Either<Failure, Counter>>(
@@ -61,13 +61,13 @@ class CounterPage extends StatelessWidget {
                     counterRepo: counterRepo,
                     defaultValue: counter,
                   ),
-                  child: CounterView(),
+                  child: const CounterView(),
                 );
               },
             );
           }
 
-          return Scaffold(body: Center(child: Text('Please Wait...')));
-        });
+          return const Scaffold(body: Center(child: Text('Please Wait...')));
+        },);
   }
 }

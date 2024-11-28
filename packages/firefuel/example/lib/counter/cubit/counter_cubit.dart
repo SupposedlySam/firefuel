@@ -27,7 +27,7 @@ class CounterCubit extends Cubit<Counter> {
 
     result.fold(
       (failure) => debugPrint(failure.error.toString()),
-      (success) => emit(success),
+      emit,
     );
   }
 
@@ -40,7 +40,7 @@ class CounterCubit extends Cubit<Counter> {
 
     result.fold(
       (failure) => debugPrint(failure.error.toString()),
-      (success) => emit(success),
+      emit,
     );
   }
 }

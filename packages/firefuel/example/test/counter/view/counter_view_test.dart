@@ -39,7 +39,7 @@ void main() {
         MaterialApp(
           home: BlocProvider.value(
             value: counterCubit,
-            child: CounterView(),
+            child: const CounterView(),
           ),
         ),
       );
@@ -53,7 +53,7 @@ void main() {
         MaterialApp(
           home: BlocProvider.value(
             value: counterCubit,
-            child: CounterView(),
+            child: const CounterView(),
           ),
         ),
       );
@@ -68,7 +68,7 @@ void main() {
         MaterialApp(
           home: BlocProvider.value(
             value: counterCubit,
-            child: CounterView(),
+            child: const CounterView(),
           ),
         ),
       );

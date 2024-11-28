@@ -14,7 +14,7 @@ void main() {
 
   group('CounterPage', () {
     testWidgets('renders CounterView', (tester) async {
-      await tester.pumpWidget(MaterialApp(home: CounterPage()));
+      await tester.pumpWidget(const MaterialApp(home: CounterPage()));
       await tester.pump(); // enter FutureBuilder's builder function
 
       expect(find.byType(CounterView), findsOneWidget);

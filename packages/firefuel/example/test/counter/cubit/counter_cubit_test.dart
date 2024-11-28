@@ -20,7 +20,7 @@ void main() {
 
     final defaultValue = await counterRepo.readOrCreate(
       docId: docId,
-      createValue: Counter.initial(),
+      createValue: const Counter.initial(),
     );
 
     counterCubit = CounterCubit(
@@ -40,7 +40,7 @@ void main() {
       blocTest<CounterCubit, Counter>(
         'emits [1] when state is 0',
         build: () => counterCubit,
-        act: (cubit) async => await cubit.increment(),
+        act: (cubit) async => cubit.increment(),
         expect: () => const <Counter>[Counter(1)],
       );
 
@@ -58,19 +58,19 @@ void main() {
         setUp(() async {
           await counterRepo.update(
             docId: docId,
-            value: Counter(41),
+            value: const Counter(41),
           );
 
           counterCubit = CounterCubit(
             counterRepo: counterRepo,
-            defaultValue: Counter(41),
+            defaultValue: const Counter(41),
           );
         });
 
         blocTest<CounterCubit, Counter>(
           'emits [42] when state is 41',
           build: () => counterCubit,
-          act: (cubit) async => await cubit.increment(),
+          act: (cubit) async => cubit.increment(),
           expect: () => const <Counter>[Counter(42)],
         );
       });
@@ -80,7 +80,7 @@ void main() {
       blocTest<CounterCubit, Counter>(
         'emits [-1] when state is 0',
         build: () => counterCubit,
-        act: (cubit) async => await cubit.decrement(),
+        act: (cubit) async => cubit.decrement(),
         expect: () => const <Counter>[Counter(-1)],
       );
 
@@ -98,19 +98,19 @@ void main() {
         setUp(() async {
           await counterRepo.update(
             docId: docId,
-            value: Counter(43),
+            value: const Counter(43),
           );
 
           counterCubit = CounterCubit(
             counterRepo: counterRepo,
-            defaultValue: Counter(43),
+            defaultValue: const Counter(43),
           );
         });
 
         blocTest<CounterCubit, Counter>(
           'emits [42] when state is 43',
           build: () => counterCubit,
-          act: (cubit) async => await cubit.decrement(),
+          act: (cubit) async => cubit.decrement(),
           expect: () => const <Counter>[Counter(42)],
         );
       });
