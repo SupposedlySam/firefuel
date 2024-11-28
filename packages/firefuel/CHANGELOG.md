@@ -1,3 +1,55 @@
+## 0.4.3
+chore: upgrade dependencies
+
+Output from `flutter pub upgrade --major-versions --no-example`
+```sh
+Resolving dependencies... 
+Changed 3 constraints in pubspec.yaml:
+  cloud_firestore: ^4.15.5 -> ^5.5.0
+  fake_cloud_firestore: ^2.1.0 -> ^3.1.0
+  very_good_analysis: ^5.1.0 -> ^6.0.0
+Resolving dependencies... 
+Downloading packages... 
+> _flutterfire_internals 1.3.46 (was 1.3.30)
+> antlr4 4.13.2 (was 4.13.1)
+  async 2.11.0 (2.12.0 available)
+  boolean_selector 2.1.1 (2.1.2 available)
+  characters 1.3.0 (1.3.1 available)
+  clock 1.1.1 (1.1.2 available)
+> cloud_firestore 5.5.0 (was 4.17.0)
+> cloud_firestore_platform_interface 6.5.0 (was 6.2.0)
+> cloud_firestore_web 4.3.4 (was 3.12.0)
+  collection 1.18.0 (1.19.1 available)
+> equatable 2.0.7 (was 2.0.5)
+  fake_async 1.3.1 (1.3.2 available)
+> fake_cloud_firestore 3.1.0 (was 2.4.9)
+> firebase_core 3.8.0 (was 2.30.0)
+> firebase_core_platform_interface 5.3.0 (was 5.0.0)
+> firebase_core_web 2.18.1 (was 2.15.0)
+> firefuel_core 0.1.4 (was 0.1.3)
+> leak_tracker 10.0.5 (was 10.0.0) (10.0.8 available)
+> leak_tracker_flutter_testing 3.0.5 (was 2.0.1) (3.0.9 available)
+> leak_tracker_testing 3.0.1 (was 2.0.1)
+> logger 2.5.0 (was 2.2.0)
+> logging 1.3.0 (was 1.2.0)
+  matcher 0.12.16+1 (0.12.17 available)
+> material_color_utilities 0.11.1 (was 0.8.0) (0.12.0 available)
+> meta 1.15.0 (was 1.11.0) (1.16.0 available)
+> mocktail 1.0.4 (was 1.0.3)
+> more 4.4.0 (was 4.2.0)
+  path 1.9.0 (1.9.1 available)
+> quiver 3.2.2 (was 3.2.1)
+> rx 0.4.0 (was 0.3.0)
+> rxdart 0.28.0 (was 0.27.7)
+  stack_trace 1.11.1 (1.12.0 available)
+  string_scanner 1.2.0 (1.4.0 available)
+> test_api 0.7.2 (was 0.6.1) (0.7.4 available)
+> typed_data 1.4.0 (was 1.3.2)
+> very_good_analysis 6.0.0 (was 5.1.0)
+> vm_service 14.2.5 (was 13.0.0) (14.3.1 available)
+> web 1.1.0 (was 0.5.1)
+```
+
 ## 0.4.2
 chore: upgrade dependencies
 
