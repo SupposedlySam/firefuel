@@ -8,13 +8,18 @@ abstract class FirefuelRepository<T extends Serializable>
   final Collection<T> _collection;
 
   @override
-  Future<Either<Failure, int>> countAll() {
-    return guard(_collection.countAll);
+  Future<Either<Failure, int>> countAll({GetOptions? getOptions}) {
+    return guard(() => _collection.countAll(getOptions: getOptions));
   }
 
   @override
-  Future<Either<Failure, int>> countWhere(List<Clause> clauses) {
-    return guard(() => _collection.countWhere(clauses));
+  Future<Either<Failure, int>> countWhere(
+    List<Clause> clauses, {
+    GetOptions? getOptions,
+  }) {
+    return guard(
+      () => _collection.countWhere(clauses, getOptions: getOptions),
+    );
   }
 
   @override
@@ -36,8 +41,13 @@ abstract class FirefuelRepository<T extends Serializable>
   }
 
   @override
-  Future<Either<Failure, List<T>>> limit(int limit) {
-    return guard(() => _collection.limit(limit));
+  Future<Either<Failure, List<T>>> limit(
+    int limit, {
+    GetOptions? getOptions,
+  }) {
+    return guard(
+      () => _collection.limit(limit, getOptions: getOptions),
+    );
   }
 
   @override
@@ -76,41 +86,68 @@ abstract class FirefuelRepository<T extends Serializable>
     List<OrderBy>? orderBy,
     int? limit,
   }) {
-    return guardStream(() => _collection.streamWhere(clauses, limit: limit));
+    return guardStream(
+      () => _collection.streamWhere(
+        clauses,
+        orderBy: orderBy,
+        limit: limit,
+      ),
+    );
   }
 
   @override
   Future<Either<Failure, List<T>>> orderBy(
     List<OrderBy> orderBy, {
     int? limit,
+    GetOptions? getOptions,
   }) {
-    return guard(() => _collection.orderBy(orderBy, limit: limit));
+    return guard(
+      () => _collection.orderBy(
+        orderBy,
+        limit: limit,
+        getOptions: getOptions,
+      ),
+    );
   }
 
   @override
-  Future<Either<Failure, Chunk<T>>> paginate(Chunk<T> chunk) {
-    return guard(() => _collection.paginate(chunk));
+  Future<Either<Failure, Chunk<T>>> paginate(
+    Chunk<T> chunk, {
+    GetOptions? getOptions,
+  }) {
+    return guard(
+      () => _collection.paginate(chunk, getOptions: getOptions),
+    );
   }
 
   @override
-  Future<Either<Failure, T?>> read(DocumentId docId) async {
-    return guard(() => _collection.read(docId));
+  Future<Either<Failure, T?>> read(
+    DocumentId docId, {
+    GetOptions? getOptions,
+  }) async {
+    return guard(
+      () => _collection.read(docId, getOptions: getOptions),
+    );
   }
 
   @override
-  Future<Either<Failure, List<T>>> readAll() async {
-    return guard(_collection.readAll);
+  Future<Either<Failure, List<T>>> readAll({GetOptions? getOptions}) async {
+    return guard(
+      () => _collection.readAll(getOptions: getOptions),
+    );
   }
 
   @override
   Future<Either<Failure, T>> readOrCreate({
     required DocumentId docId,
     required T createValue,
+    GetOptions? getOptions,
   }) {
     return guard(() {
       return _collection.readOrCreate(
         docId: docId,
         createValue: createValue,
+        getOptions: getOptions,
       );
     });
   }
@@ -119,8 +156,15 @@ abstract class FirefuelRepository<T extends Serializable>
   Future<Either<Failure, void>> replace({
     required DocumentId docId,
     required T value,
+    GetOptions? getOptions,
   }) {
-    return guard(() => _collection.replace(docId: docId, value: value));
+    return guard(
+      () => _collection.replace(
+        docId: docId,
+        value: value,
+        getOptions: getOptions,
+      ),
+    );
   }
 
   @override
@@ -164,12 +208,25 @@ abstract class FirefuelRepository<T extends Serializable>
     List<Clause> clauses, {
     List<OrderBy>? orderBy,
     int? limit,
+    GetOptions? getOptions,
   }) {
-    return guard(() => _collection.where(clauses, limit: limit));
+    return guard(
+      () => _collection.where(
+        clauses,
+        orderBy: orderBy,
+        limit: limit,
+        getOptions: getOptions,
+      ),
+    );
   }
 
   @override
-  Future<Either<Failure, T?>> whereById(DocumentId docId) {
-    return guard(() => _collection.whereById(docId));
+  Future<Either<Failure, T?>> whereById(
+    DocumentId docId, {
+    GetOptions? getOptions,
+  }) {
+    return guard(
+      () => _collection.whereById(docId, getOptions: getOptions),
+    );
   }
 }

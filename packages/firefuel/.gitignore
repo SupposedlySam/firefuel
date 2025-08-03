@@ -3,4 +3,4 @@ pubspec.lock
 
 # FVM Version Cache
 .fvm/
-!.fvm/fvm_config.json
+!**/fvm_config.json

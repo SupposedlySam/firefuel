@@ -39,9 +39,13 @@ class FirefuelBatch<T extends Serializable> extends Batch<T> with _BatchMixin {
   }
 
   @override
-  Future<void> replace({required DocumentId docId, required T value}) async {
+  Future<void> replace({
+    required DocumentId docId,
+    required T value,
+    GetOptions? getOptions,
+  }) async {
     await _addToBatch((batch) async {
-      final existingDoc = await collection.read(docId);
+      final existingDoc = await collection.read(docId, getOptions: getOptions);
 
       if (existingDoc == null) return;
 

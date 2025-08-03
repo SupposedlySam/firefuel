@@ -1,3 +1,12 @@
+## 0.4.5
+
+feat: allow optional `GetOptions` to methods reading data
+
+- FirefuelCollection: countAll, countWhere, limit, orderBy, paginate, read, readAll, readOrCreate, replace, where, whereById,
+- FirefuelRepository: same as above
+
+fix: `FirefuelRepository.streamWhere` and `FirefuelRepository.where` were not passing orderBy clauses to the collection
+
 ## 0.4.4
 
 chore: upgrade dependencies

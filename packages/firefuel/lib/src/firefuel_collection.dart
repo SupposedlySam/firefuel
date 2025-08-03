@@ -41,7 +41,7 @@ abstract class FirefuelCollection<T extends Serializable>
   ///
   /// {@macro firefuel.rules.count.footer}
   @override
-  Future<int> countAll() async {
+  Future<int> countAll({GetOptions? getOptions}) async {
     final snapshot = await untypedRef.count().get();
 
     return snapshot.count ?? 0;
@@ -53,7 +53,7 @@ abstract class FirefuelCollection<T extends Serializable>
   ///
   /// {@macro firefuel.rules.countwhere.footer}
   @override
-  Future<int> countWhere(List<Clause> clauses) async {
+  Future<int> countWhere(List<Clause> clauses, {GetOptions? getOptions}) async {
     final snapshot = await untypedRef.filter(clauses).count().get();
 
     return snapshot.count ?? 0;
@@ -96,26 +96,36 @@ abstract class FirefuelCollection<T extends Serializable>
   DocumentId generateDocId() => DocumentId(ref.doc().id);
 
   @override
-  Future<List<T>> limit(int limit) async {
-    final snapshot = await ref.limit(limit).get();
+  Future<List<T>> limit(
+    int limit, {
+    GetOptions? getOptions,
+  }) async {
+    final snapshot = await ref.limit(limit).get(getOptions);
 
     return snapshot.docs.toListT();
   }
 
   @override
-  Future<List<T>> orderBy(List<OrderBy> orderBy, {int? limit}) async {
+  Future<List<T>> orderBy(
+    List<OrderBy> orderBy, {
+    int? limit,
+    GetOptions? getOptions,
+  }) async {
     if (orderBy.isEmpty) throw MissingValueException(OrderBy);
 
     final query = ref.sort(orderBy).limitIfNotNull(limit);
 
-    final snapshot = await query.get();
+    final snapshot = await query.get(getOptions);
 
     return snapshot.docs.toListT();
   }
 
   @override
-  Future<Chunk<T>> paginate(Chunk<T> chunk) async {
-    final snapshot = await _buildPaginationSnapshot(chunk);
+  Future<Chunk<T>> paginate(Chunk<T> chunk, {GetOptions? getOptions}) async {
+    final snapshot = await _buildPaginationSnapshot(
+      chunk,
+      getOptions: getOptions,
+    );
 
     final data = snapshot.docs.toListT();
     final cursor = snapshot.size == 0 ? null : snapshot.docs.last;
@@ -137,14 +147,14 @@ abstract class FirefuelCollection<T extends Serializable>
   }
 
   @override
-  Future<T?> read(DocumentId docId) async {
-    final snapshot = await ref.doc(docId.docId).get();
+  Future<T?> read(DocumentId docId, {GetOptions? getOptions}) async {
+    final snapshot = await ref.doc(docId.docId).get(getOptions);
     return snapshot.data();
   }
 
   @override
-  Future<List<T>> readAll() async {
-    final snapshot = await ref.get();
+  Future<List<T>> readAll({GetOptions? getOptions}) async {
+    final snapshot = await ref.get(getOptions);
 
     return snapshot.docs.toListT();
   }
@@ -153,14 +163,15 @@ abstract class FirefuelCollection<T extends Serializable>
   Future<T> readOrCreate({
     required DocumentId docId,
     required T createValue,
+    GetOptions? getOptions,
   }) async {
-    final maybeData = await read(docId);
+    final maybeData = await read(docId, getOptions: getOptions);
 
     if (maybeData != null) return maybeData;
 
     await createById(value: createValue, docId: docId);
 
-    final data = await read(docId);
+    final data = await read(docId, getOptions: getOptions);
 
     return data!;
   }
@@ -169,8 +180,9 @@ abstract class FirefuelCollection<T extends Serializable>
   Future<void> replace({
     required DocumentId docId,
     required T value,
+    GetOptions? getOptions,
   }) async {
-    final existingDoc = await read(docId);
+    final existingDoc = await read(docId, getOptions: getOptions);
 
     if (existingDoc == null) return;
 
@@ -295,6 +307,7 @@ abstract class FirefuelCollection<T extends Serializable>
     List<Clause> clauses, {
     List<OrderBy>? orderBy,
     int? limit,
+    GetOptions? getOptions,
   }) async {
     final query = _getWhereWithOrderByAndLimitQuery(
       clauses: clauses,
@@ -302,19 +315,19 @@ abstract class FirefuelCollection<T extends Serializable>
       limit: limit,
     );
 
-    final snapshot = await query.get();
+    final snapshot = await query.get(getOptions);
 
     return snapshot.docs.toListT();
   }
 
   @override
-  Future<T?> whereById(DocumentId docId) async {
+  Future<T?> whereById(DocumentId docId, {GetOptions? getOptions}) async {
     final snapshot = await ref
         .where(
           FieldPath.documentId,
           isEqualTo: docId.docId,
         )
-        .get();
+        .get(getOptions);
 
     final docs = snapshot.docs;
 
@@ -327,14 +340,17 @@ abstract class FirefuelCollection<T extends Serializable>
   /// Collection
   ///
   /// Orders and limits the [ref] and returns the [QuerySnapshot]
-  Future<QuerySnapshot<T?>> _buildPaginationSnapshot(Chunk<T> chunk) async {
+  Future<QuerySnapshot<T?>> _buildPaginationSnapshot(
+    Chunk<T> chunk, {
+    GetOptions? getOptions,
+  }) async {
     final query = ref
         .filterIfNotNull(chunk.clauses)
         .sortIfNotNull(chunk.orderBy)
         .startAfterIfNotNull(chunk.cursor)
         .limitIfNotNull(chunk.limit);
 
-    return query.get();
+    return query.get(getOptions);
   }
 
   // Creates a query to filter, sort, and limit the collection

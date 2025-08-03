@@ -9,7 +9,7 @@ abstract class CollectionCount<T> {
   /// {@template firefuel.rules.count.footer}
   /// See also: [countWhere]
   /// {@endtemplate}
-  Future<T> countAll();
+  Future<T> countAll({GetOptions? getOptions});
 
   /// {@template firefuel.rules.countwhere.definition}
   /// Gets the amount of documents filtered by the provided clauses.
@@ -18,7 +18,7 @@ abstract class CollectionCount<T> {
   /// {@template firefuel.rules.countwhere.footer}
   /// See also: [countAll]
   /// {@endtemplate}
-  Future<T> countWhere(List<Clause> clauses);
+  Future<T> countWhere(List<Clause> clauses, {GetOptions? getOptions});
 
   /// {@template firefuel.rules.streamcount.definition}
   /// Gets the amount of all documents from the collection
@@ -62,7 +62,7 @@ abstract class CollectionPaginate<R, T extends Serializable> {
   ///
   /// Passing in a [Chunk] with the status of [ChunkStatus.last] will result in
   /// a [Chunk] with empty data.
-  Future<R> paginate(Chunk<T> chunk);
+  Future<R> paginate(Chunk<T> chunk, {GetOptions? getOptions});
 }
 
 /// Read a `List` of [T] from the Collection
@@ -88,7 +88,7 @@ abstract class CollectionRead<R, T extends Serializable> {
   /// Get up to the maximum number of documents specified by the [limit]
   ///
   /// Returns 0 to [limit]
-  Future<R> limit(int limit);
+  Future<R> limit(int limit, {GetOptions? getOptions});
 
   /// Get up to the maximum number of documents specified by the [limit]
   ///
@@ -149,7 +149,8 @@ abstract class CollectionRead<R, T extends Serializable> {
   /// limit: optionally provide a maximum value of items to be returned
   ///
   /// throws a [MissingValueException] when no [orderBy]s are given
-  Future<R> orderBy(List<OrderBy> orderBy, {int? limit});
+  Future<R> orderBy(List<OrderBy> orderBy,
+      {int? limit, GetOptions? getOptions});
 
   /// Gets all documents from the collection
   ///
@@ -159,7 +160,7 @@ abstract class CollectionRead<R, T extends Serializable> {
   ///
   /// {@macro firefuel.rules.subclasses}
   /// {@macro firefuel.rules.implementations}
-  Future<R> readAll();
+  Future<R> readAll({GetOptions? getOptions});
 
   /// Get a list of documents matching all clauses
   ///
@@ -168,7 +169,12 @@ abstract class CollectionRead<R, T extends Serializable> {
   /// limit: optionally provide a maximum value of items to be returned
   ///
   /// {@macro firefuel.rules.whereExceptions}
-  Future<R> where(List<Clause> clauses, {List<OrderBy>? orderBy, int? limit});
+  Future<R> where(
+    List<Clause> clauses, {
+    List<OrderBy>? orderBy,
+    int? limit,
+    GetOptions? getOptions,
+  });
 }
 
 /// Create a new Document
@@ -207,6 +213,7 @@ abstract class DocCreateIfNotExist<R, T extends Serializable>
   Future<R> readOrCreate({
     required DocumentId docId,
     required T createValue,
+    GetOptions? getOptions,
   });
 }
 
@@ -253,10 +260,10 @@ abstract class DocRead<R> {
   /// Gets a single document from the collection
   ///
   /// Does NOT refresh automatically
-  Future<R> read(DocumentId docId);
+  Future<R> read(DocumentId docId, {GetOptions? getOptions});
 
   /// Get a document matching the document id
-  Future<R?> whereById(DocumentId docId);
+  Future<R?> whereById(DocumentId docId, {GetOptions? getOptions});
 }
 
 /// Replace an existing Document
@@ -272,7 +279,11 @@ abstract class DocReplace<R, T extends Serializable> {
   /// If no document exists yet, the replace will fail silently.
   ///
   /// *Requires 1 read of doc to perform replace*
-  Future<R> replace({required DocumentId docId, required T value});
+  Future<R> replace({
+    required DocumentId docId,
+    required T value,
+    GetOptions? getOptions,
+  });
 
   /// Replaces the fields of the document at [docId] with the matching
   /// [fieldPaths] from [value]
