@@ -1,3 +1,7 @@
+## 0.1.6
+
+fix: remove lockfile so dependency management is easier in downstream apps
+
 ## 0.1.5
 
 chore: bump deps
