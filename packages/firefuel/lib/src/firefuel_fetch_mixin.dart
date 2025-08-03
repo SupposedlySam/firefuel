@@ -18,8 +18,10 @@ mixin FirefuelFetchMixin {
       final result = await callback();
 
       return Right(result);
-    } catch (e, stack) {
+    } on Object catch (e, stack) {
       if (e is FormatException) {
+        // Intentionally using print for debugging format exceptions in
+        // development
         // ignore: avoid_print
         print('Format Exception: ${e.message}');
       }
@@ -46,8 +48,10 @@ mixin FirefuelFetchMixin {
       await for (final result in streamCallback()) {
         yield Right(result);
       }
-    } catch (e, stack) {
+    } on Object catch (e, stack) {
       if (e is FormatException) {
+        // Intentionally using print for debugging format exceptions in
+        // development
         // ignore: avoid_print
         print('Format Exception: ${e.message}');
       }

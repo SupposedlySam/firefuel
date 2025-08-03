@@ -1,15 +1,50 @@
+## 0.4.4
+
+chore: upgrade dependencies
+
+Output from `flutter pub upgrade --major-versions --tighten --no-example`
+
+```sh
+Resolving dependencies...
+Changed 9 constraints in pubspec.yaml:
+  cloud_firestore: ^5.5.0 -> ^6.0.0
+  fake_cloud_firestore: ^3.1.0 -> ^4.0.0
+  very_good_analysis: ^6.0.0 -> ^9.0.0
+  dartz: ^0.10.0 -> ^0.10.1
+  equatable: ^2.0.5 -> ^2.0.7
+  firefuel_core: ^0.1.0 -> ^0.1.6
+  stack_trace: ^1.10.0 -> ^1.12.1
+  universal_io: ^2.0.4 -> ^2.2.2
+  mocktail: ^1.0.3 -> ^1.0.4
+Resolving dependencies...
+Downloading packages...
+  characters 1.4.0 (1.4.1 available)
+  leak_tracker 10.0.9 (11.0.1 available)
+  leak_tracker_flutter_testing 3.0.9 (3.0.10 available)
+  leak_tracker_testing 3.0.1 (3.0.2 available)
+  material_color_utilities 0.11.1 (0.13.0 available)
+  meta 1.16.0 (1.17.0 available)
+  more 4.5.0 (4.6.0 available)
+  rx 0.4.0 (0.5.0 available)
+  test_api 0.7.4 (0.7.7 available)
+  vector_math 2.1.4 (2.2.0 available)
+  vm_service 15.0.0 (15.0.2 available)
+```
+
 ## 0.4.3
+
 chore: upgrade dependencies
 
 Output from `flutter pub upgrade --major-versions --no-example`
+
 ```sh
-Resolving dependencies... 
+Resolving dependencies...
 Changed 3 constraints in pubspec.yaml:
   cloud_firestore: ^4.15.5 -> ^5.5.0
   fake_cloud_firestore: ^2.1.0 -> ^3.1.0
   very_good_analysis: ^5.1.0 -> ^6.0.0
-Resolving dependencies... 
-Downloading packages... 
+Resolving dependencies...
+Downloading packages...
 > _flutterfire_internals 1.3.46 (was 1.3.30)
 > antlr4 4.13.2 (was 4.13.1)
   async 2.11.0 (2.12.0 available)
@@ -51,9 +86,11 @@ Downloading packages...
 ```
 
 ## 0.4.2
+
 chore: upgrade dependencies
 
 Output from `flutter pub upgrade --major-versions`
+
 ```sh
 > _flutterfire_internals 1.3.30 (was 1.3.22)
 > cloud_firestore 4.17.0 (was 4.15.5)
@@ -87,6 +124,7 @@ These packages are no longer being depended on:
 ## 0.4.1
 
 chore!: upgrade dependencies
+
 - Environment
   - dart: 2.19.0 > 3.3.0
 - Dependencies

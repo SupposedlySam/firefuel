@@ -45,3 +45,6 @@ app.*.map.json
 # FVM Version Cache
 .fvm/
 !.fvm/fvm_config.json
+
+# Package Lockfile
+!pubspec.lock

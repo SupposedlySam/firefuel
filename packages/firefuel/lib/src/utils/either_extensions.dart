@@ -8,7 +8,7 @@ extension EitherExtension<T> on Either<Failure, T> {
       fold((_) {}, (right) {
         success = right;
       });
-    } catch (_) {}
+    } on Object catch (_) {}
 
     if (success == null) throw MissingValueException(runtimeType);
 
@@ -25,7 +25,7 @@ extension EitherExtension<T> on Either<Failure, T> {
         },
         (_) {},
       );
-    } catch (_) {}
+    } on Object catch (_) {}
 
     if (failure == null) throw MissingValueException(runtimeType);
 
