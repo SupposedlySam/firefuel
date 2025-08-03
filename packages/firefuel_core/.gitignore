@@ -74,5 +74,8 @@ build/
 !**/ios/**/default.pbxuser
 !**/ios/**/default.perspectivev3
 
+# Package Lockfile
+pubspec.lock
+
 # FVM Version Cache
 .fvm/
