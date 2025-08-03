@@ -13,7 +13,7 @@ import 'package:flutter_counter/counter/view/counter_view.dart';
 /// {@endtemplate}
 class CounterPage extends StatelessWidget {
   /// {@macro counter_page}
-  const CounterPage({Key? key}) : super(key: key);
+  const CounterPage({super.key});
 
   @override
   Widget build(BuildContext context) {
