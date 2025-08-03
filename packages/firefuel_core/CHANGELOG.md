@@ -1,10 +1,17 @@
+## 0.1.5
+
+chore: bump deps
+
 ## 0.1.4
+
 chore: bump deps
 
 ## 0.1.3
+
 chore: bump deps
 
 Output from `flutter pub upgrade --major-versions`
+
 ```sh
 > args 2.5.0 (was 2.4.2)
 > frontend_server_client 4.0.0 (was 3.2.0)
@@ -18,7 +25,9 @@ Output from `flutter pub upgrade --major-versions`
 ```
 
 ## 0.1.2
+
 chore: bump deps
+
 - Environment
   - dart: 2.19.0 > 3.3.0
 - Dependencies
