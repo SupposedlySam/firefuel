@@ -1,14 +1,14 @@
 name: firefuel
 description: A Firebase Cloud Firestore library to fuel your application's growth!
-version: 0.4.5
+version: 0.4.5+1
 repository: https://github.com/SupposedlySam/firefuel/tree/main/packages/firefuel
 homepage: https://github.com/SupposedlySam/firefuel
-documentation: https://firefuel.dev
+documentation: https://firefueldocs.com
 
 # Flutter/Dart versions: https://docs.flutter.dev/development/tools/sdk/releases?tab=macos
 environment:
-  sdk: '>=3.3.0 <4.0.0'
-  flutter: '>=3.3.2'
+  sdk: ">=3.3.0 <4.0.0"
+  flutter: ">=3.3.2"
 
 dependencies:
   cloud_firestore: ^6.0.0
