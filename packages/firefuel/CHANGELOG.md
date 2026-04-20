@@ -1,5 +1,11 @@
 ## 0.4.6
 
+feat: expose Firestore sum and average aggregation queries
+
+- `FirefuelCollection` and `FirefuelRepository`: `sumAll`, `sumWhere`, `averageAll`, `averageWhere`
+- Optional `AggregateSource? source` on each method (forwarded to `AggregateQuery.get`)
+- Re-export `AggregateSource`, `sum`, and `average` from `package:firefuel/firefuel.dart`
+
 chore: upgrade dependencies
 
 Output from `flutter pub upgrade --major-versions --tighten`
