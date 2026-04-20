@@ -1,3 +1,35 @@
+## 0.4.6
+
+chore: upgrade dependencies
+
+Output from `flutter pub upgrade --major-versions --tighten`
+
+```sh
+Resolving dependencies...
+Downloading packages...
+  async 2.13.0 (2.13.1 available)
+> cel 0.5.4+1 (was 0.5.3)
+< characters 1.4.0 (was 1.4.1) (1.4.1 available)
+> fake_firebase_security_rules 0.5.4 (was 0.5.3)
+* firefuel_core 0.1.7 (was 0.1.6)
+< leak_tracker 10.0.9 (was 11.0.2) (11.0.2 available)
+< leak_tracker_flutter_testing 3.0.9 (was 3.0.10) (3.0.10 available)
+< leak_tracker_testing 3.0.1 (was 3.0.2) (3.0.2 available)
+> logger 2.7.0 (was 2.6.1)
+< matcher 0.12.17 (was 0.12.19) (0.12.19 available)
+< material_color_utilities 0.11.1 (was 0.13.0) (0.13.0 available)
+< meta 1.16.0 (was 1.17.0) (1.18.2 available)
+> more 4.7.0 (was 4.5.0)
+  rx 0.4.0 (0.5.0 available)
+  source_span 1.10.1 (1.10.2 available)
+< test_api 0.7.4 (was 0.7.10) (0.7.11 available)
+< vector_math 2.1.4 (was 2.2.0) (2.3.0 available)
+< very_good_analysis 9.0.0 (was 10.2.0) (10.2.0 available)
+  vm_service 15.0.0 (15.1.0 available)
+These packages are no longer being depended on:
+- tuple 2.0.2
+```
+
 ## 0.4.5
 
 feat: allow optional `GetOptions` to methods reading data
@@ -250,7 +282,6 @@ BREAKING chore: Upgrade Dependencies
 ## 0.1.1
 
 - feat: add web support
-
   - replace dart:io with universal_io
 
 ## 0.1.0+1

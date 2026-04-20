@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firefuel/firefuel.dart';
 import 'package:firefuel/src/utils/serializable_extensions.dart';
 
@@ -9,7 +10,7 @@ abstract class FirefuelCollection<T extends Serializable>
       : path = _buildPath(path, useEnv);
   final String path;
 
-  final firestore = Firefuel.firestore;
+  final FirebaseFirestore firestore = Firefuel.firestore;
 
   @override
   CollectionReference<T?> get ref {

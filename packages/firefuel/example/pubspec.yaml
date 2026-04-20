@@ -7,8 +7,8 @@ environment:
   sdk: '>=3.0.0 <4.0.0'
 
 dependencies:
-  bloc: ^9.0.0
-  fake_cloud_firestore: ^4.0.0
+  bloc: ^9.2.0
+  fake_cloud_firestore: ^4.1.0+1
   firefuel:
     path: ..
   firefuel_counter:
@@ -24,7 +24,7 @@ dev_dependencies:
     sdk: flutter
   integration_test:
     sdk: flutter
-  mocktail: ^1.0.4
+  mocktail: ^1.0.5
 
 flutter:
   uses-material-design: true
