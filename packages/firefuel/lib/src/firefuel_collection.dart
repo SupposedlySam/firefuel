@@ -61,6 +61,51 @@ abstract class FirefuelCollection<T extends Serializable>
   }
 
   @override
+  Future<double?> sumAll(String field, {AggregateSource? source}) async {
+    final snapshot = await untypedRef.aggregate(sum(field)).get(
+          source: source ?? AggregateSource.server,
+        );
+
+    return snapshot.getSum(field);
+  }
+
+  @override
+  Future<double?> sumWhere(
+    List<Clause> clauses,
+    String field, {
+    AggregateSource? source,
+  }) async {
+    final snapshot = await untypedRef.filter(clauses).aggregate(sum(field)).get(
+          source: source ?? AggregateSource.server,
+        );
+
+    return snapshot.getSum(field);
+  }
+
+  @override
+  Future<double?> averageAll(String field, {AggregateSource? source}) async {
+    final snapshot = await untypedRef.aggregate(average(field)).get(
+          source: source ?? AggregateSource.server,
+        );
+
+    return snapshot.getAverage(field);
+  }
+
+  @override
+  Future<double?> averageWhere(
+    List<Clause> clauses,
+    String field, {
+    AggregateSource? source,
+  }) async {
+    final snapshot =
+        await untypedRef.filter(clauses).aggregate(average(field)).get(
+              source: source ?? AggregateSource.server,
+            );
+
+    return snapshot.getAverage(field);
+  }
+
+  @override
   Future<DocumentId> create(T value) async {
     final documentRef = await ref.add(value);
 

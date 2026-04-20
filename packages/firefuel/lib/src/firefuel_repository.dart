@@ -17,8 +17,42 @@ abstract class FirefuelRepository<T extends Serializable>
     List<Clause> clauses, {
     GetOptions? getOptions,
   }) {
+    return guard(() => _collection.countWhere(clauses, getOptions: getOptions));
+  }
+
+  @override
+  Future<Either<Failure, double?>> sumAll(
+    String field, {
+    AggregateSource? source,
+  }) {
+    return guard(() => _collection.sumAll(field, source: source));
+  }
+
+  @override
+  Future<Either<Failure, double?>> sumWhere(
+    List<Clause> clauses,
+    String field, {
+    AggregateSource? source,
+  }) {
+    return guard(() => _collection.sumWhere(clauses, field, source: source));
+  }
+
+  @override
+  Future<Either<Failure, double?>> averageAll(
+    String field, {
+    AggregateSource? source,
+  }) {
+    return guard(() => _collection.averageAll(field, source: source));
+  }
+
+  @override
+  Future<Either<Failure, double?>> averageWhere(
+    List<Clause> clauses,
+    String field, {
+    AggregateSource? source,
+  }) {
     return guard(
-      () => _collection.countWhere(clauses, getOptions: getOptions),
+      () => _collection.averageWhere(clauses, field, source: source),
     );
   }
 

@@ -1,5 +1,6 @@
 export 'package:cloud_firestore/cloud_firestore.dart'
     show
+        AggregateSource,
         CollectionReference,
         DocumentSnapshot,
         FieldPath,
@@ -8,7 +9,9 @@ export 'package:cloud_firestore/cloud_firestore.dart'
         QueryDocumentSnapshot,
         QuerySnapshot,
         SetOptions,
-        SnapshotOptions;
+        SnapshotOptions,
+        average,
+        sum;
 export 'package:dartz/dartz.dart' show Either, Left, Right, left, right;
 export 'package:firefuel/src/batch.dart';
 export 'package:firefuel/src/chunk.dart';

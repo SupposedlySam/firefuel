@@ -53,6 +53,80 @@ void main() {
     );
   });
 
+  group('#sumAll', () {
+    setUp(() async {
+      await testCollection.create(const TestUser('a', age: 10));
+      await testCollection.create(const TestUser('b', age: 20));
+      await testCollection.create(const TestUser('c', age: 30));
+    });
+
+    test('should return the sum of numeric field values', () async {
+      final actual = await testCollection.sumAll(TestUser.fieldAge);
+
+      expect(actual, 60);
+    });
+  });
+
+  group('#sumWhere', () {
+    setUp(() async {
+      await testCollection.create(const TestUser('a', age: 10));
+      await testCollection.create(const TestUser('b', age: 20));
+      await testCollection.create(const TestUser('c', age: 30));
+    });
+
+    test(
+      'should return the sum for documents matching clauses',
+      () async {
+        const target = 'match';
+        await testCollection.create(const TestUser(target, age: 100));
+
+        final actual = await testCollection.sumWhere(
+          [Clause(TestUser.fieldName, isEqualTo: target)],
+          TestUser.fieldAge,
+        );
+
+        expect(actual, 100);
+      },
+    );
+  });
+
+  group('#averageAll', () {
+    setUp(() async {
+      await testCollection.create(const TestUser('a', age: 10));
+      await testCollection.create(const TestUser('b', age: 20));
+      await testCollection.create(const TestUser('c', age: 30));
+    });
+
+    test('should return the average of numeric field values', () async {
+      final actual = await testCollection.averageAll(TestUser.fieldAge);
+
+      expect(actual, 20);
+    });
+  });
+
+  group('#averageWhere', () {
+    setUp(() async {
+      await testCollection.create(const TestUser('a', age: 10));
+      await testCollection.create(const TestUser('b', age: 20));
+      await testCollection.create(const TestUser('c', age: 30));
+    });
+
+    test(
+      'should return the average for documents matching clauses',
+      () async {
+        const target = 'match';
+        await testCollection.create(const TestUser(target, age: 90));
+
+        final actual = await testCollection.averageWhere(
+          [Clause(TestUser.fieldName, isEqualTo: target)],
+          TestUser.fieldAge,
+        );
+
+        expect(actual, 90);
+      },
+    );
+  });
+
   group('#create', () {
     test('should return a new document', () async {
       final originalDocId = await testCollection.create(defaultUser);

@@ -44,6 +44,33 @@ abstract class CollectionCount<T> {
   Stream<T> streamCountWhere(List<Clause> clauses);
 }
 
+/// Server-side sum and average aggregations over a query, without downloading
+/// matching documents. Wraps `Query.aggregate` from `cloud_firestore`.
+///
+/// The optional `source` argument is passed to `AggregateQuery.get`. The
+/// FlutterFire plugin currently exposes `AggregateSource.server` only.
+abstract class CollectionAggregate<T> {
+  /// Sum of [field] over all documents in the collection.
+  Future<T> sumAll(String field, {AggregateSource? source});
+
+  /// Sum of [field] over documents matching [clauses].
+  Future<T> sumWhere(
+    List<Clause> clauses,
+    String field, {
+    AggregateSource? source,
+  });
+
+  /// Average of [field] over all documents in the collection.
+  Future<T> averageAll(String field, {AggregateSource? source});
+
+  /// Average of [field] over documents matching [clauses].
+  Future<T> averageWhere(
+    List<Clause> clauses,
+    String field, {
+    AggregateSource? source,
+  });
+}
+
 /// Get a number of Documents from the Collection
 ///
 /// /// [R]: should return a [T] or some subset,
@@ -149,8 +176,11 @@ abstract class CollectionRead<R, T extends Serializable> {
   /// limit: optionally provide a maximum value of items to be returned
   ///
   /// throws a [MissingValueException] when no [orderBy]s are given
-  Future<R> orderBy(List<OrderBy> orderBy,
-      {int? limit, GetOptions? getOptions});
+  Future<R> orderBy(
+    List<OrderBy> orderBy, {
+    int? limit,
+    GetOptions? getOptions,
+  });
 
   /// Gets all documents from the collection
   ///
