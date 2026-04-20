@@ -1,3 +1,15 @@
+## 0.1.7
+
+chore: bump deps
+
+Output from `flutter pub upgrade --major-versions --tighten`
+
+```sh
+  > equatable: ^2.0.7 -> ^2.0.8
+  > universal_io: ^2.2.2 -> ^2.3.1
+  > test: ^1.26.3 -> ^1.31.0
+```
+
 ## 0.1.6
 
 fix: remove lockfile so dependency management is easier in downstream apps
