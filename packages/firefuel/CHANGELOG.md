@@ -6,6 +6,12 @@ feat: expose Firestore sum and average aggregation queries
 - Optional `AggregateSource? source` on each method (forwarded to `AggregateQuery.get`)
 - Re-export `AggregateSource`, `sum`, and `average` from `package:firefuel/firefuel.dart`
 
+feat: add `Clause.fieldMatchingRangeOrderingRule` for the field that must lead `orderBy` with a range `Clause`
+
+fix: `where` and `streamWhere` with `orderBy` and a range `Clause` were using the first `Clause` in the list for the leading `OrderBy` instead of the range field
+
+- `FirefuelCollection`: `fieldToMatch` for `orderBy` with a range `Clause`
+
 chore: upgrade dependencies
 
 Output from `flutter pub upgrade --major-versions --tighten`
