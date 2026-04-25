@@ -11,6 +11,11 @@ feat: add `streamChanges` for typed document-change streams
 - `FirefuelCollection` and `FirefuelRepository`: `streamChanges`
 - Removed documents are excluded by default and can be included with `includeRemoved`
 
+feat: add document field update helpers
+
+- `FirefuelCollection`, `FirefuelRepository`, and `FirefuelBatch`: `updateFields`, `arrayUnion`, `arrayRemove`, `serverTimestamp`
+- Re-export `FieldValue` from `package:firefuel/firefuel.dart` for callers that need custom transforms
+
 ## 0.4.6
 
 feat: expose Firestore sum and average aggregation queries

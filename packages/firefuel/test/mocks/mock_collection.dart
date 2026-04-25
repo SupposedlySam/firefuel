@@ -30,12 +30,19 @@ extension MockCollectionX<T extends Serializable> on MockCollection<T> {
     Null Function()? onReplace,
     Null Function()? onReplaceFields,
     Null Function()? onUpdate,
+    Null Function()? onUpdateFields,
+    Null Function()? onArrayUnion,
+    Null Function()? onArrayRemove,
+    Null Function()? onServerTimestamp,
     T Function()? onUpdateOrCreate,
     List<T> Function()? onWhere,
     T? Function()? onWhereById,
   }) {
     registerFallbackValue(DocumentId('fallbackValue'));
     registerFallbackValue(false);
+    registerFallbackValue('fallbackValue');
+    registerFallbackValue(<Object?>[]);
+    registerFallbackValue(<String, Object?>{});
     registerFallbackValue(const TestUser('fallbackValue'));
     registerFallbackValue(
       Chunk<TestUser>(orderBy: [OrderBy(field: TestUser.fieldName)]),
@@ -156,6 +163,44 @@ extension MockCollectionX<T extends Serializable> on MockCollection<T> {
     if (onUpdate != null) {
       when(() => update(docId: any(named: 'docId'), value: any(named: 'value')))
           .thenAnswer((_) => Future.value(onUpdate()));
+    }
+
+    if (onUpdateFields != null) {
+      when(() {
+        return updateFields(
+          docId: any(named: 'docId'),
+          fields: any(named: 'fields'),
+        );
+      }).thenAnswer((_) => Future.value(onUpdateFields()));
+    }
+
+    if (onArrayUnion != null) {
+      when(() {
+        return arrayUnion(
+          docId: any(named: 'docId'),
+          field: any(named: 'field'),
+          values: any(named: 'values'),
+        );
+      }).thenAnswer((_) => Future.value(onArrayUnion()));
+    }
+
+    if (onArrayRemove != null) {
+      when(() {
+        return arrayRemove(
+          docId: any(named: 'docId'),
+          field: any(named: 'field'),
+          values: any(named: 'values'),
+        );
+      }).thenAnswer((_) => Future.value(onArrayRemove()));
+    }
+
+    if (onServerTimestamp != null) {
+      when(() {
+        return serverTimestamp(
+          docId: any(named: 'docId'),
+          field: any(named: 'field'),
+        );
+      }).thenAnswer((_) => Future.value(onServerTimestamp()));
     }
 
     if (onUpdateOrCreate != null) {

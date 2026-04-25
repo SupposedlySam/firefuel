@@ -1036,6 +1036,72 @@ void main() {
     });
   });
 
+  group('#updateFields', () {
+    test('should update only provided fields', () async {
+      final docId = await testCollection.create(defaultUser);
+
+      await testCollection.updateFields(
+        docId: docId,
+        fields: {TestUser.fieldName: 'updatedName'},
+      );
+
+      final readResult = await testCollection.read(docId);
+
+      expect(readResult!.name, 'updatedName');
+      expect(readResult.age, defaultUser.age);
+    });
+  });
+
+  group('#arrayUnion', () {
+    test('should add values to an array field', () async {
+      final docId = await testCollection.create(defaultUser);
+
+      await testCollection.arrayUnion(
+        docId: docId,
+        field: 'tags',
+        values: ['alpha', 'beta'],
+      );
+
+      final snapshot = await testCollection.untypedRef.doc(docId.docId).get();
+
+      expect(snapshot.data()!['tags'], ['alpha', 'beta']);
+    });
+  });
+
+  group('#arrayRemove', () {
+    test('should remove values from an array field', () async {
+      final docId = await testCollection.create(defaultUser);
+      await testCollection.updateFields(
+        docId: docId,
+        fields: {
+          'tags': ['alpha', 'beta'],
+        },
+      );
+
+      await testCollection.arrayRemove(
+        docId: docId,
+        field: 'tags',
+        values: ['alpha'],
+      );
+
+      final snapshot = await testCollection.untypedRef.doc(docId.docId).get();
+
+      expect(snapshot.data()!['tags'], ['beta']);
+    });
+  });
+
+  group('#serverTimestamp', () {
+    test('should set a field to the server timestamp', () async {
+      final docId = await testCollection.create(defaultUser);
+
+      await testCollection.serverTimestamp(docId: docId, field: 'updatedAt');
+
+      final snapshot = await testCollection.untypedRef.doc(docId.docId).get();
+
+      expect(snapshot.data()!['updatedAt'], isNotNull);
+    });
+  });
+
   group('#updateOrCreate', () {
     test('should create new document when document does not exist', () async {
       final originalDocId = DocumentId('originalDocId');

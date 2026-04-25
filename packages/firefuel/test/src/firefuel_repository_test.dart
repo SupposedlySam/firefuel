@@ -415,6 +415,78 @@ void main() {
     },
   );
 
+  RepositoryTestUtil.runTests<void, TestUser>(
+    methodName: 'updateFields',
+    mockCollection: MockCollection(),
+    initHappyPath: (mockCollection) async {
+      mockCollection.initialize(onUpdateFields: () => null);
+    },
+    initSadPath: (mockCollection) async {
+      mockCollection.initialize(onUpdateFields: () => throw ExpectedFailure());
+    },
+    methodCallback: (testRepository) {
+      return testRepository.updateFields(
+        docId: docId,
+        fields: {TestUser.fieldName: 'updatedUser'},
+      );
+    },
+  );
+
+  RepositoryTestUtil.runTests<void, TestUser>(
+    methodName: 'arrayUnion',
+    mockCollection: MockCollection(),
+    initHappyPath: (mockCollection) async {
+      mockCollection.initialize(onArrayUnion: () => null);
+    },
+    initSadPath: (mockCollection) async {
+      mockCollection.initialize(onArrayUnion: () => throw ExpectedFailure());
+    },
+    methodCallback: (testRepository) {
+      return testRepository.arrayUnion(
+        docId: docId,
+        field: 'tokens',
+        values: ['token'],
+      );
+    },
+  );
+
+  RepositoryTestUtil.runTests<void, TestUser>(
+    methodName: 'arrayRemove',
+    mockCollection: MockCollection(),
+    initHappyPath: (mockCollection) async {
+      mockCollection.initialize(onArrayRemove: () => null);
+    },
+    initSadPath: (mockCollection) async {
+      mockCollection.initialize(onArrayRemove: () => throw ExpectedFailure());
+    },
+    methodCallback: (testRepository) {
+      return testRepository.arrayRemove(
+        docId: docId,
+        field: 'tokens',
+        values: ['token'],
+      );
+    },
+  );
+
+  RepositoryTestUtil.runTests<void, TestUser>(
+    methodName: 'serverTimestamp',
+    mockCollection: MockCollection(),
+    initHappyPath: (mockCollection) async {
+      mockCollection.initialize(onServerTimestamp: () => null);
+    },
+    initSadPath: (mockCollection) async {
+      mockCollection.initialize(
+        onServerTimestamp: () => throw ExpectedFailure(),
+      );
+    },
+    methodCallback: (testRepository) {
+      return testRepository.serverTimestamp(
+        docId: docId,
+        field: 'updatedAt',
+      );
+    },
+  );
+
   RepositoryTestUtil.runTests<TestUser, TestUser>(
     methodName: 'updateOrCreate',
     mockCollection: MockCollection(),

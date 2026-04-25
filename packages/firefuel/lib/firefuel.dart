@@ -4,6 +4,7 @@ export 'package:cloud_firestore/cloud_firestore.dart'
         CollectionReference,
         DocumentSnapshot,
         FieldPath,
+        FieldValue,
         GetOptions,
         Query,
         QueryDocumentSnapshot,

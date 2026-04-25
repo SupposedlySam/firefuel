@@ -371,4 +371,31 @@ abstract class DocUpdate<R, T extends Serializable> {
     required DocumentId docId,
     required T value,
   });
+
+  /// Updates specific fields on the document.
+  Future<R> updateFields({
+    required DocumentId docId,
+    required Map<String, Object?> fields,
+  });
+
+  /// Adds [values] to an array field using Firestore's array union transform.
+  Future<R> arrayUnion({
+    required DocumentId docId,
+    required String field,
+    required List<Object?> values,
+  });
+
+  /// Removes [values] from an array field using Firestore's array remove
+  /// transform.
+  Future<R> arrayRemove({
+    required DocumentId docId,
+    required String field,
+    required List<Object?> values,
+  });
+
+  /// Sets [field] to Firestore's server timestamp.
+  Future<R> serverTimestamp({
+    required DocumentId docId,
+    required String field,
+  });
 }

@@ -303,6 +303,75 @@ void main() {
     });
   });
 
+  group('#updateFields', () {
+    test('should update only provided fields', () async {
+      final docId = await testCollection.create(batman);
+
+      await testBatch.updateFields(
+        docId: docId,
+        fields: {TestUser.fieldName: 'updatedName'},
+      );
+      await testBatch.commit();
+
+      final readResult = await testCollection.read(docId);
+
+      expect(readResult!.name, 'updatedName');
+    });
+  });
+
+  group('#arrayUnion', () {
+    test('should add values to an array field', () async {
+      final docId = await testCollection.create(batman);
+
+      await testBatch.arrayUnion(
+        docId: docId,
+        field: 'tags',
+        values: ['alpha', 'beta'],
+      );
+      await testBatch.commit();
+
+      final snapshot = await testCollection.untypedRef.doc(docId.docId).get();
+
+      expect(snapshot.data()!['tags'], ['alpha', 'beta']);
+    });
+  });
+
+  group('#arrayRemove', () {
+    test('should remove values from an array field', () async {
+      final docId = await testCollection.create(batman);
+      await testCollection.updateFields(
+        docId: docId,
+        fields: {
+          'tags': ['alpha', 'beta'],
+        },
+      );
+
+      await testBatch.arrayRemove(
+        docId: docId,
+        field: 'tags',
+        values: ['alpha'],
+      );
+      await testBatch.commit();
+
+      final snapshot = await testCollection.untypedRef.doc(docId.docId).get();
+
+      expect(snapshot.data()!['tags'], ['beta']);
+    });
+  });
+
+  group('#serverTimestamp', () {
+    test('should set a field to the server timestamp', () async {
+      final docId = await testCollection.create(batman);
+
+      await testBatch.serverTimestamp(docId: docId, field: 'updatedAt');
+      await testBatch.commit();
+
+      final snapshot = await testCollection.untypedRef.doc(docId.docId).get();
+
+      expect(snapshot.data()!['updatedAt'], isNotNull);
+    });
+  });
+
   group('#updateOrCreate', () {
     test('should create new document when document does not exist', () async {
       final originalDocId = DocumentId('originalDocId');

@@ -254,6 +254,54 @@ abstract class FirefuelRepository<T extends Serializable>
   }
 
   @override
+  Future<Either<Failure, void>> updateFields({
+    required DocumentId docId,
+    required Map<String, Object?> fields,
+  }) {
+    return guard(() => _collection.updateFields(docId: docId, fields: fields));
+  }
+
+  @override
+  Future<Either<Failure, void>> arrayUnion({
+    required DocumentId docId,
+    required String field,
+    required List<Object?> values,
+  }) {
+    return guard(
+      () => _collection.arrayUnion(
+        docId: docId,
+        field: field,
+        values: values,
+      ),
+    );
+  }
+
+  @override
+  Future<Either<Failure, void>> arrayRemove({
+    required DocumentId docId,
+    required String field,
+    required List<Object?> values,
+  }) {
+    return guard(
+      () => _collection.arrayRemove(
+        docId: docId,
+        field: field,
+        values: values,
+      ),
+    );
+  }
+
+  @override
+  Future<Either<Failure, void>> serverTimestamp({
+    required DocumentId docId,
+    required String field,
+  }) {
+    return guard(
+      () => _collection.serverTimestamp(docId: docId, field: field),
+    );
+  }
+
+  @override
   Future<Either<Failure, T>> updateOrCreate({
     required DocumentId docId,
     required T value,

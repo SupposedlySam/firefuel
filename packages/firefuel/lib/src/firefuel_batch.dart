@@ -77,6 +77,51 @@ class FirefuelBatch<T extends Serializable> extends Batch<T> with _BatchMixin {
   }
 
   @override
+  Future<void> updateFields({
+    required DocumentId docId,
+    required Map<String, Object?> fields,
+  }) async {
+    await _addToBatch((batch) {
+      batch.update(collection.untypedRef.doc(docId.docId), fields);
+    });
+  }
+
+  @override
+  Future<void> arrayUnion({
+    required DocumentId docId,
+    required String field,
+    required List<Object?> values,
+  }) {
+    return updateFields(
+      docId: docId,
+      fields: {field: FieldValue.arrayUnion(values)},
+    );
+  }
+
+  @override
+  Future<void> arrayRemove({
+    required DocumentId docId,
+    required String field,
+    required List<Object?> values,
+  }) {
+    return updateFields(
+      docId: docId,
+      fields: {field: FieldValue.arrayRemove(values)},
+    );
+  }
+
+  @override
+  Future<void> serverTimestamp({
+    required DocumentId docId,
+    required String field,
+  }) {
+    return updateFields(
+      docId: docId,
+      fields: {field: FieldValue.serverTimestamp()},
+    );
+  }
+
+  @override
   Future<void> updateOrCreate({
     required DocumentId docId,
     required T value,
