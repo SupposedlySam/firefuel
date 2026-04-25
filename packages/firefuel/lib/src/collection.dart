@@ -10,6 +10,7 @@ abstract class Collection<T extends Serializable>
         DocCreateIfNotExist<T, T>,
         DocDelete<void>,
         DocRead<T?>,
+        DocReadMany<List<T?>>,
         DocReplace<void, T>,
         DocUpdate<void, T> {
   const Collection(); // coverage:ignore-line

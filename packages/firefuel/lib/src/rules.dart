@@ -215,6 +215,19 @@ abstract class CollectionRead<R, T extends Serializable> {
   });
 }
 
+/// Read multiple documents by id while preserving the order of the ids.
+///
+/// Missing documents are represented as `null` in the returned list.
+abstract class DocReadMany<R> {
+  /// Gets a stream of the requested documents.
+  Stream<R> streamMany(List<DocumentId> docIds);
+
+  /// Gets the requested documents once.
+  ///
+  /// Does NOT refresh automatically.
+  Future<R> readMany(List<DocumentId> docIds, {GetOptions? getOptions});
+}
+
 /// Create a new Document
 ///
 /// [R]: should return a [DocumentId] or some subset,

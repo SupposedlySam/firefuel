@@ -90,6 +90,11 @@ abstract class FirefuelRepository<T extends Serializable>
   }
 
   @override
+  Stream<Either<Failure, List<T?>>> streamMany(List<DocumentId> docIds) {
+    return guardStream(() => _collection.streamMany(docIds));
+  }
+
+  @override
   Stream<Either<Failure, List<T>>> streamAll() {
     return guardStream(_collection.streamAll);
   }
@@ -161,6 +166,16 @@ abstract class FirefuelRepository<T extends Serializable>
   }) async {
     return guard(
       () => _collection.read(docId, getOptions: getOptions),
+    );
+  }
+
+  @override
+  Future<Either<Failure, List<T?>>> readMany(
+    List<DocumentId> docIds, {
+    GetOptions? getOptions,
+  }) async {
+    return guard(
+      () => _collection.readMany(docIds, getOptions: getOptions),
     );
   }
 

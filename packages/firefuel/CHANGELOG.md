@@ -1,3 +1,11 @@
+## 0.4.7
+
+feat: add `readMany` and `streamMany` for reading documents by id
+
+- `FirefuelCollection` and `FirefuelRepository`: `readMany`, `streamMany`
+- Results preserve the requested document id order
+- Missing documents are returned as `null` entries
+
 ## 0.4.6
 
 feat: expose Firestore sum and average aggregation queries

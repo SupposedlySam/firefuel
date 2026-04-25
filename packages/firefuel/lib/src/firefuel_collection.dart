@@ -199,6 +199,16 @@ abstract class FirefuelCollection<T extends Serializable>
   }
 
   @override
+  Future<List<T?>> readMany(
+    List<DocumentId> docIds, {
+    GetOptions? getOptions,
+  }) {
+    return Future.wait(
+      docIds.map((docId) => read(docId, getOptions: getOptions)),
+    );
+  }
+
+  @override
   Future<List<T>> readAll({GetOptions? getOptions}) async {
     final snapshot = await ref.get(getOptions);
 
@@ -253,6 +263,45 @@ abstract class FirefuelCollection<T extends Serializable>
   @override
   Stream<T?> stream(DocumentId docId) {
     return ref.doc(docId.docId).snapshots().toMaybeT();
+  }
+
+  @override
+  Stream<List<T?>> streamMany(List<DocumentId> docIds) {
+    if (docIds.isEmpty) return Stream.value(<T?>[]);
+
+    late StreamController<List<T?>> controller;
+    final latest = List<T?>.filled(docIds.length, null);
+    final hasValue = List<bool>.filled(docIds.length, false);
+    final subscriptions = <StreamSubscription<T?>>[];
+
+    void emitIfReady() {
+      if (!hasValue.every((value) => value)) return;
+
+      controller.add(List<T?>.unmodifiable(latest));
+    }
+
+    controller = StreamController<List<T?>>(
+      onListen: () {
+        for (final (index, docId) in docIds.indexed) {
+          final subscription = stream(docId).listen(
+            (value) {
+              latest[index] = value;
+              hasValue[index] = true;
+              emitIfReady();
+            },
+            onError: controller.addError,
+          );
+          subscriptions.add(subscription);
+        }
+      },
+      onCancel: () async {
+        await Future.wait(
+          subscriptions.map((subscription) => subscription.cancel()),
+        );
+      },
+    );
+
+    return controller.stream;
   }
 
   @override

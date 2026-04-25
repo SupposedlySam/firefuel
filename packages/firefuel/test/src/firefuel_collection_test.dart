@@ -273,6 +273,33 @@ void main() {
     });
   });
 
+  group('#streamMany', () {
+    test('should output requested docs in the requested order', () async {
+      const user1 = TestUser('user1');
+      const user2 = TestUser('user2');
+      const updatedUser2 = TestUser('updatedUser2');
+      final docId1 = await testCollection.create(user1);
+      final docId2 = await testCollection.create(user2);
+      final missingDocId = DocumentId('missingDocId');
+
+      final stream = testCollection.streamMany([docId2, missingDocId, docId1]);
+
+      expect(
+        stream,
+        emitsInOrder([
+          [user2, null, user1],
+          [updatedUser2, null, user1],
+        ]),
+      );
+
+      await testCollection.update(docId: docId2, value: updatedUser2);
+    });
+
+    test('should output an empty list when no document ids are given', () {
+      expect(testCollection.streamMany([]), emits(<TestUser?>[]));
+    });
+  });
+
   group('#streamAll', () {
     late Stream<List<TestUser>> stream;
     late DocumentId docId;
@@ -585,7 +612,8 @@ void main() {
 
           test('and matching $OrderBy is not first in orderBy list', () {
             // Range on `age` requires that field first in Firestore; firefuel
-            // reorders to orderBy(age).orderBy(name). Same-age docs sort by name.
+            // reorders to orderBy(age).orderBy(name). Same-age docs sort by
+            // name.
             expect(
               testCollection.streamWhere(
                 [Clause(TestUser.fieldAge, isGreaterThan: 4)],
@@ -801,6 +829,33 @@ void main() {
 
       expect(readResult, isNull);
     });
+  });
+
+  group('#readMany', () {
+    test('should return requested docs in the requested order', () async {
+      const user1 = TestUser('user1');
+      const user2 = TestUser('user2');
+      final docId1 = await testCollection.create(user1);
+      final docId2 = await testCollection.create(user2);
+      final missingDocId = DocumentId('missingDocId');
+
+      final readResult = await testCollection.readMany([
+        docId2,
+        missingDocId,
+        docId1,
+      ]);
+
+      expect(readResult, [user2, null, user1]);
+    });
+
+    test(
+      'should return an empty list when no document ids are given',
+      () async {
+        final readResult = await testCollection.readMany([]);
+
+        expect(readResult, <TestUser?>[]);
+      },
+    );
   });
 
   group('#readAll', () {

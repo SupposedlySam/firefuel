@@ -10,6 +10,7 @@ abstract class Repository<T extends Serializable>
         DocCreateIfNotExist<Either<Failure, T>, T>,
         DocDelete<Either<Failure, void>>,
         DocRead<Either<Failure, T?>>,
+        DocReadMany<Either<Failure, List<T?>>>,
         DocReplace<Either<Failure, void>, T>,
         DocUpdate<Either<Failure, void>, T> {
   const Repository(); // coverage:ignore-line

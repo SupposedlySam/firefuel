@@ -79,6 +79,22 @@ void main() {
     streamCallback: (testRepository) => testRepository.stream(docId),
   );
 
+  RepositoryTestUtil.runStreamTests<List<TestUser?>, TestUser>(
+    methodName: 'streamMany',
+    mockCollection: MockCollection(),
+    initHappyPath: (mockCollection) async {
+      mockCollection.initialize(
+        onStreamMany: () => Stream.fromIterable([
+          [const TestUser('streamUser'), null],
+        ]),
+      );
+    },
+    initSadPath: (mockCollection) async {
+      mockCollection.initialize(onStreamMany: () => throw ExpectedFailure());
+    },
+    streamCallback: (testRepository) => testRepository.streamMany([docId]),
+  );
+
   RepositoryTestUtil.runStreamTests<List<TestUser>, TestUser>(
     methodName: 'streamAll',
     mockCollection: MockCollection(),
@@ -292,6 +308,18 @@ void main() {
       mockCollection.initialize(onRead: () => throw ExpectedFailure());
     },
     methodCallback: (testRepository) => testRepository.read(docId),
+  );
+
+  RepositoryTestUtil.runTests<List<TestUser?>, TestUser>(
+    methodName: 'readMany',
+    mockCollection: MockCollection(),
+    initHappyPath: (mockCollection) async {
+      mockCollection.initialize(onReadMany: () => [defaultUser, null]);
+    },
+    initSadPath: (mockCollection) async {
+      mockCollection.initialize(onReadMany: () => throw ExpectedFailure());
+    },
+    methodCallback: (testRepository) => testRepository.readMany([docId]),
   );
 
   RepositoryTestUtil.runTests<List<TestUser>, TestUser>(

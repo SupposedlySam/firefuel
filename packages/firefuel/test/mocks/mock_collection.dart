@@ -15,6 +15,7 @@ extension MockCollectionX<T extends Serializable> on MockCollection<T> {
     Null Function()? onDelete,
     List<T> Function()? onLimit,
     Stream<T?> Function()? onStream,
+    Stream<List<T?>> Function()? onStreamMany,
     Stream<List<T>> Function()? onStreamAll,
     Stream<List<T>> Function()? onStreamLimited,
     Stream<List<T>> Function()? onStreamOrdered,
@@ -22,6 +23,7 @@ extension MockCollectionX<T extends Serializable> on MockCollection<T> {
     List<T> Function()? onOrderBy,
     Chunk<T> Function()? onPaginate,
     T? Function()? onRead,
+    List<T?> Function()? onReadMany,
     List<T>? Function()? onReadAll,
     T Function()? onReadOrCreate,
     Null Function()? onReplace,
@@ -60,6 +62,10 @@ extension MockCollectionX<T extends Serializable> on MockCollection<T> {
 
     if (onStream != null) {
       when(() => stream(any())).thenAnswer((_) => onStream());
+    }
+
+    if (onStreamMany != null) {
+      when(() => streamMany(any())).thenAnswer((_) => onStreamMany());
     }
 
     if (onStreamAll != null) {
@@ -101,6 +107,10 @@ extension MockCollectionX<T extends Serializable> on MockCollection<T> {
 
     if (onRead != null) {
       when(() => read(any())).thenAnswer((_) => Future.value(onRead()));
+    }
+
+    if (onReadMany != null) {
+      when(() => readMany(any())).thenAnswer((_) => Future.value(onReadMany()));
     }
 
     if (onReadAll != null) {
