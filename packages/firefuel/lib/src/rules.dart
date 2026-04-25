@@ -150,11 +150,19 @@ abstract class CollectionRead<R, T extends Serializable> {
   /// - any clause is an equality or in (contains) operator, the orderBy
   /// criteria will be removed
   ///
+  /// That "first where clause" is about the field you're filtering on with a
+  /// range (`<`, `>`, etc.)—that field has to lead the sort, and any extra
+  /// orderBys you pass only fine-tune order after that (they won't give you
+  /// "sort by name first" if your range is on something else).
+  ///
   /// #### Rules
   /// - If you include a filter with a range comparison, your first ordering
   /// must be on the same field
   /// - You cannot order your query by any field included in an equality or in
   /// clause
+  ///
+  /// Firefuel picks the range field from your clauses automatically (not only
+  /// `clauses.first`), so you can list equality filters before range filters.
   /// {@endtemplate}
   ///
   /// limit: optionally provide a maximum value of items to be returned
