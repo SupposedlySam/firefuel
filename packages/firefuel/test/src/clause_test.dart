@@ -87,4 +87,28 @@ void main() {
       expect(result, [equalToAge, whereInAge, nullAge]);
     });
   });
+
+  group('.fieldMatchingRangeOrderingRule', () {
+    test(
+      'should use the range field when equality clauses are listed first',
+      () {
+        expect(
+          Clause.fieldMatchingRangeOrderingRule([
+            Clause('name', isEqualTo: 'a'),
+            Clause('age', isGreaterThan: 4),
+          ]),
+          'age',
+        );
+      },
+    );
+
+    test('should fall back to first clause when there is no range', () {
+      expect(
+        Clause.fieldMatchingRangeOrderingRule([
+          Clause('name', isEqualTo: 'a'),
+        ]),
+        'name',
+      );
+    });
+  });
 }

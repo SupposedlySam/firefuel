@@ -584,6 +584,8 @@ void main() {
           });
 
           test('and matching $OrderBy is not first in orderBy list', () {
+            // Range on `age` requires that field first in Firestore; firefuel
+            // reorders to orderBy(age).orderBy(name). Same-age docs sort by name.
             expect(
               testCollection.streamWhere(
                 [Clause(TestUser.fieldAge, isGreaterThan: 4)],
@@ -593,14 +595,12 @@ void main() {
                 ],
               ),
               emitsInOrder([
-                [fry, oldFry, leela],
+                [fry, leela, oldFry],
               ]),
             );
           });
         },
-        skip: true,
-      ); // Skipping due to a regression with the fake_cloud_firestore
-      // version causing ordering to fail
+      );
 
       group('when using a equality comparison', () {
         test('and has matching $OrderBy field', () {
