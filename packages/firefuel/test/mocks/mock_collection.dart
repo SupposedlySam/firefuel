@@ -15,10 +15,10 @@ extension MockCollectionX<T extends Serializable> on MockCollection<T> {
     Null Function()? onDelete,
     List<T> Function()? onLimit,
     Stream<T?> Function()? onStream,
-    Stream<List<T?>> Function()? onStreamMany,
     Stream<List<T>> Function()? onStreamAll,
     Stream<List<T>> Function()? onStreamChanges,
     Stream<List<T>> Function()? onStreamLimited,
+    Stream<List<T?>> Function()? onStreamMany,
     Stream<List<T>> Function()? onStreamOrdered,
     Stream<List<T>> Function()? onStreamWhere,
     List<T> Function()? onOrderBy,
@@ -30,10 +30,10 @@ extension MockCollectionX<T extends Serializable> on MockCollection<T> {
     Null Function()? onReplace,
     Null Function()? onReplaceFields,
     Null Function()? onUpdate,
-    Null Function()? onUpdateFields,
-    Null Function()? onArrayUnion,
     Null Function()? onArrayRemove,
+    Null Function()? onArrayUnion,
     Null Function()? onServerTimestamp,
+    Null Function()? onUpdateFields,
     T Function()? onUpdateOrCreate,
     List<T> Function()? onWhere,
     T? Function()? onWhereById,
@@ -73,10 +73,6 @@ extension MockCollectionX<T extends Serializable> on MockCollection<T> {
       when(() => stream(any())).thenAnswer((_) => onStream());
     }
 
-    if (onStreamMany != null) {
-      when(() => streamMany(any())).thenAnswer((_) => onStreamMany());
-    }
-
     if (onStreamAll != null) {
       when(streamAll).thenAnswer((_) => onStreamAll());
     }
@@ -89,6 +85,10 @@ extension MockCollectionX<T extends Serializable> on MockCollection<T> {
 
     if (onStreamLimited != null) {
       when(() => streamLimited(any())).thenAnswer((_) => onStreamLimited());
+    }
+
+    if (onStreamMany != null) {
+      when(() => streamMany(any())).thenAnswer((_) => onStreamMany());
     }
 
     if (onStreamOrdered != null) {
@@ -165,13 +165,14 @@ extension MockCollectionX<T extends Serializable> on MockCollection<T> {
           .thenAnswer((_) => Future.value(onUpdate()));
     }
 
-    if (onUpdateFields != null) {
+    if (onArrayRemove != null) {
       when(() {
-        return updateFields(
+        return arrayRemove(
           docId: any(named: 'docId'),
-          fields: any(named: 'fields'),
+          field: any(named: 'field'),
+          values: any(named: 'values'),
         );
-      }).thenAnswer((_) => Future.value(onUpdateFields()));
+      }).thenAnswer((_) => Future.value(onArrayRemove()));
     }
 
     if (onArrayUnion != null) {
@@ -184,16 +185,6 @@ extension MockCollectionX<T extends Serializable> on MockCollection<T> {
       }).thenAnswer((_) => Future.value(onArrayUnion()));
     }
 
-    if (onArrayRemove != null) {
-      when(() {
-        return arrayRemove(
-          docId: any(named: 'docId'),
-          field: any(named: 'field'),
-          values: any(named: 'values'),
-        );
-      }).thenAnswer((_) => Future.value(onArrayRemove()));
-    }
-
     if (onServerTimestamp != null) {
       when(() {
         return serverTimestamp(
@@ -201,6 +192,15 @@ extension MockCollectionX<T extends Serializable> on MockCollection<T> {
           field: any(named: 'field'),
         );
       }).thenAnswer((_) => Future.value(onServerTimestamp()));
+    }
+
+    if (onUpdateFields != null) {
+      when(() {
+        return updateFields(
+          docId: any(named: 'docId'),
+          fields: any(named: 'fields'),
+        );
+      }).thenAnswer((_) => Future.value(onUpdateFields()));
     }
 
     if (onUpdateOrCreate != null) {
