@@ -4,26 +4,26 @@ import 'package:fake_cloud_firestore/fake_cloud_firestore.dart';
 import 'package:firefuel/firefuel.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:flutter_counter/app.dart';
-import 'package:flutter_counter/counter/counter.dart';
+import 'package:firefuel_example/app.dart';
+import 'package:firefuel_example/playground/playground.dart';
 
 void main() {
   setUp(() => Firefuel.initialize(FakeFirebaseFirestore()));
 
   tearDown(Firefuel.reset);
 
-  group('CounterApp', () {
+  group('FirefuelPlaygroundApp', () {
     testWidgets('is a MaterialApp', (tester) async {
-      expect(const CounterApp(), isA<MaterialApp>());
+      expect(const FirefuelPlaygroundApp(), isA<MaterialApp>());
     });
 
-    testWidgets('home is CounterPage', (tester) async {
-      expect(const CounterApp().home, isA<CounterPage>());
+    testWidgets('home is PlaygroundPage', (tester) async {
+      expect(const FirefuelPlaygroundApp().home, isA<PlaygroundPage>());
     });
 
-    testWidgets('renders CounterPage', (tester) async {
-      await tester.pumpWidget(const CounterApp());
-      expect(find.byType(CounterPage), findsOneWidget);
+    testWidgets('renders PlaygroundPage', (tester) async {
+      await tester.pumpWidget(const FirefuelPlaygroundApp());
+      expect(find.byType(PlaygroundPage), findsOneWidget);
     });
   });
 }

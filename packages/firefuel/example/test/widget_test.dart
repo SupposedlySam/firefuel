@@ -1,14 +1,7 @@
-// This is a basic Flutter widget test.
-//
-// To perform an interaction with a widget in your test, use the WidgetTester
-// utility that Flutter provides. For example, you can send tap and scroll
-// gestures. You can also use WidgetTester to find child widgets in the widget
-// tree, read text, and verify that the values of widget properties are correct.
-
 import 'package:fake_cloud_firestore/fake_cloud_firestore.dart';
 import 'package:firefuel/firefuel.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_counter/app.dart';
+import 'package:firefuel_example/app.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
@@ -16,21 +9,39 @@ void main() {
 
   tearDown(Firefuel.reset);
 
-  testWidgets('Counter increments smoke test', (WidgetTester tester) async {
-    // Build our app and trigger a frame.
-    await tester.pumpWidget(const CounterApp());
-    await tester.pump(); // Run builder of FutureBuilder
+  testWidgets('playground renders feature cards and seeded data',
+      (tester) async {
+    await tester.pumpWidget(const FirefuelPlaygroundApp());
+    await tester.pumpAndSettle();
 
-    // Verify that our counter starts at 0.
-    expect(find.text('0'), findsOneWidget);
-    expect(find.text('1'), findsNothing);
+    expect(find.text('Firefuel Playground'), findsOneWidget);
+    expect(find.text('Create a document'), findsOneWidget);
+    await tester.scrollUntilVisible(
+      find.text('Query and aggregate'),
+      250,
+    );
+    expect(find.text('Query and aggregate'), findsOneWidget);
+    await tester.scrollUntilVisible(
+      find.text('Welcome note'),
+      250,
+    );
+    expect(find.text('Welcome note'), findsOneWidget);
+  });
 
-    // Tap the '+' icon and trigger a frame.
-    await tester.tap(find.byIcon(Icons.add));
-    await tester.pump();
+  testWidgets('create demo adds a note', (tester) async {
+    await tester.pumpWidget(const FirefuelPlaygroundApp());
+    await tester.pumpAndSettle();
 
-    // Verify that our counter has incremented.
-    expect(find.text('0'), findsNothing);
-    expect(find.text('1'), findsOneWidget);
+    final createButton = find.byKey(
+      const ValueKey('Create a document demo button'),
+    );
+    await tester.scrollUntilVisible(createButton, 250);
+    await tester.ensureVisible(createButton);
+    await tester.pumpAndSettle();
+    await tester.tap(createButton);
+    await tester.pumpAndSettle();
+
+    await tester.scrollUntilVisible(find.text('Created note 1'), 250);
+    expect(find.text('Created note 1'), findsOneWidget);
   });
 }

@@ -1,30 +1,24 @@
-name: flutter_counter
-description: A new Flutter project.
+name: firefuel_example
+description: A playground example for Firefuel APIs.
 version: 1.0.0+1
 publish_to: none
 
 environment:
-  sdk: '>=3.0.0 <4.0.0'
+  sdk: '>=3.3.0 <4.0.0'
 
 dependencies:
-  bloc: ^9.2.0
   fake_cloud_firestore: ^4.1.0+1
   firefuel:
     path: ..
-  firefuel_counter:
-    path: ./packages/firefuel_counter
   flutter:
     sdk: flutter
-  flutter_bloc: ^9.1.1
 
 dev_dependencies:
-  bloc_test: ^10.0.0
   flutter_lints: ^6.0.0
   flutter_test:
     sdk: flutter
   integration_test:
     sdk: flutter
-  mocktail: ^1.0.5
 
 flutter:
   uses-material-design: true

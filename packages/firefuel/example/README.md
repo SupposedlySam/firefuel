@@ -1,16 +1,25 @@
-# flutter_counter
+# Firefuel Playground
 
-A new Flutter project.
+An interactive, single-page example that shows common Firefuel APIs against an
+in-memory `FakeFirebaseFirestore` instance.
 
-## Getting Started
+The playground includes small demos for:
 
-This project is a starting point for a Flutter application.
+- creating and reading documents
+- live collection streams
+- repository error handling
+- field updates and transforms
+- queries, counts, sums, and averages
+- pagination
+- multi-document reads and streams
+- document-change streams
+- batch writes
 
-A few resources to get you started if this is your first Flutter project:
+## Running
 
-- [Lab: Write your first Flutter app](https://flutter.dev/docs/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://flutter.dev/docs/cookbook)
+```sh
+fvm flutter run
+```
 
-For help getting started with Flutter, view our
-[online documentation](https://flutter.dev/docs), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+No Firebase project setup is required for the example because `main.dart`
+initializes Firefuel with `FakeFirebaseFirestore`.
