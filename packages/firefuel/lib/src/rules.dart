@@ -112,6 +112,12 @@ abstract class CollectionRead<R, T extends Serializable> {
   /// See: StreamBuilder
   Stream<R> streamAll();
 
+  /// Get the documents changed by each collection snapshot.
+  ///
+  /// Removed documents are excluded by default. Set [includeRemoved] to true to
+  /// include removed document data when Firestore provides it.
+  Stream<R> streamChanges({bool includeRemoved = false});
+
   /// Get up to the maximum number of documents specified by the [limit]
   ///
   /// Returns 0 to [limit]

@@ -17,6 +17,7 @@ extension MockCollectionX<T extends Serializable> on MockCollection<T> {
     Stream<T?> Function()? onStream,
     Stream<List<T?>> Function()? onStreamMany,
     Stream<List<T>> Function()? onStreamAll,
+    Stream<List<T>> Function()? onStreamChanges,
     Stream<List<T>> Function()? onStreamLimited,
     Stream<List<T>> Function()? onStreamOrdered,
     Stream<List<T>> Function()? onStreamWhere,
@@ -34,6 +35,7 @@ extension MockCollectionX<T extends Serializable> on MockCollection<T> {
     T? Function()? onWhereById,
   }) {
     registerFallbackValue(DocumentId('fallbackValue'));
+    registerFallbackValue(false);
     registerFallbackValue(const TestUser('fallbackValue'));
     registerFallbackValue(
       Chunk<TestUser>(orderBy: [OrderBy(field: TestUser.fieldName)]),
@@ -70,6 +72,12 @@ extension MockCollectionX<T extends Serializable> on MockCollection<T> {
 
     if (onStreamAll != null) {
       when(streamAll).thenAnswer((_) => onStreamAll());
+    }
+
+    if (onStreamChanges != null) {
+      when(() {
+        return streamChanges(includeRemoved: any(named: 'includeRemoved'));
+      }).thenAnswer((_) => onStreamChanges());
     }
 
     if (onStreamLimited != null) {

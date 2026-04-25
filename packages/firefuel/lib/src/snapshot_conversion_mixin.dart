@@ -7,6 +7,24 @@ extension QuerySnapshotX<T> on Stream<QuerySnapshot<T?>> {
       (snapshot) => snapshot.docs.toListT(),
     );
   }
+
+  /// Get non-null data from changed [QuerySnapshot] documents.
+  Stream<List<T>> toChangedListT({bool includeRemoved = false}) {
+    return map(
+      (snapshot) {
+        final changes = includeRemoved
+            ? snapshot.docChanges
+            : snapshot.docChanges.where(
+                (change) => change.type != DocumentChangeType.removed,
+              );
+
+        return changes
+            .map((change) => change.doc.data())
+            .whereType<T>()
+            .toList();
+      },
+    );
+  }
 }
 
 extension QueryDocumentSnapshotX<T> on List<QueryDocumentSnapshot<T?>> {

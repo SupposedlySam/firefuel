@@ -338,6 +338,42 @@ void main() {
     });
   });
 
+  group('#streamChanges', () {
+    test('should output changed docs and skip removed docs by default',
+        () async {
+      final docId = await testCollection.create(defaultUser);
+      const newUser = TestUser('newUser');
+      final stream = testCollection.streamChanges();
+
+      expect(
+        stream,
+        emitsInOrder([
+          [defaultUser],
+          [newUser],
+          <TestUser>[],
+        ]),
+      );
+
+      await testCollection.update(docId: docId, value: newUser);
+      await testCollection.delete(docId);
+    });
+
+    test('should include removed docs when requested', () async {
+      final docId = await testCollection.create(defaultUser);
+      final stream = testCollection.streamChanges(includeRemoved: true);
+
+      expect(
+        stream,
+        emitsInOrder([
+          [defaultUser],
+          [defaultUser],
+        ]),
+      );
+
+      await testCollection.delete(docId);
+    });
+  });
+
   group('#streamCountAll', () {
     late Stream<int> stream;
     late DocumentId docId;

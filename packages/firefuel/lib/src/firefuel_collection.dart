@@ -309,6 +309,11 @@ abstract class FirefuelCollection<T extends Serializable>
     return ref.snapshots().toListT();
   }
 
+  @override
+  Stream<List<T>> streamChanges({bool includeRemoved = false}) {
+    return ref.snapshots().toChangedListT(includeRemoved: includeRemoved);
+  }
+
   /// {@macro firefuel.rules.streamcount.definition}
   ///
   /// {@template firefuel.collection.streamcount}

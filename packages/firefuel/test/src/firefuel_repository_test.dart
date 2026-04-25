@@ -112,6 +112,22 @@ void main() {
   );
 
   RepositoryTestUtil.runStreamTests<List<TestUser>, TestUser>(
+    methodName: 'streamChanges',
+    mockCollection: MockCollection(),
+    initHappyPath: (mockCollection) async {
+      mockCollection.initialize(
+        onStreamChanges: () => Stream.fromIterable([
+          [const TestUser('changedUser')],
+        ]),
+      );
+    },
+    initSadPath: (mockCollection) async {
+      mockCollection.initialize(onStreamChanges: () => throw ExpectedFailure());
+    },
+    streamCallback: (testRepository) => testRepository.streamChanges(),
+  );
+
+  RepositoryTestUtil.runStreamTests<List<TestUser>, TestUser>(
     methodName: 'streamLimited',
     mockCollection: MockCollection(),
     initHappyPath: (mockCollection) async {

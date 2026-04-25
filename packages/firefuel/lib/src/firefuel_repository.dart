@@ -100,6 +100,15 @@ abstract class FirefuelRepository<T extends Serializable>
   }
 
   @override
+  Stream<Either<Failure, List<T>>> streamChanges({
+    bool includeRemoved = false,
+  }) {
+    return guardStream(
+      () => _collection.streamChanges(includeRemoved: includeRemoved),
+    );
+  }
+
+  @override
   Stream<Either<Failure, int>> streamCountAll() {
     return guardStream(_collection.streamCountAll);
   }

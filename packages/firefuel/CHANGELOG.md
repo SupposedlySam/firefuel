@@ -6,6 +6,11 @@ feat: add `readMany` and `streamMany` for reading documents by id
 - Results preserve the requested document id order
 - Missing documents are returned as `null` entries
 
+feat: add `streamChanges` for typed document-change streams
+
+- `FirefuelCollection` and `FirefuelRepository`: `streamChanges`
+- Removed documents are excluded by default and can be included with `includeRemoved`
+
 ## 0.4.6
 
 feat: expose Firestore sum and average aggregation queries
