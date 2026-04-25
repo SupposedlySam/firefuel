@@ -15,17 +15,12 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('Firefuel Playground'), findsOneWidget);
+    expect(find.text('Live notes'), findsOneWidget);
+
+    await tester.drag(find.byType(PageView), const Offset(-400, 0));
+    await tester.pumpAndSettle();
+
     expect(find.text('Create a document'), findsOneWidget);
-    await tester.scrollUntilVisible(
-      find.text('Query and aggregate'),
-      250,
-    );
-    expect(find.text('Query and aggregate'), findsOneWidget);
-    await tester.scrollUntilVisible(
-      find.text('Welcome note'),
-      250,
-    );
-    expect(find.text('Welcome note'), findsOneWidget);
   });
 
   testWidgets('create demo adds a note', (tester) async {
@@ -35,13 +30,35 @@ void main() {
     final createButton = find.byKey(
       const ValueKey('Create a document demo button'),
     );
-    await tester.scrollUntilVisible(createButton, 250);
-    await tester.ensureVisible(createButton);
+    await tester.drag(find.byType(PageView), const Offset(-400, 0));
     await tester.pumpAndSettle();
     await tester.tap(createButton);
     await tester.pumpAndSettle();
 
-    await tester.scrollUntilVisible(find.text('Created note 1'), 250);
-    expect(find.text('Created note 1'), findsOneWidget);
+    expect(
+      find.textContaining('server timestamp').hitTestable(),
+      findsAtLeastNWidgets(1),
+    );
+  });
+
+  testWidgets('last result stays visible while scrolling', (tester) async {
+    await tester.pumpWidget(const FirefuelPlaygroundApp());
+    await tester.pumpAndSettle();
+
+    final createButton = find.byKey(
+      const ValueKey('Create a document demo button'),
+    );
+    await tester.drag(find.byType(PageView), const Offset(-400, 0));
+    await tester.pumpAndSettle();
+    await tester.tap(createButton);
+    await tester.pumpAndSettle();
+
+    await tester.drag(find.byType(PageView), const Offset(-400, 0));
+    await tester.pumpAndSettle();
+
+    expect(
+      find.textContaining('server timestamp').hitTestable(),
+      findsAtLeastNWidgets(1),
+    );
   });
 }

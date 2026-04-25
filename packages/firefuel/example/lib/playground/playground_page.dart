@@ -17,7 +17,7 @@ class _PlaygroundPageState extends State<PlaygroundPage> {
   late final PlaygroundNoteCollection _collection;
   late final PlaygroundNoteRepository _repository;
   late final Stream<List<PlaygroundNote>> _notesStream;
-  late final Stream<List<PlaygroundNote>> _changesStream;
+  late final PageController _actionPageController;
 
   var _createdNotes = 0;
   var _isBusy = false;
@@ -29,10 +29,10 @@ class _PlaygroundPageState extends State<PlaygroundPage> {
 
     _collection = PlaygroundNoteCollection();
     _repository = PlaygroundNoteRepository(collection: _collection);
+    _actionPageController = PageController(viewportFraction: 0.9);
     _notesStream = _collection.streamOrdered([
       OrderBy(field: PlaygroundNote.fieldTitle),
     ]);
-    _changesStream = _collection.streamChanges();
 
     _runAction(
       label: 'Seeded sample notes',
@@ -41,111 +41,156 @@ class _PlaygroundPageState extends State<PlaygroundPage> {
   }
 
   @override
+  void dispose() {
+    _actionPageController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    const actionTrayReservedHeight = 380.0;
+    final featureCards = [
+      _FeatureCard(
+        apis: const ['FirefuelBatch.create()'],
+        description: 'Create sample documents in one commit.',
+        title: 'Seed sample data',
+        onPressed: () => _runAction(
+          label: 'Seeded sample notes',
+          action: _seedSampleNotes,
+        ),
+      ),
+      _FeatureCard(
+        apis: const [
+          'FirefuelRepository.create()',
+          'FirefuelRepository.serverTimestamp()',
+        ],
+        description: 'Create a note through a repository and timestamp it.',
+        title: 'Create a document',
+        onPressed: () => _runAction(
+          label: 'Created a timestamped note',
+          action: _createTimestampedNote,
+        ),
+      ),
+      _FeatureCard(
+        apis: const ['FirefuelRepository.readOrCreate()'],
+        description: 'Fetch a known document, or create it if missing.',
+        title: 'Read or create',
+        onPressed: () => _runAction(
+          label: 'Read or created the welcome note',
+          action: _readOrCreateWelcomeNote,
+        ),
+      ),
+      _FeatureCard(
+        apis: const [
+          'FirefuelCollection.update()',
+          'FirefuelCollection.updateFields()',
+          'FirefuelCollection.serverTimestamp()',
+        ],
+        description: 'Update one model, then update individual fields.',
+        title: 'Update fields',
+        onPressed: () => _runAction(
+          label: 'Pinned and updated the first note',
+          action: _pinFirstNote,
+        ),
+      ),
+      _FeatureCard(
+        apis: const [
+          'FirefuelCollection.arrayUnion()',
+          'FirefuelCollection.arrayRemove()',
+        ],
+        description: 'Add and remove tags with Firestore transforms.',
+        title: 'Array transforms',
+        onPressed: () => _runAction(
+          label: 'Toggled a tag on the first note',
+          action: _toggleTag,
+        ),
+      ),
+      _FeatureCard(
+        apis: const [
+          'FirefuelCollection.where()',
+          'FirefuelCollection.countWhere()',
+          'FirefuelCollection.sumAll()',
+          'FirefuelCollection.averageAll()',
+        ],
+        description: 'Run filtered reads and aggregate queries.',
+        title: 'Query and aggregate',
+        onPressed: () => _runAction(
+          label: 'Calculated query stats',
+          action: _showStats,
+        ),
+      ),
+      _FeatureCard(
+        apis: const [
+          'FirefuelCollection.paginate()',
+          'Chunk',
+        ],
+        description: 'Load one small page at a time.',
+        title: 'Paginate',
+        onPressed: () => _runAction(
+          label: 'Loaded the first page',
+          action: _showFirstPage,
+        ),
+      ),
+      _FeatureCard(
+        apis: const [
+          'FirefuelCollection.readMany()',
+          'FirefuelCollection.streamMany()',
+        ],
+        description: 'Read or stream a known set of document IDs.',
+        title: 'Multi-document reads',
+        onPressed: () => _runAction(
+          label: 'Read many selected notes',
+          action: _readManyNotes,
+        ),
+      ),
+      _FeatureCard(
+        apis: const ['FirefuelCollection.delete()'],
+        description: 'Remove the newest demo-created note.',
+        title: 'Delete',
+        onPressed: () => _runAction(
+          label: 'Deleted the newest demo note',
+          action: _deleteNewestDemoNote,
+        ),
+      ),
+    ];
 
     return Scaffold(
       appBar: AppBar(title: const Text('Firefuel Playground')),
-      body: ListView(
-        padding: const EdgeInsets.all(16),
+      body: Stack(
         children: [
-          Text(
-            'Small, copyable demos for the Firefuel API.',
-            style: theme.textTheme.headlineSmall,
+          ListView(
+            padding: const EdgeInsets.fromLTRB(
+              16,
+              16,
+              16,
+              actionTrayReservedHeight,
+            ),
+            children: [
+              Text(
+                'Small, copyable demos for the Firefuel API.',
+                style: theme.textTheme.headlineSmall,
+              ),
+              const SizedBox(height: 8),
+              const Text(
+                'Run the demos below and watch this live collection update.',
+              ),
+              const SizedBox(height: 16),
+              _NotesCard(notesStream: _notesStream),
+            ],
           ),
-          const SizedBox(height: 8),
-          const Text(
-            'This example uses fake Firestore so it works without Firebase '
-            'setup. Each card maps one common app action to a Firefuel method.',
-          ),
-          const SizedBox(height: 16),
-          _StatusCard(isBusy: _isBusy, message: _lastResult),
-          const SizedBox(height: 16),
-          _FeatureCard(
-            api: 'FirefuelBatch, create',
-            description: 'Create sample documents in one commit.',
-            title: 'Seed sample data',
-            onPressed: () => _runAction(
-              label: 'Seeded sample notes',
-              action: _seedSampleNotes,
+          Align(
+            alignment: Alignment.bottomCenter,
+            child: SafeArea(
+              top: false,
+              child: _ActionTray(
+                controller: _actionPageController,
+                featureCards: featureCards,
+                isBusy: _isBusy,
+                message: _lastResult,
+              ),
             ),
           ),
-          _FeatureCard(
-            api: 'FirefuelRepository, create, serverTimestamp',
-            description: 'Create a note through a repository and timestamp it.',
-            title: 'Create a document',
-            onPressed: () => _runAction(
-              label: 'Created a timestamped note',
-              action: _createTimestampedNote,
-            ),
-          ),
-          _FeatureCard(
-            api: 'readOrCreate',
-            description: 'Fetch a known document, or create it if missing.',
-            title: 'Read or create',
-            onPressed: () => _runAction(
-              label: 'Read or created the welcome note',
-              action: _readOrCreateWelcomeNote,
-            ),
-          ),
-          _FeatureCard(
-            api: 'update, updateFields, serverTimestamp',
-            description: 'Update one model, then update individual fields.',
-            title: 'Update fields',
-            onPressed: () => _runAction(
-              label: 'Pinned and updated the first note',
-              action: _pinFirstNote,
-            ),
-          ),
-          _FeatureCard(
-            api: 'arrayUnion, arrayRemove',
-            description: 'Add and remove tags with Firestore transforms.',
-            title: 'Array transforms',
-            onPressed: () => _runAction(
-              label: 'Toggled a tag on the first note',
-              action: _toggleTag,
-            ),
-          ),
-          _FeatureCard(
-            api: 'where, countWhere, sumAll, averageAll',
-            description: 'Run filtered reads and aggregate queries.',
-            title: 'Query and aggregate',
-            onPressed: () => _runAction(
-              label: 'Calculated query stats',
-              action: _showStats,
-            ),
-          ),
-          _FeatureCard(
-            api: 'paginate, Chunk',
-            description: 'Load one small page at a time.',
-            title: 'Paginate',
-            onPressed: () => _runAction(
-              label: 'Loaded the first page',
-              action: _showFirstPage,
-            ),
-          ),
-          _FeatureCard(
-            api: 'readMany, streamMany',
-            description: 'Read or stream a known set of document IDs.',
-            title: 'Multi-document reads',
-            onPressed: () => _runAction(
-              label: 'Read many selected notes',
-              action: _readManyNotes,
-            ),
-          ),
-          _FeatureCard(
-            api: 'delete',
-            description: 'Remove the newest demo-created note.',
-            title: 'Delete',
-            onPressed: () => _runAction(
-              label: 'Deleted the newest demo note',
-              action: _deleteNewestDemoNote,
-            ),
-          ),
-          const SizedBox(height: 8),
-          _NotesCard(notesStream: _notesStream),
-          _ChangesCard(changesStream: _changesStream),
-          _StreamManyCard(collection: _collection),
         ],
       ),
     );
@@ -367,15 +412,86 @@ extension _FirstOrNullX<T> on Iterable<T> {
   }
 }
 
+class _ActionTray extends StatelessWidget {
+  const _ActionTray({
+    required this.controller,
+    required this.featureCards,
+    required this.isBusy,
+    required this.message,
+  });
+
+  final PageController controller;
+  final List<Widget> featureCards;
+  final bool isBusy;
+  final String message;
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        color: colorScheme.surface,
+        boxShadow: [
+          BoxShadow(
+            blurRadius: 16,
+            color: colorScheme.shadow.withValues(alpha: 0.12),
+            offset: const Offset(0, -4),
+          ),
+        ],
+      ),
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _StatusCard(isBusy: isBusy, message: message),
+            const SizedBox(height: 8),
+            Row(
+              children: [
+                Text(
+                  'Demos',
+                  style: Theme.of(context).textTheme.titleSmall,
+                ),
+                const SizedBox(width: 8),
+                Text(
+                  'Swipe to choose an action',
+                  style: Theme.of(context).textTheme.bodySmall,
+                ),
+              ],
+            ),
+            const SizedBox(height: 8),
+            SizedBox(
+              height: 220,
+              child: PageView.builder(
+                controller: controller,
+                itemCount: featureCards.length,
+                padEnds: false,
+                itemBuilder: (context, index) {
+                  return Padding(
+                    padding: const EdgeInsets.only(right: 12),
+                    child: featureCards[index],
+                  );
+                },
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
 class _FeatureCard extends StatelessWidget {
   const _FeatureCard({
-    required this.api,
+    required this.apis,
     required this.description,
     required this.onPressed,
     required this.title,
   });
 
-  final String api;
+  final List<String> apis;
   final String description;
   final VoidCallback onPressed;
   final String title;
@@ -383,6 +499,7 @@ class _FeatureCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
+      margin: EdgeInsets.zero,
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -390,19 +507,72 @@ class _FeatureCard extends StatelessWidget {
           children: [
             Text(title, style: Theme.of(context).textTheme.titleMedium),
             const SizedBox(height: 4),
-            Text(description),
+            Expanded(
+              child: Text(description),
+            ),
             const SizedBox(height: 8),
-            Wrap(
-              crossAxisAlignment: WrapCrossAlignment.center,
-              spacing: 8,
-              children: [
-                Chip(label: Text(api)),
-                FilledButton(
-                  key: ValueKey('$title demo button'),
-                  onPressed: onPressed,
-                  child: const Text('Run demo'),
-                ),
-              ],
+            Text(
+              'Uses',
+              style: Theme.of(context).textTheme.labelMedium,
+            ),
+            const SizedBox(height: 6),
+            SizedBox(
+              height: 34,
+              child: ListView.separated(
+                scrollDirection: Axis.horizontal,
+                itemBuilder: (context, index) {
+                  return _ApiReferencePill(api: apis[index]);
+                },
+                itemCount: apis.length,
+                separatorBuilder: (context, index) {
+                  return const SizedBox(width: 8);
+                },
+              ),
+            ),
+            const SizedBox(height: 8),
+            Align(
+              alignment: Alignment.centerLeft,
+              child: FilledButton(
+                key: ValueKey('$title demo button'),
+                onPressed: onPressed,
+                child: const Text('Run demo'),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _ApiReferencePill extends StatelessWidget {
+  const _ApiReferencePill({required this.api});
+
+  final String api;
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        border: Border.all(color: colorScheme.outlineVariant),
+        borderRadius: BorderRadius.circular(999),
+        color: colorScheme.surfaceContainerHighest,
+      ),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(Icons.code, color: colorScheme.onSurfaceVariant, size: 16),
+            const SizedBox(width: 6),
+            Text(
+              api,
+              style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                    color: colorScheme.onSurfaceVariant,
+                    fontFamily: 'monospace',
+                  ),
             ),
           ],
         ),
@@ -480,83 +650,6 @@ class _NotesCard extends StatelessWidget {
           ],
         ),
       ),
-    );
-  }
-}
-
-class _ChangesCard extends StatelessWidget {
-  const _ChangesCard({required this.changesStream});
-
-  final Stream<List<PlaygroundNote>> changesStream;
-
-  @override
-  Widget build(BuildContext context) {
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: StreamBuilder<List<PlaygroundNote>>(
-          stream: changesStream,
-          builder: (context, snapshot) {
-            final changes = snapshot.data ?? const <PlaygroundNote>[];
-            final label = changes.isEmpty
-                ? 'No changed documents in the latest snapshot.'
-                : changes.map((note) => note.title).join(', ');
-
-            return ListTile(
-              contentPadding: EdgeInsets.zero,
-              leading: const Icon(Icons.sync),
-              title: const Text('Latest streamChanges payload'),
-              subtitle: Text(label),
-            );
-          },
-        ),
-      ),
-    );
-  }
-}
-
-class _StreamManyCard extends StatelessWidget {
-  const _StreamManyCard({required this.collection});
-
-  final PlaygroundNoteCollection collection;
-
-  @override
-  Widget build(BuildContext context) {
-    return FutureBuilder<List<PlaygroundNote>>(
-      future: collection.orderBy([OrderBy(field: PlaygroundNote.fieldTitle)]),
-      builder: (context, snapshot) {
-        final docIds = (snapshot.data ?? const <PlaygroundNote>[])
-            .map((note) => note.docId)
-            .whereType<String>()
-            .take(2)
-            .map(DocumentId.new)
-            .toList();
-
-        return Card(
-          child: Padding(
-            padding: const EdgeInsets.all(16),
-            child: StreamBuilder<List<PlaygroundNote?>>(
-              stream: collection.streamMany(docIds),
-              builder: (context, streamSnapshot) {
-                final notes = streamSnapshot.data ?? const <PlaygroundNote?>[];
-                final titles = notes
-                    .whereType<PlaygroundNote>()
-                    .map((note) => note.title)
-                    .join(', ');
-
-                return ListTile(
-                  contentPadding: EdgeInsets.zero,
-                  leading: const Icon(Icons.library_books),
-                  title: const Text('streamMany selection'),
-                  subtitle: Text(
-                    titles.isEmpty ? 'Waiting for selected notes.' : titles,
-                  ),
-                );
-              },
-            ),
-          ),
-        );
-      },
     );
   }
 }
