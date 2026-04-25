@@ -412,7 +412,7 @@ abstract class FirefuelCollection<T extends Serializable>
     }
 
     final augmentedOrderBys = OrderBy.moveOrCreateMatchingField(
-      fieldToMatch: clauses.first.field,
+      fieldToMatch: Clause.fieldMatchingRangeOrderingRule(clauses),
       orderBy: orderBy,
       isRangeComparison: Clause.hasRangeComparison(clauses),
     );

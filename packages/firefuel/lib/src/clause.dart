@@ -139,6 +139,19 @@ class Clause extends Equatable {
     return clauses.any((clause) => clause.isRangeComparison);
   }
 
+  /// Field Firestore uses for "first orderBy must match your range filter."
+  ///
+  /// This is the first **range** clause's field, not necessarily the first
+  /// clause in the list, so callers can list equality filters before range
+  /// filters.
+  static String fieldMatchingRangeOrderingRule(List<Clause> clauses) {
+    final rangeClauses = clauses.where((c) => c.isRangeComparison);
+
+    return rangeClauses.isNotEmpty
+        ? rangeClauses.first.field
+        : clauses.first.field;
+  }
+
   static bool _hasAny(List<dynamic> options) {
     return options.any((option) => option != null);
   }
