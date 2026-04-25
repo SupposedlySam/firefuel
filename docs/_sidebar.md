@@ -8,6 +8,7 @@ Introduction
 Documentation
 
 - [Core Concepts](coreconcepts.md)
+- [Firefuel API Guide](firefuelapi.md)
 - [Architecture](architecture.md)
 - [Naming Conventions](firefuelnamingconventions.md)
 
