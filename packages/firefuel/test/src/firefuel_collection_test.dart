@@ -1047,8 +1047,12 @@ void main() {
 
       final readResult = await testCollection.read(docId);
 
-      expect(readResult!.name, 'updatedName');
-      expect(readResult.age, defaultUser.age);
+      expect(
+        readResult,
+        isA<TestUser>()
+            .having((user) => user.name, 'name', 'updatedName')
+            .having((user) => user.age, 'age', defaultUser.age),
+      );
     });
   });
 
@@ -1064,7 +1068,7 @@ void main() {
 
       final snapshot = await testCollection.untypedRef.doc(docId.docId).get();
 
-      expect(snapshot.data()!['tags'], ['alpha', 'beta']);
+      expect(snapshot.data(), containsPair('tags', ['alpha', 'beta']));
     });
   });
 
@@ -1086,7 +1090,7 @@ void main() {
 
       final snapshot = await testCollection.untypedRef.doc(docId.docId).get();
 
-      expect(snapshot.data()!['tags'], ['beta']);
+      expect(snapshot.data(), containsPair('tags', ['beta']));
     });
   });
 
@@ -1098,7 +1102,14 @@ void main() {
 
       final snapshot = await testCollection.untypedRef.doc(docId.docId).get();
 
-      expect(snapshot.data()!['updatedAt'], isNotNull);
+      expect(
+        snapshot.data(),
+        isA<Map<String, dynamic>>().having(
+          (data) => data['updatedAt'],
+          'updatedAt',
+          isNotNull,
+        ),
+      );
     });
   });
 
