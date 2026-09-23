@@ -33,7 +33,9 @@ class OrderBy extends Equatable {
   bool get isDescending => direction.toAscDesc == OrderDirection.desc;
 
   @override
-  List<Object?> get props => [field, direction];
+  // byId and the normalised direction: `OrderBy.docId(zToA)` sorts exactly
+  // like `OrderBy.docId(desc)`, and neither is a field named 'unused'.
+  List<Object?> get props => [field, byId, isDescending];
 
   /// Handle cases when using [OrderBy] with where clauses containing range
   /// comparisons.

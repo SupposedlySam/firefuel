@@ -147,7 +147,13 @@ final class FieldClause extends Clause {
          isGreaterThan,
          isGreaterThanOrEqualTo,
        ]),
-       isEqualityOrInComparison = _hasAny([isEqualTo, whereIn, isNull]),
+       // `isNull: false` lowers to `!= null`, an inequality, so only
+       // `isNull: true` counts as equality.
+       isEqualityOrInComparison = _hasAny([
+         isEqualTo,
+         whereIn,
+         if (isNull ?? false) isNull,
+       ]),
        super._() {
     _ensureSingleOptionChosen([
       isEqualTo,
@@ -181,20 +187,22 @@ final class FieldClause extends Clause {
 
   // coverage:ignore-start
   @override
+  // Every operator slot, nulls included: a value alone does not say which
+  // operator it belongs to, and `age < 18` must not equal `age > 18`.
   List<Object?> get props => [
     FieldClause,
     field,
-    if (isEqualTo != null) isEqualTo,
-    if (isNotEqualTo != null) isNotEqualTo,
-    if (isLessThan != null) isLessThan,
-    if (isLessThanOrEqualTo != null) isLessThanOrEqualTo,
-    if (isGreaterThan != null) isGreaterThan,
-    if (isGreaterThanOrEqualTo != null) isGreaterThanOrEqualTo,
-    if (arrayContains != null) arrayContains,
-    if (arrayContainsAny != null) arrayContainsAny,
-    if (whereIn != null) whereIn,
-    if (whereNotIn != null) whereNotIn,
-    if (isNull != null) isNull,
+    isEqualTo,
+    isNotEqualTo,
+    isLessThan,
+    isLessThanOrEqualTo,
+    isGreaterThan,
+    isGreaterThanOrEqualTo,
+    arrayContains,
+    arrayContainsAny,
+    whereIn,
+    whereNotIn,
+    isNull,
   ];
   // coverage:ignore-end
 
@@ -231,6 +239,10 @@ final class ClauseGroup extends Clause {
   void _ensureNotEmpty() {
     if (clauses.isEmpty) {
       throw ArgumentError.value(clauses, 'clauses', 'must not be empty');
+    }
+    if (clauses.length > 30) {
+      // Filter.or/Filter.and take at most 30 filters.
+      throw ArgumentError.value(clauses, 'clauses', 'must hold at most 30');
     }
   }
 

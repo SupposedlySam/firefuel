@@ -773,7 +773,9 @@ void main() {
 
         expect(emptyLastChunk2.status, ChunkStatus.last);
         expect(emptyLastChunk2.data.isEmpty, isTrue);
-        expect(emptyLastChunk2.cursor, isNull);
+        // Keeps the last page's cursor, so passing it in again stays at
+        // the end.
+        expect(emptyLastChunk2.cursor, lastChunk.cursor);
       },
     );
 
@@ -791,7 +793,7 @@ void main() {
 
       expect(emptyLastChunk.status, ChunkStatus.last);
       expect(emptyLastChunk.data.isEmpty, isTrue);
-      expect(emptyLastChunk.cursor, isNull);
+      expect(emptyLastChunk.cursor, lastFullChunk.cursor);
     });
   });
 

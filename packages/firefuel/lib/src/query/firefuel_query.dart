@@ -46,6 +46,27 @@ class FirefuelQuery extends Equatable {
       // mistake is made, with a name that says what is missing.
       throw MissingValueException(OrderBy);
     }
+    if (needsOrder && !_sameOrder(effectiveOrderBy, orderBy)) {
+      // Cursor values line up with the order the caller wrote. If Firestore's
+      // rules force a different order (a range field moved or inserted first,
+      // an equality field dropped), those values would be compared against
+      // the wrong fields: silently wrong results, or a rejected query.
+      throw ArgumentError.value(
+        orderBy.map((o) => o.field).toList(),
+        'orderBy',
+        'must already satisfy Firestore when using cursors or limitToLast; '
+            'with these clauses it would become '
+            '${effectiveOrderBy.map((o) => o.field).toList()}',
+      );
+    }
+  }
+
+  static bool _sameOrder(List<OrderBy> a, List<OrderBy> b) {
+    if (a.length != b.length) return false;
+    for (var i = 0; i < a.length; i++) {
+      if (a[i] != b[i]) return false;
+    }
+    return true;
   }
 
   /// Filters every returned document must match (combined with AND).

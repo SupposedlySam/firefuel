@@ -399,9 +399,10 @@ abstract class DocReplace<R, T extends Serializable> {
   /// Replaces the fields of the document at [docId] with the matching
   /// [fieldPaths] from [value]
   ///
-  /// Converts all [fieldPaths] into [FieldPath] objects to compare against
+  /// [fieldPaths] are matched against the top-level keys [value]
+  /// serializes to; a dotted path such as `address.city` matches nothing.
   ///
-  /// If no document exists yet, the update will fail silently.
+  /// Fails with a `not-found` error when no document exists yet.
   Future<R> replaceFields({
     required DocumentId docId,
     required T value,
@@ -420,7 +421,8 @@ abstract class DocUpdate<R, T extends Serializable> {
   /// Updates data on the document. Data will be merged with any existing
   /// document data.
   ///
-  /// If no document exists yet, the update will fail silently.
+  /// Fails with a `not-found` error when no document exists yet; use
+  /// `updateOrCreate` to create it instead.
   Future<R> update({required DocumentId docId, required T value});
 
   /// Updates specific fields on the document.

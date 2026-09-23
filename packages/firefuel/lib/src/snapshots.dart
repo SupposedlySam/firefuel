@@ -91,7 +91,8 @@ class FirefuelDoc<T> extends Equatable {
   final bool hasPendingWrites;
 
   /// The id of the ancestor document inside the [collectionId] collection,
-  /// or `null` if [collectionId] is not in this document's path.
+  /// or `null` if no proper ancestor lives in a collection of that id. The
+  /// document's own collection does not count.
   ///
   /// Documents read through a collection group come from many parents; this
   /// recovers which one. For `conversations/c1/messagePods/p1/reactions/u1`,

@@ -119,7 +119,9 @@ mixin FirefuelQueryReads<T extends Serializable> implements ReadableQuery<T> {
 
     return chunk.followedBy(
       data: snapshot.docs.toListT(),
-      cursor: snapshot.docs.lastOrNull,
+      // An empty page keeps the previous cursor, so paginating past the
+      // end stays at the end instead of restarting at page one.
+      cursor: snapshot.docs.lastOrNull ?? chunk.cursor,
       isLast: snapshot.docs.length < chunk.limit,
     );
   }
@@ -228,6 +230,10 @@ mixin FirefuelQueryReads<T extends Serializable> implements ReadableQuery<T> {
     ];
     if (fields.isEmpty) {
       throw ArgumentError('aggregate needs count, sums or averages');
+    }
+    if (fields.length > 30) {
+      // Query.aggregate takes at most 30 fields.
+      throw ArgumentError('aggregate takes at most 30 fields');
     }
 
     // Query.aggregate takes its fields positionally (1 to 30), not as a
