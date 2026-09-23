@@ -149,7 +149,11 @@ final february = notes.streamQuery(
 );
 ```
 
-Cursor values line up with the `orderBy` fields, first to first. `limitToLast` and cursors require an `orderBy`, and firefuel throws `MissingValueException` if it's missing. A query is immutable; use `copyWith` to derive variations.
+Cursor values line up with the `orderBy` fields, first to first. `limitToLast` and cursors require an `orderBy`, and firefuel throws `MissingValueException` if it's missing.
+
+With cursors or `limitToLast`, write the order Firestore needs: any range-filtered field first, and no field filtered by equality. Otherwise firefuel throws an `ArgumentError` naming the order it would need. Firefuel won't silently rewrite the order, because your cursor values would then line up with the wrong fields.
+
+A query is immutable; use `copyWith` to derive variations.
 
 ## Pagination
 

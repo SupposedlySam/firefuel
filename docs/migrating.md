@@ -97,6 +97,18 @@ It was an `assert`, which release builds skip.
 
 A collection captured `Firefuel.firestore` when it was constructed, so after re-initializing, existing collections kept using the old instance. They now resolve it on every call. To keep a collection on one instance, pass it: `super('notes', firestore: instance)`.
 
+### `Clause(isNull: false)` keeps its sort
+
+It means `!= null` (an inequality) but was treated as an equality filter, so firefuel dropped any `orderBy` on the same field. The sort is now kept.
+
+### Paginating past the end stays at the end
+
+An empty last page reset its cursor, so passing it back to `paginate` started again from page one. It now keeps the previous cursor.
+
+### `Clause` and `OrderBy` equality
+
+Two clauses on one field with different operators (`age < 18`, `age > 18`) compared equal, as did `OrderBy.docId()` and `OrderBy(field: 'unused')`. Both now compare everything that affects the query.
+
 ### `streamOrdered([])` throws
 
 As its documentation always said, it now throws `MissingValueException`.

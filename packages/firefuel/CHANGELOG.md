@@ -12,6 +12,7 @@ fix!: make queries and writes do what their names say
 - `countAll` / `countWhere` take the `AggregateSource? source` they use, instead of an ignored `GetOptions`
 - `FirefuelBatch` rolled over one op early and over-counted `totalTransactionsCommitted`
 - `update` / `replaceFields` serialize through `toFirestore` like every other write
+- `Clause(isNull: false)` no longer drops its `orderBy`; `Clause` / `OrderBy` equality includes the operator, `byId` and the effective direction; an empty last page keeps its cursor; cursors and `limitToLast` require an order that already satisfies Firestore (it was silently rewritten under them)
 - Collections resolve `Firefuel.firestore` per call instead of capturing it at construction; `Firefuel.firestore` throws a `StateError` before `initialize`
 
 feat!: own the `Either`
