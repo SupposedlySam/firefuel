@@ -154,6 +154,13 @@ void main() {
       expect(original.copyWith(), original);
     });
 
+    test('cursor variants with the same values should not be equal', () {
+      // equatable 3 stopped comparing runtimeType.
+      expect(const StartCursor.at([1]), isNot(const StartCursor.after([1])));
+      expect(const EndCursor.at([1]), isNot(const EndCursor.before([1])));
+      expect(const StartCursor.at([1]), const StartCursor.at([1]));
+    });
+
     group('effectiveOrderBy', () {
       test('should leave the order alone without clauses', () {
         final orderBy = [OrderBy(field: TestUser.fieldName)];

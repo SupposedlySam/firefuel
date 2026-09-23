@@ -37,6 +37,14 @@ sealed class FieldUpdate extends Equatable {
 
   /// The server's clock when the write is committed.
   const factory FieldUpdate.serverTimestamp() = ServerTimestamp;
+
+  /// Every variant leads its props with its own type. equatable 3 stopped
+  /// comparing `runtimeType`, so without it `DeleteField()` would equal
+  /// `ServerTimestamp()` and `ArrayUnion(x)` would equal `ArrayRemove(x)`.
+  @override
+  List<Object?> get props => [runtimeType, ..._values];
+
+  List<Object?> get _values;
 }
 
 /// See [FieldUpdate.increment].
@@ -46,7 +54,7 @@ final class Increment extends FieldUpdate {
   final num by;
 
   @override
-  List<Object?> get props => [by];
+  List<Object?> get _values => [by];
 }
 
 /// See [FieldUpdate.arrayUnion].
@@ -56,7 +64,7 @@ final class ArrayUnion extends FieldUpdate {
   final List<Object?> values;
 
   @override
-  List<Object?> get props => [values];
+  List<Object?> get _values => [values];
 }
 
 /// See [FieldUpdate.arrayRemove].
@@ -66,7 +74,7 @@ final class ArrayRemove extends FieldUpdate {
   final List<Object?> values;
 
   @override
-  List<Object?> get props => [values];
+  List<Object?> get _values => [values];
 }
 
 /// See [FieldUpdate.delete].
@@ -74,7 +82,7 @@ final class DeleteField extends FieldUpdate {
   const DeleteField();
 
   @override
-  List<Object?> get props => const [];
+  List<Object?> get _values => const [];
 }
 
 /// The server's clock when the write is committed.
@@ -97,5 +105,5 @@ final class ServerTimestamp extends FieldUpdate {
   const ServerTimestamp();
 
   @override
-  List<Object?> get props => const [];
+  List<Object?> get _values => const [];
 }

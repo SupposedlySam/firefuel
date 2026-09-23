@@ -14,8 +14,10 @@ abstract class Failure extends Equatable {
   /// Where [error] was raised, folded across async gaps.
   final Chain stackTrace;
 
+  /// Led by the type: equatable 3 no longer compares `runtimeType`, and two
+  /// kinds of failure can wrap the same error.
   @override
-  List<Object> get props => [error, stackTrace];
+  List<Object> get props => [runtimeType, error, stackTrace];
 
   @override
   String toString() => '$error\n\n${stackTrace.terse}';

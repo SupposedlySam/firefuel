@@ -176,8 +176,10 @@ sealed class StartCursor extends Equatable {
 
   final List<Object?> values;
 
+  /// Led by the type: equatable 3 no longer compares `runtimeType`, and
+  /// the at/after (or at/before) variants hold the same values.
   @override
-  List<Object?> get props => [values];
+  List<Object?> get props => [runtimeType, values];
 }
 
 /// Inclusive start cursor; see [StartCursor.at].
@@ -204,8 +206,10 @@ sealed class EndCursor extends Equatable {
 
   final List<Object?> values;
 
+  /// Led by the type: equatable 3 no longer compares `runtimeType`, and
+  /// the at/after (or at/before) variants hold the same values.
   @override
-  List<Object?> get props => [values];
+  List<Object?> get props => [runtimeType, values];
 }
 
 /// Inclusive end cursor; see [EndCursor.at].

@@ -92,20 +92,6 @@ sealed class Clause extends Equatable {
     ).any((clause) => clause.isEqualityOrInComparison);
   }
 
-  /// Checks to see if more than one field is found between all range
-  /// comparisons
-  @Deprecated(
-    'Firestore allows range filters on several fields; unused since 0.5',
-  )
-  static bool hasMoreThanOneFieldInRangeComparisons(List<Clause> clauses) {
-    final rangeClauses = _fieldClauses(
-      clauses,
-    ).where((clause) => clause.isRangeComparison);
-    final uniqueFields = rangeClauses.map((clause) => clause.field).toSet();
-
-    return uniqueFields.length > 1;
-  }
-
   /// Checks to see whether any of the clauses given are range comparisons
   static bool hasRangeComparison(List<Clause> clauses) {
     return _fieldClauses(clauses).any((clause) => clause.isRangeComparison);
@@ -196,6 +182,7 @@ final class FieldClause extends Clause {
   // coverage:ignore-start
   @override
   List<Object?> get props => [
+    FieldClause,
     field,
     if (isEqualTo != null) isEqualTo,
     if (isNotEqualTo != null) isNotEqualTo,
@@ -248,5 +235,5 @@ final class ClauseGroup extends Clause {
   }
 
   @override
-  List<Object?> get props => [isOr, clauses];
+  List<Object?> get props => [ClauseGroup, isOr, clauses];
 }

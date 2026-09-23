@@ -23,8 +23,16 @@ void main() {
       expect(failure.stackTrace, chain);
     });
 
-    test('should have an error and chain as props', () {
-      expect(failure.props, [error, chain]);
+    test('should have its type, error and chain as props', () {
+      expect(failure.props, [TestFailure, error, chain]);
+    });
+
+    test('should not equal another kind of failure with the same error', () {
+      // equatable 3 stopped comparing runtimeType, so props carry it.
+      final other = TestFirefuelFailure(error: error, stackTrace: chain);
+
+      expect(failure, isNot(other));
+      expect(failure, TestFailure(error, stackTrace: chain));
     });
 
     test('#toString should contain the error', () {

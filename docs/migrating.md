@@ -69,7 +69,7 @@ It was never passed to Firestore, so the query ran unfiltered.
 
 ### Range filters on several fields are allowed
 
-firefuel threw `MoreThanOneFieldInRangeClauseException`. Firestore has supported range filters on up to 10 fields since 2024, so firefuel now sends the query. The exception is deprecated and no longer thrown. Firestore may ask for a composite index.
+firefuel threw `MoreThanOneFieldInRangeClauseException`. Firestore has supported range filters on up to 10 fields since 2024, so firefuel now sends the query. The exception and `Clause.hasMoreThanOneFieldInRangeComparisons` are removed. Firestore may ask for a composite index.
 
 ### `replace` fails for a missing document
 

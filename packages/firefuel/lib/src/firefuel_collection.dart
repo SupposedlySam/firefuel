@@ -334,9 +334,7 @@ abstract class FirefuelCollection<T extends Serializable>
       case WriteAcknowledgement.server:
         await write();
       case WriteAcknowledgement.local:
-        unawaited(
-          write().catchError(FirefuelFetchMixin.report),
-        );
+        unawaited(write().catchError(FirefuelFetchMixin.report));
     }
   }
 
