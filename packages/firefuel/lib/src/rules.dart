@@ -379,6 +379,10 @@ abstract class DocUpdate<R, T extends Serializable> {
   Future<R> update({required DocumentId docId, required T value});
 
   /// Updates specific fields on the document.
+  ///
+  /// A value may be a [FieldUpdate] (increment, array union or remove,
+  /// delete, server timestamp) to combine transforms and plain sets in one
+  /// atomic write.
   Future<R> updateFields({
     required DocumentId docId,
     required Map<String, Object?> fields,
@@ -401,4 +405,15 @@ abstract class DocUpdate<R, T extends Serializable> {
 
   /// Sets [field] to Firestore's server timestamp.
   Future<R> serverTimestamp({required DocumentId docId, required String field});
+
+  /// Adds [by] to the number in [field] on the server, so concurrent
+  /// increments are never lost. A missing field counts as 0.
+  Future<R> increment({
+    required DocumentId docId,
+    required String field,
+    required num by,
+  });
+
+  /// Deletes [field] from the document.
+  Future<R> deleteField({required DocumentId docId, required String field});
 }

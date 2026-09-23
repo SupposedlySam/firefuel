@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firefuel/firefuel.dart';
-import 'package:firefuel/src/utils/serializable_extensions.dart';
+import 'package:firefuel/src/utils/field_updates.dart';
 import 'package:flutter/foundation.dart';
 
 class FirefuelBatch<T extends Serializable> extends Batch<T> with _BatchMixin {
@@ -44,10 +44,7 @@ class FirefuelBatch<T extends Serializable> extends Batch<T> with _BatchMixin {
     // earlier in the same batch was invisible and the replace was silently
     // dropped (#43). update() checks existence at commit instead.
     await _addToBatch((batch) {
-      batch.update(
-        collection.untypedRef.doc(docId.docId),
-        collection.toFirestore(value, null),
-      );
+      batch.update(collection.ref.doc(docId.docId), collection.encode(value));
     });
   }
 
@@ -58,9 +55,10 @@ class FirefuelBatch<T extends Serializable> extends Batch<T> with _BatchMixin {
     required List<String> fieldPaths,
   }) async {
     await _addToBatch((batch) {
-      final replacement = value.toIsolatedJson(fieldPaths);
-
-      batch.update(collection.ref.doc(docId.docId), replacement);
+      batch.update(
+        collection.ref.doc(docId.docId),
+        collection.encodeFields(value, fieldPaths),
+      );
     });
   }
 
@@ -70,7 +68,7 @@ class FirefuelBatch<T extends Serializable> extends Batch<T> with _BatchMixin {
   @override
   Future<void> update({required DocumentId docId, required T value}) async {
     await _addToBatch((batch) {
-      batch.update(collection.ref.doc(docId.docId), value.toJson());
+      batch.update(collection.ref.doc(docId.docId), collection.encode(value));
     });
   }
 
@@ -80,7 +78,7 @@ class FirefuelBatch<T extends Serializable> extends Batch<T> with _BatchMixin {
     required Map<String, Object?> fields,
   }) async {
     await _addToBatch((batch) {
-      batch.update(collection.untypedRef.doc(docId.docId), fields);
+      batch.update(collection.ref.doc(docId.docId), FieldUpdates.lower(fields));
     });
   }
 
@@ -92,7 +90,7 @@ class FirefuelBatch<T extends Serializable> extends Batch<T> with _BatchMixin {
   }) {
     return updateFields(
       docId: docId,
-      fields: {field: FieldValue.arrayUnion(values)},
+      fields: {field: FieldUpdate.arrayUnion(values)},
     );
   }
 
@@ -104,7 +102,7 @@ class FirefuelBatch<T extends Serializable> extends Batch<T> with _BatchMixin {
   }) {
     return updateFields(
       docId: docId,
-      fields: {field: FieldValue.arrayRemove(values)},
+      fields: {field: FieldUpdate.arrayRemove(values)},
     );
   }
 
@@ -115,7 +113,27 @@ class FirefuelBatch<T extends Serializable> extends Batch<T> with _BatchMixin {
   }) {
     return updateFields(
       docId: docId,
-      fields: {field: FieldValue.serverTimestamp()},
+      fields: {field: const FieldUpdate.serverTimestamp()},
+    );
+  }
+
+  @override
+  Future<void> increment({
+    required DocumentId docId,
+    required String field,
+    required num by,
+  }) {
+    return updateFields(
+      docId: docId,
+      fields: {field: FieldUpdate.increment(by)},
+    );
+  }
+
+  @override
+  Future<void> deleteField({required DocumentId docId, required String field}) {
+    return updateFields(
+      docId: docId,
+      fields: {field: const FieldUpdate.delete()},
     );
   }
 

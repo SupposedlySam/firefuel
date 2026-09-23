@@ -271,6 +271,25 @@ abstract class FirefuelRepository<T extends Serializable>
   }
 
   @override
+  Future<Either<Failure, void>> increment({
+    required DocumentId docId,
+    required String field,
+    required num by,
+  }) {
+    return guard(
+      () => _collection.increment(docId: docId, field: field, by: by),
+    );
+  }
+
+  @override
+  Future<Either<Failure, void>> deleteField({
+    required DocumentId docId,
+    required String field,
+  }) {
+    return guard(() => _collection.deleteField(docId: docId, field: field));
+  }
+
+  @override
   Future<Either<Failure, T>> updateOrCreate({
     required DocumentId docId,
     required T value,

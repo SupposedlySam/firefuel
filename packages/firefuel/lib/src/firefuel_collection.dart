@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firefuel/firefuel.dart';
-import 'package:firefuel/src/utils/serializable_extensions.dart';
+import 'package:firefuel/src/utils/field_updates.dart';
 
 abstract class FirefuelCollection<T extends Serializable>
     with FirefuelQueryReads<T>
@@ -37,7 +37,9 @@ abstract class FirefuelCollection<T extends Serializable>
   CollectionReference<T?> get ref {
     return untypedRef.withConverter(
       fromFirestore: fromFirestore,
-      toFirestore: toFirestore,
+      toFirestore: (model, options) {
+        return FieldUpdates.lower(toFirestore(model, options));
+      },
     );
   }
 
@@ -122,7 +124,7 @@ abstract class FirefuelCollection<T extends Serializable>
     // update(), not a read followed by set(): the existence check then runs
     // on the server at commit, which is atomic, read-free and offline-safe.
     // See project_management/DESIGN.md D4.
-    return untypedRef.doc(docId.docId).update(toFirestore(value, null));
+    return ref.doc(docId.docId).update(encode(value));
   }
 
   @override
@@ -131,9 +133,7 @@ abstract class FirefuelCollection<T extends Serializable>
     required T value,
     required List<String> fieldPaths,
   }) async {
-    final replacement = value.toIsolatedJson(fieldPaths);
-
-    await untypedRef.doc(docId.docId).update(replacement);
+    await ref.doc(docId.docId).update(encodeFields(value, fieldPaths));
 
     return;
   }
@@ -180,11 +180,34 @@ abstract class FirefuelCollection<T extends Serializable>
   }
 
   /// Converts a [T?] to a [`Map<String, Object?>`] to upload to Firestore.
+  ///
+  /// May contain [FieldUpdate] values (for example a [ServerTimestamp] for a
+  /// `createdAt` field); firefuel lowers them on every write.
   Map<String, Object?> toFirestore(T? model, SetOptions? options);
+
+  /// The data firefuel writes for [value]: [toFirestore]'s output with every
+  /// [FieldUpdate] lowered.
+  ///
+  /// Updates send this map through the typed [ref], not [untypedRef].
+  /// Firestore itself does not care, but fake_cloud_firestore (which most
+  /// consumers test with) notifies listeners per reference type, so a write
+  /// through [untypedRef] never reaches a `stream` built on [ref].
+  ///
+  /// Every write (set, update, replace, and their batched forms) serializes
+  /// through here. Before 0.5, `update` sent `value.toJson()` while `set`
+  /// went through [toFirestore], so the two could disagree.
+  Map<String, Object?> encode(T value) {
+    return FieldUpdates.lower(toFirestore(value, null));
+  }
+
+  /// The data for [value], limited to [fieldPaths].
+  Map<String, Object?> encodeFields(T value, List<String> fieldPaths) {
+    return encode(value)..removeWhere((key, _) => !fieldPaths.contains(key));
+  }
 
   @override
   Future<void> update({required DocumentId docId, required T value}) async {
-    await ref.doc(docId.docId).update(value.toJson());
+    await ref.doc(docId.docId).update(encode(value));
 
     return;
   }
@@ -194,7 +217,7 @@ abstract class FirefuelCollection<T extends Serializable>
     required DocumentId docId,
     required Map<String, Object?> fields,
   }) async {
-    await untypedRef.doc(docId.docId).update(fields);
+    await ref.doc(docId.docId).update(FieldUpdates.lower(fields));
 
     return;
   }
@@ -207,7 +230,7 @@ abstract class FirefuelCollection<T extends Serializable>
   }) {
     return updateFields(
       docId: docId,
-      fields: {field: FieldValue.arrayUnion(values)},
+      fields: {field: FieldUpdate.arrayUnion(values)},
     );
   }
 
@@ -219,7 +242,7 @@ abstract class FirefuelCollection<T extends Serializable>
   }) {
     return updateFields(
       docId: docId,
-      fields: {field: FieldValue.arrayRemove(values)},
+      fields: {field: FieldUpdate.arrayRemove(values)},
     );
   }
 
@@ -230,7 +253,27 @@ abstract class FirefuelCollection<T extends Serializable>
   }) {
     return updateFields(
       docId: docId,
-      fields: {field: FieldValue.serverTimestamp()},
+      fields: {field: const FieldUpdate.serverTimestamp()},
+    );
+  }
+
+  @override
+  Future<void> increment({
+    required DocumentId docId,
+    required String field,
+    required num by,
+  }) {
+    return updateFields(
+      docId: docId,
+      fields: {field: FieldUpdate.increment(by)},
+    );
+  }
+
+  @override
+  Future<void> deleteField({required DocumentId docId, required String field}) {
+    return updateFields(
+      docId: docId,
+      fields: {field: const FieldUpdate.delete()},
     );
   }
 

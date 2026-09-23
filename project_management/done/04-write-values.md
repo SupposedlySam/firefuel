@@ -3,7 +3,7 @@
 ## Metadata
 - **Type:** Feature
 - **Appetite:** 2 days
-- **Status:** Pitch
+- **Status:** Done (2026-09-23)
 - **Created:** 2026-09-23
 - **Breaking:** no
 
@@ -41,3 +41,23 @@ that a model's `toJson` returns, resolved on create/createById/update/updateOrCr
 `updateFields(docId, [FieldUpdate.set(f, v), FieldUpdate.arrayUnion(f, [...]), ...])`, with the
 `Map` form kept. flyby notes the sentinel alone won't remove its 8-attempt retry. A read option
 for `ServerTimestampBehavior.estimate`, or a write that returns the local snapshot, would.
+
+## Outcome (2026-09-23)
+- A sealed `FieldUpdate` lives in **firefuel_core**: `increment`, `arrayUnion`, `arrayRemove`,
+  `delete`, `serverTimestamp` (`const ServerTimestamp()`). flyby's model package can use it
+  without Flutter or cloud_firestore.
+- It's lowered in one place (`FieldUpdates.lower`), which every write path uses, the typed
+  converter included. So a `ServerTimestamp` returned from `toJson` works on create, createById,
+  update, updateOrCreate, replace and in batches.
+- **Shape changed from the pitch:** there's no new list-form `updateFields`. `FieldUpdate`
+  values go in the existing `Map` form, keyed by field, so one method covers both uses and a
+  field can't be named twice. A plain value means set, per the creative review.
+- New `increment` and `deleteField` helpers on collection, repository and batch.
+- One serialization path: `encode(value)` (`toFirestore` plus lowering). `update` and
+  `replaceFields` used `toJson()` before.
+- Found: fake_cloud_firestore notifies listeners per reference *type*, so every write goes
+  through the typed `ref`. Consumers test with the fake too.
+- **Not done:** a helper to convert `Timestamp` to `DateTime`. For flyby's read-after-create
+  retry, the answer is a documented read option,
+  `GetOptions(source: Source.cache, serverTimestampBehavior: ServerTimestampBehavior.estimate)`,
+  now reachable through firefuel's exports. It still needs verifying in flyby.
