@@ -62,6 +62,24 @@ void main() {
       expect(testBatch.totalTransactionsCommitted, 1);
     });
 
+    test('should hold a full batch until one more op arrives', () async {
+      for (var i = 0; i < testBatch.transactionLimit; i++) {
+        await testBatch.create(batman);
+      }
+
+      // A full batch has not been committed yet...
+      expect(testBatch.totalTransactionsCommitted, 0);
+      expect(testBatch.transactionSize, testBatch.transactionLimit);
+      expect(await testCollection.countAll(), 0);
+
+      await testBatch.create(batman);
+
+      // ...the op that does not fit commits it and starts the next batch.
+      expect(testBatch.totalTransactionsCommitted, testBatch.transactionLimit);
+      expect(testBatch.transactionSize, 1);
+      expect(await testCollection.countAll(), testBatch.transactionLimit);
+    });
+
     group('should persist transaction count across batches', () {
       test('when auto-commit takes place', () async {
         final overSize = testBatch.transactionLimit + 1;

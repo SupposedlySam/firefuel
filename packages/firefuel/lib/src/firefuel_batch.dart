@@ -174,27 +174,20 @@ mixin _BatchMixin<T extends Serializable> on Batch<T> {
   /// Automatically commits the current batch and creates a new one when the
   /// [transactionLimit] is reached
   Future<void> _addToBatch(FutureOr<void> Function(WriteBatch) action) async {
-    // increment the size of the batch
-    _transactionSize++;
-
-    // if the batch is full, commit it
+    // Roll over before adding, so the op that does not fit starts the next
+    // batch and is counted there. Counting first (as before 0.5) committed
+    // 499 ops, then left the rolled-over op uncounted in the new batch.
     if (_transactionSize >= transactionLimit) {
       await _commitBatch();
 
       _createNewBatch();
     }
 
-    // execute the action
     await action(batch);
+
+    _transactionSize++;
   }
 
-  /// Commits all transactions in the batch.
-  ///
-  /// Calling this method prevents any future operations from being added.
-  ///
-  /// Should be called after all transactions have been added to the batch.
-  ///
-  /// {@macro firefuel.batch.size}
   Future<void> _commitBatch() async {
     await batch.commit();
 
