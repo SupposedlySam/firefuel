@@ -3,7 +3,7 @@
 ## Metadata
 - **Type:** Chore
 - **Appetite:** 2 days
-- **Status:** Pitch
+- **Status:** Done (2026-09-23)
 - **Created:** 2026-09-23
 - **Breaking:** no
 
@@ -30,3 +30,11 @@
 ### Out of scope
 - Moving off docsify (for example to a static site generator). Not warranted; docsify serves
   from `/docs` with no build step, and that's why a push to main deploys it.
+
+## Outcome (2026-09-23)
+Shipped in `4da3b27`: docsify 5.0.0 with pinned assets; the dead analytics tag, abandoned
+plugins and never-registered `sw.js` removed; a site home page; the migration guide; the API
+guide rewritten. Rendered locally in headless Chrome (home, API guide, migration).
+**Open, needs the maintainer:** `https://firefueldocs.com` serves GitHub's `*.github.io`
+certificate, so HTTPS fails with a name mismatch; HTTP works. Re-provision the certificate in
+the repo's Pages settings. `firefuel.dev` and `firefueldocs.dev` have no DNS records.

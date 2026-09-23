@@ -73,7 +73,7 @@ from 2026-09-23.
 
 | Order | # | Title | Type | flyby demand |
 |---|---|---|---|---|
-| 1 | 01 | [Toolchain, workspace, hygiene](bet/01-toolchain-and-workspace.md) | Chore | — |
+| 1 | 01 | [Toolchain, workspace, hygiene](done/01-toolchain-and-workspace.md) | Chore | — |
 | 2 | 02 | [Correctness fixes](done/02-correctness-fixes.md) | Fix | direction bug (latent) |
 | 3 | 10 | [Own the Either](done/10-either-without-dartz.md) | Improvement | ok, keep names |
 | 4 | 12 | [The query is a value](done/12-query-layer.md) | Infrastructure | enables 05/06 |
@@ -85,6 +85,6 @@ from 2026-09-23.
 | 10 | 08 | [Query power](done/08-query-power.md) | Feature | no |
 | 11 | 09 | [Observer, quieter failures](done/09-observer-and-failures.md) | Feature | — |
 | 12 | 13 | [Offline writes](done/13-offline-writes.md) | Feature | — |
-| 13 | 11 | [Docs and site](pitches/11-docs-site-refresh.md) | Chore | — |
+| 13 | 11 | [Docs and site](done/11-docs-site-refresh.md) | Chore | — |
 
 Capability coverage: [pass-through.md](pass-through.md).

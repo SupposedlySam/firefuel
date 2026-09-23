@@ -3,7 +3,7 @@
 ## Metadata
 - **Type:** Chore
 - **Appetite:** 1 day
-- **Status:** Bet (started 2026-09-23)
+- **Status:** Done (2026-09-23)
 - **Created:** 2026-09-23
 - **Breaking:** raises the SDK floor only
 
@@ -44,3 +44,9 @@ with no code. `universal_io` is a dependency of both published packages, used on
 - The workspace changes how `firefuel` resolves `firefuel_core`. A published `firefuel` still
   depends on `firefuel_core: ^x.y.z` from pub, so core has to be published first. Record that
   in the release notes.
+
+## Outcome (2026-09-23)
+All must-haves shipped: `0af13de`, `94cfc07` and `09d1c91`. `CLAUDE.md` came later.
+**CI has never run:** the workflow was added on this branch and nothing has been pushed. The
+first push of the branch is its first real run. `kuhnroyal/flutter-fvm-config-action@v3` is
+assumed to accept `path:`, which is unverified.
