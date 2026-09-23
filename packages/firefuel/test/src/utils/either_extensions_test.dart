@@ -16,10 +16,7 @@ void main() {
     test('should throw $MissingValueException when Right does not exist', () {
       final Either<Failure, String> result = Left(ExpectedFailure());
 
-      expect(
-        result.getRight,
-        throwsA(isA<MissingValueException>()),
-      );
+      expect(result.getRight, throwsA(isA<MissingValueException>()));
     });
   });
 
@@ -32,15 +29,14 @@ void main() {
       expect(left, isA<Failure>());
     });
 
-    test('should throw $MissingValueException when $Failure does not exist',
-        () {
-      const Either<Failure, String> result = Right('testValue');
+    test(
+      'should throw $MissingValueException when $Failure does not exist',
+      () {
+        const Either<Failure, String> result = Right('testValue');
 
-      expect(
-        result.getLeft,
-        throwsA(isA<MissingValueException>()),
-      );
-    });
+        expect(result.getLeft, throwsA(isA<MissingValueException>()));
+      },
+    );
   });
 
   group('#getRightOrElseNull', () {

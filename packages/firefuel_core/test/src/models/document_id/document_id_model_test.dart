@@ -38,7 +38,7 @@ void main() {
     );
 
     test('$CannotSolelyConsistOfASingleOrDoublePeriod when value is "."', () {
-      final invalidInput = '.';
+      const invalidInput = '.';
 
       expect(
         () => DocumentId(invalidInput),
@@ -47,7 +47,7 @@ void main() {
     });
 
     test('$CannotSolelyConsistOfASingleOrDoublePeriod when value is "."', () {
-      final invalidInput = '..';
+      const invalidInput = '..';
 
       expect(
         () => DocumentId(invalidInput),
@@ -55,50 +55,46 @@ void main() {
       );
     });
 
-    test(
-      '$CannotStartAndEndWithDoubleUnderscore when value matches regex "__.*__"',
-      () {
-        expect(
-          () => DocumentId('__someValue__'),
-          throwsA(isA<CannotStartAndEndWithDoubleUnderscore>()),
-        );
-        expect(
-          () => DocumentId('____'),
-          throwsA(isA<CannotStartAndEndWithDoubleUnderscore>()),
-        );
-        expect(
-          () => DocumentId('__1234__'),
-          throwsA(isA<CannotStartAndEndWithDoubleUnderscore>()),
-        );
-        expect(
-          () => DocumentId('__  __'),
-          throwsA(isA<CannotStartAndEndWithDoubleUnderscore>()),
-        );
-      },
-    );
+    test('$CannotStartAndEndWithDoubleUnderscore when value matches '
+        'regex "__.*__"', () {
+      expect(
+        () => DocumentId('__someValue__'),
+        throwsA(isA<CannotStartAndEndWithDoubleUnderscore>()),
+      );
+      expect(
+        () => DocumentId('____'),
+        throwsA(isA<CannotStartAndEndWithDoubleUnderscore>()),
+      );
+      expect(
+        () => DocumentId('__1234__'),
+        throwsA(isA<CannotStartAndEndWithDoubleUnderscore>()),
+      );
+      expect(
+        () => DocumentId('__  __'),
+        throwsA(isA<CannotStartAndEndWithDoubleUnderscore>()),
+      );
+    });
 
-    test(
-      '$CannotContainForwardSlash when forward slash is present and flag is set',
-      () {
-        final invalidInput = 'some/value';
+    test('$CannotContainForwardSlash when forward slash is present and flag '
+        'is set', () {
+      const invalidInput = 'some/value';
 
-        expect(
-          () => DocumentId(invalidInput, throwsOnForwardSlash: true),
-          throwsA(isA<CannotContainForwardSlash>()),
-        );
-      },
-    );
+      expect(
+        () => DocumentId(invalidInput, throwsOnForwardSlash: true),
+        throwsA(isA<CannotContainForwardSlash>()),
+      );
+    });
   });
 
   test('should have value as prop', () {
-    final value = 'testValue';
+    const value = 'testValue';
     final docId = DocumentId(value);
 
     expect(docId.props, [value]);
   });
 
   test('should serialize using the $DocumentIdSerializer', () {
-    final value = 'testValue';
+    const value = 'testValue';
     final docId = DocumentId(value);
     final expectedResult = DocumentIdSerializer.toMap(docId);
 

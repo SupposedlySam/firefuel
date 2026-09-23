@@ -152,10 +152,7 @@ void main() {
     final originalDocId = DocumentId('originalDocId');
 
     test('should create the document with provided id', () async {
-      await testBatch.createById(
-        value: batman,
-        docId: originalDocId,
-      );
+      await testBatch.createById(value: batman, docId: originalDocId);
 
       await testBatch.commit();
 
@@ -208,10 +205,7 @@ void main() {
       await testBatch.createById(value: newUser, docId: originalDocId);
       await testBatch.commit();
 
-      await testBatch.replace(
-        value: updatedUser,
-        docId: originalDocId,
-      );
+      await testBatch.replace(value: updatedUser, docId: originalDocId);
 
       await testBatch.commit();
 
@@ -290,10 +284,7 @@ void main() {
       const updatedDoc = TestUser('updateValue');
       final docId = await testCollection.create(batman);
 
-      await testBatch.update(
-        docId: docId,
-        value: updatedDoc,
-      );
+      await testBatch.update(docId: docId, value: updatedDoc);
 
       await testBatch.commit();
 
@@ -387,10 +378,7 @@ void main() {
       final originalDocId = DocumentId('originalDocId');
       const newUser = TestUser('newUser');
 
-      await testBatch.updateOrCreate(
-        docId: originalDocId,
-        value: newUser,
-      );
+      await testBatch.updateOrCreate(docId: originalDocId, value: newUser);
 
       await testBatch.commit();
 
@@ -403,10 +391,7 @@ void main() {
       const updatedDoc = TestUser('updateValue');
       final docId = await testCollection.create(batman);
 
-      await testBatch.updateOrCreate(
-        docId: docId,
-        value: updatedDoc,
-      );
+      await testBatch.updateOrCreate(docId: docId, value: updatedDoc);
 
       await testBatch.commit();
 

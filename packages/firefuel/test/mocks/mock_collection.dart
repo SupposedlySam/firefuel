@@ -102,17 +102,12 @@ extension MockCollectionX<T extends Serializable> on MockCollection<T> {
           orderBy: any(named: 'orderBy'),
           limit: any(named: 'limit'),
         );
-      }).thenAnswer(
-        (_) => onStreamWhere(),
-      );
+      }).thenAnswer((_) => onStreamWhere());
     }
 
     if (onOrderBy != null) {
       when(
-        () => orderBy(
-          any(),
-          limit: any(named: 'limit'),
-        ),
+        () => orderBy(any(), limit: any(named: 'limit')),
       ).thenAnswer((_) => Future.value(onOrderBy()));
     }
 
@@ -161,8 +156,12 @@ extension MockCollectionX<T extends Serializable> on MockCollection<T> {
     }
 
     if (onUpdate != null) {
-      when(() => update(docId: any(named: 'docId'), value: any(named: 'value')))
-          .thenAnswer((_) => Future.value(onUpdate()));
+      when(
+        () => update(
+          docId: any(named: 'docId'),
+          value: any(named: 'value'),
+        ),
+      ).thenAnswer((_) => Future.value(onUpdate()));
     }
 
     if (onArrayRemove != null) {
@@ -223,8 +222,9 @@ extension MockCollectionX<T extends Serializable> on MockCollection<T> {
     }
 
     if (onWhereById != null) {
-      when(() => whereById(any()))
-          .thenAnswer((_) => Future.value(onWhereById()));
+      when(
+        () => whereById(any()),
+      ).thenAnswer((_) => Future.value(onWhereById()));
     }
   }
 }

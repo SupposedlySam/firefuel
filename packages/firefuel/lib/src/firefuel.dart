@@ -26,10 +26,7 @@ class Firefuel {
   /// [env] is optional and will be prepended to all collection names
   ///
   /// Useful for separating collections between app flavors / environments
-  static void initialize(
-    FirebaseFirestore firestore, {
-    String? env,
-  }) {
+  static void initialize(FirebaseFirestore firestore, {String? env}) {
     _env = env;
     _firestore = firestore;
   }

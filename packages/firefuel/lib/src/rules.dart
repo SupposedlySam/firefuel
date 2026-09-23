@@ -246,10 +246,7 @@ abstract class DocCreate<R, T extends Serializable> {
   Future<R> create(T value);
 
   /// Create a new document with the provided [docId]
-  Future<R> createById({
-    required T value,
-    required DocumentId docId,
-  });
+  Future<R> createById({required T value, required DocumentId docId});
 }
 
 /// {@template firefuel.rules.doc_create_if_not_exists}
@@ -285,10 +282,7 @@ abstract class DocUpdateOrCreate<R, T extends Serializable> {
   /// If no document exists, a new document will be created
   ///
   /// The value returned is the value passed in, a read is not performed
-  Future<R> updateOrCreate({
-    required DocumentId docId,
-    required T value,
-  });
+  Future<R> updateOrCreate({required DocumentId docId, required T value});
 }
 
 /// Delete an existing Document
@@ -367,10 +361,7 @@ abstract class DocUpdate<R, T extends Serializable> {
   /// document data.
   ///
   /// If no document exists yet, the update will fail silently.
-  Future<R> update({
-    required DocumentId docId,
-    required T value,
-  });
+  Future<R> update({required DocumentId docId, required T value});
 
   /// Updates specific fields on the document.
   Future<R> updateFields({
@@ -394,8 +385,5 @@ abstract class DocUpdate<R, T extends Serializable> {
   });
 
   /// Sets [field] to Firestore's server timestamp.
-  Future<R> serverTimestamp({
-    required DocumentId docId,
-    required String field,
-  });
+  Future<R> serverTimestamp({required DocumentId docId, required String field});
 }

@@ -11,9 +11,7 @@ mixin FirefuelFetchMixin {
   /// errors are triggered by the [callback]
   ///
   /// See also: [guardStream] for [Stream] types
-  Future<Either<Failure, R>> guard<R>(
-    FutureOr<R> Function() callback,
-  ) async {
+  Future<Either<Failure, R>> guard<R>(FutureOr<R> Function() callback) async {
     try {
       final result = await callback();
 
@@ -27,10 +25,7 @@ mixin FirefuelFetchMixin {
       }
 
       return Left(
-        FirestoreFailure(
-          error: e,
-          stackTrace: Chain.forTrace(stack),
-        ),
+        FirestoreFailure(error: e, stackTrace: Chain.forTrace(stack)),
       );
     }
   }
@@ -56,12 +51,7 @@ mixin FirefuelFetchMixin {
         print('Format Exception: ${e.message}');
       }
 
-      yield Left(
-        FirestoreFailure(
-          error: e,
-          stackTrace: Chain.forTrace(stack),
-        ),
-      );
+      yield Left(FirestoreFailure(error: e, stackTrace: Chain.forTrace(stack)));
     }
   }
 }

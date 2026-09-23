@@ -7,7 +7,7 @@ import 'package:firefuel/src/utils/serializable_extensions.dart';
 abstract class FirefuelCollection<T extends Serializable>
     implements Collection<T> {
   FirefuelCollection(String path, {bool useEnv = true})
-      : path = _buildPath(path, useEnv);
+    : path = _buildPath(path, useEnv);
   final String path;
 
   final FirebaseFirestore firestore = Firefuel.firestore;
@@ -62,9 +62,9 @@ abstract class FirefuelCollection<T extends Serializable>
 
   @override
   Future<double?> sumAll(String field, {AggregateSource? source}) async {
-    final snapshot = await untypedRef.aggregate(sum(field)).get(
-          source: source ?? AggregateSource.server,
-        );
+    final snapshot = await untypedRef
+        .aggregate(sum(field))
+        .get(source: source ?? AggregateSource.server);
 
     return snapshot.getSum(field);
   }
@@ -75,18 +75,19 @@ abstract class FirefuelCollection<T extends Serializable>
     String field, {
     AggregateSource? source,
   }) async {
-    final snapshot = await untypedRef.filter(clauses).aggregate(sum(field)).get(
-          source: source ?? AggregateSource.server,
-        );
+    final snapshot = await untypedRef
+        .filter(clauses)
+        .aggregate(sum(field))
+        .get(source: source ?? AggregateSource.server);
 
     return snapshot.getSum(field);
   }
 
   @override
   Future<double?> averageAll(String field, {AggregateSource? source}) async {
-    final snapshot = await untypedRef.aggregate(average(field)).get(
-          source: source ?? AggregateSource.server,
-        );
+    final snapshot = await untypedRef
+        .aggregate(average(field))
+        .get(source: source ?? AggregateSource.server);
 
     return snapshot.getAverage(field);
   }
@@ -97,10 +98,10 @@ abstract class FirefuelCollection<T extends Serializable>
     String field, {
     AggregateSource? source,
   }) async {
-    final snapshot =
-        await untypedRef.filter(clauses).aggregate(average(field)).get(
-              source: source ?? AggregateSource.server,
-            );
+    final snapshot = await untypedRef
+        .filter(clauses)
+        .aggregate(average(field))
+        .get(source: source ?? AggregateSource.server);
 
     return snapshot.getAverage(field);
   }
@@ -142,10 +143,7 @@ abstract class FirefuelCollection<T extends Serializable>
   DocumentId generateDocId() => DocumentId(ref.doc().id);
 
   @override
-  Future<List<T>> limit(
-    int limit, {
-    GetOptions? getOptions,
-  }) async {
+  Future<List<T>> limit(int limit, {GetOptions? getOptions}) async {
     final snapshot = await ref.limit(limit).get(getOptions);
 
     return snapshot.docs.toListT();
@@ -180,16 +178,8 @@ abstract class FirefuelCollection<T extends Serializable>
     final isNotLast = snapshotLength == chunk.limit;
 
     return isNotLast
-        ? Chunk<T>.next(
-            data: data,
-            cursor: cursor,
-            orderBy: chunk.orderBy,
-          )
-        : Chunk<T>.last(
-            data: data,
-            cursor: cursor,
-            orderBy: chunk.orderBy,
-          );
+        ? Chunk<T>.next(data: data, cursor: cursor, orderBy: chunk.orderBy)
+        : Chunk<T>.last(data: data, cursor: cursor, orderBy: chunk.orderBy);
   }
 
   @override
@@ -199,10 +189,7 @@ abstract class FirefuelCollection<T extends Serializable>
   }
 
   @override
-  Future<List<T?>> readMany(
-    List<DocumentId> docIds, {
-    GetOptions? getOptions,
-  }) {
+  Future<List<T?>> readMany(List<DocumentId> docIds, {GetOptions? getOptions}) {
     return Future.wait(
       docIds.map((docId) => read(docId, getOptions: getOptions)),
     );
@@ -283,14 +270,11 @@ abstract class FirefuelCollection<T extends Serializable>
     controller = StreamController<List<T?>>(
       onListen: () {
         for (final (index, docId) in docIds.indexed) {
-          final subscription = stream(docId).listen(
-            (value) {
-              latest[index] = value;
-              hasValue[index] = true;
-              emitIfReady();
-            },
-            onError: controller.addError,
-          );
+          final subscription = stream(docId).listen((value) {
+            latest[index] = value;
+            hasValue[index] = true;
+            emitIfReady();
+          }, onError: controller.addError);
           subscriptions.add(subscription);
         }
       },
@@ -377,16 +361,10 @@ abstract class FirefuelCollection<T extends Serializable>
   }
 
   /// Converts a [T?] to a [`Map<String, Object?>`] to upload to Firestore.
-  Map<String, Object?> toFirestore(
-    T? model,
-    SetOptions? options,
-  );
+  Map<String, Object?> toFirestore(T? model, SetOptions? options);
 
   @override
-  Future<void> update({
-    required DocumentId docId,
-    required T value,
-  }) async {
+  Future<void> update({required DocumentId docId, required T value}) async {
     await ref.doc(docId.docId).update(value.toJson());
 
     return;
@@ -468,10 +446,7 @@ abstract class FirefuelCollection<T extends Serializable>
   @override
   Future<T?> whereById(DocumentId docId, {GetOptions? getOptions}) async {
     final snapshot = await ref
-        .where(
-          FieldPath.documentId,
-          isEqualTo: docId.docId,
-        )
+        .where(FieldPath.documentId, isEqualTo: docId.docId)
         .get(getOptions);
 
     final docs = snapshot.docs;
@@ -488,7 +463,7 @@ abstract class FirefuelCollection<T extends Serializable>
   Future<QuerySnapshot<T?>> _buildPaginationSnapshot(
     Chunk<T> chunk, {
     GetOptions? getOptions,
-  }) async {
+  }) {
     final query = ref
         .filterIfNotNull(chunk.clauses)
         .sortIfNotNull(chunk.orderBy)

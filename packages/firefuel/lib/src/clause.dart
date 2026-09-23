@@ -38,19 +38,13 @@ class Clause extends Equatable {
     this.whereIn,
     this.whereNotIn,
     this.isNull,
-  })  : isRangeComparison = _hasAny([
-          isLessThan,
-          isLessThanOrEqualTo,
-          isGreaterThan,
-          isGreaterThanOrEqualTo,
-        ]),
-        isEqualityOrInComparison = _hasAny(
-          [
-            isEqualTo,
-            whereIn,
-            isNull,
-          ],
-        ) {
+  }) : isRangeComparison = _hasAny([
+         isLessThan,
+         isLessThanOrEqualTo,
+         isGreaterThan,
+         isGreaterThanOrEqualTo,
+       ]),
+       isEqualityOrInComparison = _hasAny([isEqualTo, whereIn, isNull]) {
     _ensureSingleOptionChosen([
       isEqualTo,
       isNotEqualTo,
@@ -84,19 +78,19 @@ class Clause extends Equatable {
   // coverage:ignore-start
   @override
   List<Object?> get props => [
-        field,
-        if (isEqualTo != null) isEqualTo,
-        if (isNotEqualTo != null) isNotEqualTo,
-        if (isLessThan != null) isLessThan,
-        if (isLessThanOrEqualTo != null) isLessThanOrEqualTo,
-        if (isGreaterThan != null) isGreaterThan,
-        if (isGreaterThanOrEqualTo != null) isGreaterThanOrEqualTo,
-        if (arrayContains != null) arrayContains,
-        if (arrayContainsAny != null) arrayContainsAny,
-        if (whereIn != null) whereIn,
-        if (whereNotIn != null) whereNotIn,
-        if (isNull != null) isNull,
-      ];
+    field,
+    if (isEqualTo != null) isEqualTo,
+    if (isNotEqualTo != null) isNotEqualTo,
+    if (isLessThan != null) isLessThan,
+    if (isLessThanOrEqualTo != null) isLessThanOrEqualTo,
+    if (isGreaterThan != null) isGreaterThan,
+    if (isGreaterThanOrEqualTo != null) isGreaterThanOrEqualTo,
+    if (arrayContains != null) arrayContains,
+    if (arrayContainsAny != null) arrayContainsAny,
+    if (whereIn != null) whereIn,
+    if (whereNotIn != null) whereNotIn,
+    if (isNull != null) isNull,
+  ];
   // coverage:ignore-end
 
   /// Checks for non-null options and throws a [TooManyArgumentsException] when
@@ -110,9 +104,7 @@ class Clause extends Equatable {
 
   /// Get a subset of the given clauses that are either equality or in
   /// (contains) comparisons
-  static List<String> getEqualityOrInComparisonFields(
-    List<Clause> clauses,
-  ) {
+  static List<String> getEqualityOrInComparisonFields(List<Clause> clauses) {
     return clauses
         .where((clause) => clause.isEqualityOrInComparison)
         .map((clause) => clause.field)

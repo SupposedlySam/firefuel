@@ -3,27 +3,20 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 extension QuerySnapshotX<T> on Stream<QuerySnapshot<T?>> {
   /// Get all non-null data from the [QuerySnapshot] documents
   Stream<List<T>> toListT() {
-    return map(
-      (snapshot) => snapshot.docs.toListT(),
-    );
+    return map((snapshot) => snapshot.docs.toListT());
   }
 
   /// Get non-null data from changed [QuerySnapshot] documents.
   Stream<List<T>> toChangedListT({bool includeRemoved = false}) {
-    return map(
-      (snapshot) {
-        final changes = includeRemoved
-            ? snapshot.docChanges
-            : snapshot.docChanges.where(
-                (change) => change.type != DocumentChangeType.removed,
-              );
+    return map((snapshot) {
+      final changes = includeRemoved
+          ? snapshot.docChanges
+          : snapshot.docChanges.where(
+              (change) => change.type != DocumentChangeType.removed,
+            );
 
-        return changes
-            .map((change) => change.doc.data())
-            .whereType<T>()
-            .toList();
-      },
-    );
+      return changes.map((change) => change.doc.data()).whereType<T>().toList();
+    });
   }
 }
 

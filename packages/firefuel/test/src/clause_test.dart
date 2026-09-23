@@ -49,17 +49,14 @@ void main() {
       },
     );
 
-    test(
-      'should return false when given one field in range comparison',
-      () {
-        final result = Clause.hasMoreThanOneFieldInRangeComparisons([
-          Clause('age', isLessThan: 20),
-          Clause('age', isGreaterThan: 10),
-        ]);
+    test('should return false when given one field in range comparison', () {
+      final result = Clause.hasMoreThanOneFieldInRangeComparisons([
+        Clause('age', isLessThan: 20),
+        Clause('age', isGreaterThan: 10),
+      ]);
 
-        expect(result, isFalse);
-      },
-    );
+      expect(result, isFalse);
+    });
   });
 
   group('.getEqualityOrInComparisonFields', () {
@@ -104,9 +101,7 @@ void main() {
 
     test('should fall back to first clause when there is no range', () {
       expect(
-        Clause.fieldMatchingRangeOrderingRule([
-          Clause('name', isEqualTo: 'a'),
-        ]),
+        Clause.fieldMatchingRangeOrderingRule([Clause('name', isEqualTo: 'a')]),
         'name',
       );
     });

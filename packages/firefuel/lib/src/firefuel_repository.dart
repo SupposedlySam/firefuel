@@ -4,7 +4,7 @@ abstract class FirefuelRepository<T extends Serializable>
     with FirefuelFetchMixin
     implements Repository<T> {
   const FirefuelRepository({required Collection<T> collection})
-      : _collection = collection;
+    : _collection = collection;
   final Collection<T> _collection;
 
   @override
@@ -75,13 +75,8 @@ abstract class FirefuelRepository<T extends Serializable>
   }
 
   @override
-  Future<Either<Failure, List<T>>> limit(
-    int limit, {
-    GetOptions? getOptions,
-  }) {
-    return guard(
-      () => _collection.limit(limit, getOptions: getOptions),
-    );
+  Future<Either<Failure, List<T>>> limit(int limit, {GetOptions? getOptions}) {
+    return guard(() => _collection.limit(limit, getOptions: getOptions));
   }
 
   @override
@@ -135,11 +130,7 @@ abstract class FirefuelRepository<T extends Serializable>
     int? limit,
   }) {
     return guardStream(
-      () => _collection.streamWhere(
-        clauses,
-        orderBy: orderBy,
-        limit: limit,
-      ),
+      () => _collection.streamWhere(clauses, orderBy: orderBy, limit: limit),
     );
   }
 
@@ -150,11 +141,7 @@ abstract class FirefuelRepository<T extends Serializable>
     GetOptions? getOptions,
   }) {
     return guard(
-      () => _collection.orderBy(
-        orderBy,
-        limit: limit,
-        getOptions: getOptions,
-      ),
+      () => _collection.orderBy(orderBy, limit: limit, getOptions: getOptions),
     );
   }
 
@@ -163,36 +150,25 @@ abstract class FirefuelRepository<T extends Serializable>
     Chunk<T> chunk, {
     GetOptions? getOptions,
   }) {
-    return guard(
-      () => _collection.paginate(chunk, getOptions: getOptions),
-    );
+    return guard(() => _collection.paginate(chunk, getOptions: getOptions));
   }
 
   @override
-  Future<Either<Failure, T?>> read(
-    DocumentId docId, {
-    GetOptions? getOptions,
-  }) async {
-    return guard(
-      () => _collection.read(docId, getOptions: getOptions),
-    );
+  Future<Either<Failure, T?>> read(DocumentId docId, {GetOptions? getOptions}) {
+    return guard(() => _collection.read(docId, getOptions: getOptions));
   }
 
   @override
   Future<Either<Failure, List<T?>>> readMany(
     List<DocumentId> docIds, {
     GetOptions? getOptions,
-  }) async {
-    return guard(
-      () => _collection.readMany(docIds, getOptions: getOptions),
-    );
+  }) {
+    return guard(() => _collection.readMany(docIds, getOptions: getOptions));
   }
 
   @override
-  Future<Either<Failure, List<T>>> readAll({GetOptions? getOptions}) async {
-    return guard(
-      () => _collection.readAll(getOptions: getOptions),
-    );
+  Future<Either<Failure, List<T>>> readAll({GetOptions? getOptions}) {
+    return guard(() => _collection.readAll(getOptions: getOptions));
   }
 
   @override
@@ -244,12 +220,9 @@ abstract class FirefuelRepository<T extends Serializable>
   Future<Either<Failure, void>> update({
     required DocumentId docId,
     required T value,
-  }) async {
+  }) {
     return guard(() {
-      return _collection.update(
-        docId: docId,
-        value: value,
-      );
+      return _collection.update(docId: docId, value: value);
     });
   }
 
@@ -268,11 +241,7 @@ abstract class FirefuelRepository<T extends Serializable>
     required List<Object?> values,
   }) {
     return guard(
-      () => _collection.arrayUnion(
-        docId: docId,
-        field: field,
-        values: values,
-      ),
+      () => _collection.arrayUnion(docId: docId, field: field, values: values),
     );
   }
 
@@ -283,11 +252,7 @@ abstract class FirefuelRepository<T extends Serializable>
     required List<Object?> values,
   }) {
     return guard(
-      () => _collection.arrayRemove(
-        docId: docId,
-        field: field,
-        values: values,
-      ),
+      () => _collection.arrayRemove(docId: docId, field: field, values: values),
     );
   }
 
@@ -296,9 +261,7 @@ abstract class FirefuelRepository<T extends Serializable>
     required DocumentId docId,
     required String field,
   }) {
-    return guard(
-      () => _collection.serverTimestamp(docId: docId, field: field),
-    );
+    return guard(() => _collection.serverTimestamp(docId: docId, field: field));
   }
 
   @override
@@ -331,8 +294,6 @@ abstract class FirefuelRepository<T extends Serializable>
     DocumentId docId, {
     GetOptions? getOptions,
   }) {
-    return guard(
-      () => _collection.whereById(docId, getOptions: getOptions),
-    );
+    return guard(() => _collection.whereById(docId, getOptions: getOptions));
   }
 }

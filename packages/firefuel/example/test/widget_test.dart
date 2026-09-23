@@ -9,8 +9,9 @@ void main() {
 
   tearDown(Firefuel.reset);
 
-  testWidgets('playground renders feature cards and seeded data',
-      (tester) async {
+  testWidgets('playground renders feature cards and seeded data', (
+    tester,
+  ) async {
     await tester.pumpWidget(const FirefuelPlaygroundApp());
     await tester.pumpAndSettle();
 

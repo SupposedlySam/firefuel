@@ -34,10 +34,7 @@ class _PlaygroundPageState extends State<PlaygroundPage> {
       OrderBy(field: PlaygroundNote.fieldTitle),
     ]);
 
-    _runAction(
-      label: 'Seeded sample notes',
-      action: _seedSampleNotes,
-    );
+    _runAction(label: 'Seeded sample notes', action: _seedSampleNotes);
   }
 
   @override
@@ -55,10 +52,8 @@ class _PlaygroundPageState extends State<PlaygroundPage> {
         apis: const ['FirefuelBatch.create()'],
         description: 'Create sample documents in one commit.',
         title: 'Seed sample data',
-        onPressed: () => _runAction(
-          label: 'Seeded sample notes',
-          action: _seedSampleNotes,
-        ),
+        onPressed: () =>
+            _runAction(label: 'Seeded sample notes', action: _seedSampleNotes),
       ),
       _FeatureCard(
         apis: const [
@@ -115,22 +110,15 @@ class _PlaygroundPageState extends State<PlaygroundPage> {
         ],
         description: 'Run filtered reads and aggregate queries.',
         title: 'Query and aggregate',
-        onPressed: () => _runAction(
-          label: 'Calculated query stats',
-          action: _showStats,
-        ),
+        onPressed: () =>
+            _runAction(label: 'Calculated query stats', action: _showStats),
       ),
       _FeatureCard(
-        apis: const [
-          'FirefuelCollection.paginate()',
-          'Chunk',
-        ],
+        apis: const ['FirefuelCollection.paginate()', 'Chunk'],
         description: 'Load one small page at a time.',
         title: 'Paginate',
-        onPressed: () => _runAction(
-          label: 'Loaded the first page',
-          action: _showFirstPage,
-        ),
+        onPressed: () =>
+            _runAction(label: 'Loaded the first page', action: _showFirstPage),
       ),
       _FeatureCard(
         apis: const [
@@ -450,10 +438,7 @@ class _ActionTray extends StatelessWidget {
             const SizedBox(height: 8),
             Row(
               children: [
-                Text(
-                  'Demos',
-                  style: Theme.of(context).textTheme.titleSmall,
-                ),
+                Text('Demos', style: Theme.of(context).textTheme.titleSmall),
                 const SizedBox(width: 8),
                 Text(
                   'Swipe to choose an action',
@@ -507,14 +492,9 @@ class _FeatureCard extends StatelessWidget {
           children: [
             Text(title, style: Theme.of(context).textTheme.titleMedium),
             const SizedBox(height: 4),
-            Expanded(
-              child: Text(description),
-            ),
+            Expanded(child: Text(description)),
             const SizedBox(height: 8),
-            Text(
-              'Uses',
-              style: Theme.of(context).textTheme.labelMedium,
-            ),
+            Text('Uses', style: Theme.of(context).textTheme.labelMedium),
             const SizedBox(height: 6),
             SizedBox(
               height: 34,
@@ -570,9 +550,9 @@ class _ApiReferencePill extends StatelessWidget {
             Text(
               api,
               style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                    color: colorScheme.onSurfaceVariant,
-                    fontFamily: 'monospace',
-                  ),
+                color: colorScheme.onSurfaceVariant,
+                fontFamily: 'monospace',
+              ),
             ),
           ],
         ),
@@ -618,10 +598,7 @@ class _NotesCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              'Live notes',
-              style: Theme.of(context).textTheme.titleMedium,
-            ),
+            Text('Live notes', style: Theme.of(context).textTheme.titleMedium),
             const SizedBox(height: 8),
             StreamBuilder<List<PlaygroundNote>>(
               stream: notesStream,

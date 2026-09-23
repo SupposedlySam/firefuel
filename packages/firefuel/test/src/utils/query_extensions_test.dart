@@ -31,9 +31,9 @@ void main() {
     });
 
     test('should return a new query when not null', () {
-      final result = ref.filterIfNotNull(
-        [Clause(TestUser.fieldName, isEqualTo: 'testUser')],
-      );
+      final result = ref.filterIfNotNull([
+        Clause(TestUser.fieldName, isEqualTo: 'testUser'),
+      ]);
 
       expect(identityHashCode(result), isNot(identityHashCode(ref)));
     });
@@ -47,9 +47,9 @@ void main() {
     });
 
     test('should return a new query', () {
-      final result = ref.filter(
-        [Clause(TestUser.fieldName, isEqualTo: 'testUser')],
-      );
+      final result = ref.filter([
+        Clause(TestUser.fieldName, isEqualTo: 'testUser'),
+      ]);
 
       expect(identityHashCode(result), isNot(identityHashCode(ref)));
     });
