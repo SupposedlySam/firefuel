@@ -302,6 +302,11 @@ abstract class DocCreateIfNotExist<R, T extends Serializable>
   ///
   /// If the documentId returns a snapshot that does not exist, or `data()`
   /// returns `null`, create a new document with the [docId] provided.
+  ///
+  /// Not atomic: two clients racing on the same missing document can both
+  /// create it, and the later write wins. It works offline, which a
+  /// transaction does not. When the race matters, use
+  /// `TransactionScope.readOrCreate` inside `Firefuel.runTransaction`.
   Future<R> readOrCreate({
     required DocumentId docId,
     required T createValue,

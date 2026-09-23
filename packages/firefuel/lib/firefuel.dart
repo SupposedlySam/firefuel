@@ -3,6 +3,7 @@ export 'package:cloud_firestore/cloud_firestore.dart'
         AggregateSource,
         CollectionReference,
         DocumentChangeType,
+        DocumentReference,
         DocumentSnapshot,
         FieldPath,
         FieldValue,
@@ -17,6 +18,8 @@ export 'package:cloud_firestore/cloud_firestore.dart'
         SnapshotOptions,
         Source,
         Timestamp,
+        Transaction,
+        WriteBatch,
         average,
         sum;
 export 'package:firefuel/src/batch.dart';
@@ -41,3 +44,4 @@ export 'package:firefuel/src/snapshots.dart';
 export 'package:firefuel/src/utils/either_extensions.dart';
 export 'package:firefuel/src/utils/exceptions.dart';
 export 'package:firefuel_core/firefuel_core.dart';
+export 'package:firefuel/src/write_scopes.dart' hide WriteScopes;

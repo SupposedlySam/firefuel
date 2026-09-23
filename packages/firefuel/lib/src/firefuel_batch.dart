@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firefuel/firefuel.dart';
 import 'package:firefuel/src/utils/field_updates.dart';
 import 'package:flutter/foundation.dart';

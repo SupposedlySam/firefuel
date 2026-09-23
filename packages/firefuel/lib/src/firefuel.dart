@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firefuel/src/write_scopes.dart';
 
 class Firefuel {
   /// The instance collections use unless they were given their own.
@@ -52,5 +53,49 @@ class Firefuel {
   static void reset() {
     _env = null;
     _firestore = null;
+  }
+
+  /// Runs [handler] as a Firestore transaction and returns its result.
+  ///
+  /// Scope the transaction to each collection with `transaction.of(...)`,
+  /// read what you need, then write:
+  ///
+  /// ```dart
+  /// await Firefuel.runTransaction((transaction) async {
+  ///   final accounts = transaction.of(accountCollection);
+  ///   final from = await accounts.read(fromId);
+  ///   final to = await accounts.read(toId);
+  ///
+  ///   accounts
+  ///     ..update(docId: fromId, value: from!.withdraw(amount))
+  ///     ..update(docId: toId, value: to!.deposit(amount));
+  /// });
+  /// ```
+  ///
+  /// If a document it read changes before it commits, Firestore runs
+  /// [handler] again, up to [maxAttempts] times, so [handler] must not have
+  /// side effects beyond the transaction. Transactions fail while offline.
+  ///
+  /// Runs on [firestore], or on the default instance.
+  static Future<R> runTransaction<R>(
+    Future<R> Function(FirefuelTransaction transaction) handler, {
+    FirebaseFirestore? firestore,
+    Duration timeout = const Duration(seconds: 30),
+    int maxAttempts = 5,
+  }) {
+    return WriteScopes.runTransaction(
+      firestore ?? Firefuel.firestore,
+      handler,
+      timeout: timeout,
+      maxAttempts: maxAttempts,
+    );
+  }
+
+  /// An atomic batch of writes that may span collections, on [firestore]
+  /// or the default instance. Scope it with `batch.of(...)` and [commit].
+  ///
+  /// [commit]: FirefuelWriteBatch.commit
+  static FirefuelWriteBatch batch({FirebaseFirestore? firestore}) {
+    return WriteScopes.batch(firestore ?? Firefuel.firestore);
   }
 }
