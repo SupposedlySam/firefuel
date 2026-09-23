@@ -1,9 +1,20 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class Firefuel {
+  /// The instance collections use unless they were given their own.
+  ///
+  /// Throws a [StateError] before [initialize] is called. (Before 0.5 this was
+  /// an assert, which release builds skip, so the failure there was an
+  /// unexplained null-check crash.)
   static FirebaseFirestore get firestore {
-    assert(_firestore != null, 'Firefuel is not initialized');
-    return _firestore!;
+    final firestore = _firestore;
+    if (firestore == null) {
+      throw StateError(
+        'Firefuel is not initialized: call Firefuel.initialize(firestore) '
+        'before using a collection.',
+      );
+    }
+    return firestore;
   }
 
   static FirebaseFirestore? _firestore;
@@ -19,7 +30,10 @@ class Firefuel {
   ///
   /// This method must be called before any other method of Firefuel
   ///
-  /// All collections will reference [firestore]
+  /// Collections without their own instance use [firestore], resolved each
+  /// time they touch Firestore. Calling [initialize] again (for example after
+  /// switching to a named database) moves every such collection over, including
+  /// ones built earlier.
   ///
   /// ---
   ///

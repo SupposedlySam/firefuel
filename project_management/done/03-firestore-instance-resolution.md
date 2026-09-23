@@ -3,7 +3,7 @@
 ## Metadata
 - **Type:** Feature / Fix
 - **Appetite:** 1 day
-- **Status:** Pitch
+- **Status:** Done (2026-09-23)
 - **Created:** 2026-09-23
 - **Breaking:** no
 
@@ -38,3 +38,8 @@ once, before `Firefuel.initialize`. C is foreground code that could use
 `UserCollection.updateFields` today. flyby wants the optional `FirebaseFirestore? firestore`
 constructor param, mainly for tests. **Priority: low.** Keep the lazy getter, because it
 costs nothing and removes a latent trap.
+
+## Outcome (2026-09-23)
+Shipped as shaped. The first test passed against a `late final` mutation because it never used
+the collection before switching, so it was tightened to read first; it now fails on that mutation.
+Batches take the instance once, when they are created, which is the right scope for a batch.

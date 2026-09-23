@@ -1373,4 +1373,45 @@ void main() {
       });
     });
   });
+
+  group('firestore instance', () {
+    test('should follow Firefuel.initialize after construction', () async {
+      final second = FakeFirebaseFirestore();
+
+      // Built and used against the instance from setUp...
+      final collection = TestCollection();
+      await collection.readAll();
+      Firefuel.initialize(second);
+
+      // ...but writes land in the instance current at call time.
+      await collection.createById(
+        value: defaultUser,
+        docId: DocumentId('moved'),
+      );
+
+      final stored = await second
+          .collection(TestCollection.testUsersCollectionName)
+          .doc('moved')
+          .get();
+      expect(stored.exists, isTrue);
+    });
+
+    test('should stay on an instance it was given', () async {
+      final pinned = FakeFirebaseFirestore();
+      final collection = TestCollection(firestore: pinned);
+
+      Firefuel.initialize(FakeFirebaseFirestore());
+      await collection.createById(
+        value: defaultUser,
+        docId: DocumentId('pinned'),
+      );
+
+      final stored = await pinned
+          .collection(TestCollection.testUsersCollectionName)
+          .doc('pinned')
+          .get();
+      expect(stored.exists, isTrue);
+      expect(await testCollection.read(DocumentId('pinned')), isNull);
+    });
+  });
 }

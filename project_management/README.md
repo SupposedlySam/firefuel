@@ -77,7 +77,7 @@ from 2026-09-23.
 | 2 | 02 | [Correctness fixes](done/02-correctness-fixes.md) | Fix | direction bug (latent) |
 | 3 | 10 | [Own the Either](done/10-either-without-dartz.md) | Improvement | ok, keep names |
 | 4 | 12 | [The query is a value](done/12-query-layer.md) | Infrastructure | enables 05/06 |
-| 5 | 03 | [Instance resolution](pitches/03-firestore-instance-resolution.md) | Feature | low |
+| 5 | 03 | [Instance resolution](done/03-firestore-instance-resolution.md) | Feature | low |
 | 6 | 04 | [Server values and multi-field updates](pitches/04-write-values.md) | Feature | **yes** |
 | 7 | 07 | [Transactions](pitches/07-transactions.md) | Feature | no |
 | 8 | 06 | [Collection groups](pitches/06-collection-groups.md) | Feature | **yes** |

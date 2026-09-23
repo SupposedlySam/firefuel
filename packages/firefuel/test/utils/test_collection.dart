@@ -3,7 +3,7 @@ import 'package:firefuel/firefuel.dart';
 import 'test_user.dart';
 
 class TestCollection extends FirefuelCollection<TestUser> {
-  TestCollection() : super(testUsersCollectionName);
+  TestCollection({super.firestore}) : super(testUsersCollectionName);
 
   static const testUsersCollectionName = 'testUsers';
 

@@ -7,11 +7,31 @@ import 'package:firefuel/src/utils/serializable_extensions.dart';
 abstract class FirefuelCollection<T extends Serializable>
     with FirefuelQueryReads<T>
     implements Collection<T> {
-  FirefuelCollection(String path, {bool useEnv = true})
-    : path = _buildPath(path, useEnv);
+  /// A collection at [path].
+  ///
+  /// Pass [firestore] to pin this collection to one instance (a named
+  /// database, or a fake in tests). Without it, the collection uses
+  /// `Firefuel.firestore` as it is at the time of each call.
+  ///
+  /// [path] is prefixed with `Firefuel.env` unless [useEnv] is false.
+  FirefuelCollection(
+    String path, {
+    FirebaseFirestore? firestore,
+    bool useEnv = true,
+  }) : path = _buildPath(path, useEnv),
+       _firestore = firestore;
+
   final String path;
 
-  final FirebaseFirestore firestore = Firefuel.firestore;
+  final FirebaseFirestore? _firestore;
+
+  /// The instance this collection reads and writes.
+  ///
+  /// Resolved on every use rather than captured at construction. Until 0.5 a
+  /// collection kept the instance that was current when it was built, so
+  /// re-initializing Firefuel (to switch databases) silently left existing
+  /// collections on the old one.
+  FirebaseFirestore get firestore => _firestore ?? Firefuel.firestore;
 
   @override
   CollectionReference<T?> get ref {

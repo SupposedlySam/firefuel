@@ -10,8 +10,8 @@ void main() {
 
     tearDown(Firefuel.reset);
 
-    test('should throw an exception when not initialized', () {
-      expect(() => Firefuel.firestore, throwsA(isA<AssertionError>()));
+    test('should throw a StateError when not initialized', () {
+      expect(() => Firefuel.firestore, throwsStateError);
     });
 
     test('should return a $FirebaseFirestore instance when initialized', () {
