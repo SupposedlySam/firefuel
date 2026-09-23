@@ -157,6 +157,10 @@ final List<Friend> friends = await user.friends.readAll();
 
 !> Firestore does not support recursively deleting subcollections. If you delete a document that has subcollections, the subcollections still exist in your database and can be reference by url. They will not be visible in the firebase console. See [Delete Collections](https://firebase.google.com/docs/firestore/manage-data/delete-data#collections) and [this SO answer](https://stackoverflow.com/questions/49286764/delete-a-document-with-all-subcollections-and-nested-subcollections-in-firestore/57623425#57623425) for how to handle deleting subcollections.
 
+### Reading Across Subcollections
+
+To query every `friends` subcollection at once, rather than one user's, use a collection group. See [Collection groups](firefuelapi.md#collection-groups).
+
 ## Repositories (Optional)
 
 ### Summary
@@ -173,11 +177,13 @@ A Repository in Firefuel is responsible for the business logic of your data laye
 
 ## Handling Errors
 
-Firefuel is opinionated on how you should handle errors. Firefuel exposes the [dartz package](https://pub.dev/packages/dartz) [Either type](https://pub.dev/documentation/dartz/latest/dartz/Either-class.html), and requires that Repositories handle any error from the Collection and return "Either" a `Failure` or the success type for the function.
+Firefuel is opinionated about error handling. Repositories catch any error from the Collection and return "Either" a `Failure` or the method's success value. `Either` is a small sealed type in `firefuel_core`, exported by `package:firefuel/firefuel.dart`. (Before 0.5 it came from the unmaintained `dartz` package; the names and methods are the same.)
+
+Every failure a repository returns is also reported to `Firefuel.observer`. See [Observing failures](firefuelapi.md#observing-failures).
 
 Before we get too far ahead of ourselves, all methods inherited from the `FirefuelRepository` already take care of returning the `Either` type for you.
 
-## Either Types (via dartz package)
+## Either Types
 
 For every `Either` type you must provide a Type you expect if the method fails (`Left`) and a Type you expect if the method succeeds (`Right`). For example, the following defines an `Either` type where a failure would return a `Failure` class and a success would return a `String`:
 
@@ -187,41 +193,52 @@ Either<Failure, String>
 
 ### Failures (Left)
 
-A failure should be returned as a `Left`. The `Left` class is a subclass of the `Either` type and can be returned from a method.
+A failure is returned as a `Left`. `Failure` is abstract: extend it for each kind of failure your app distinguishes.
 
 ```dart
-Either<Failure, String> someMethod() {
-    try {
-        // some code that throws an Exception
-    }
-    catch(e, stackTrace) {
-        return Left(Failure(e, stackTrace: stackTrace));
-    }
+class ProfileNotFound extends Failure {
+  ProfileNotFound(super.error, {required super.stackTrace});
+}
+
+Either<Failure, Profile> parseProfile(Map<String, dynamic>? json) {
+  try {
+    return Right(Profile.fromJson(json!));
+  } on Object catch (e, stackTrace) {
+    return Left(ProfileNotFound(e, stackTrace: Chain.forTrace(stackTrace)));
+  }
 }
 ```
 
+Inside a repository you rarely need to write this yourself: `guard` does it for you, and reports the failure to the observer too.
+
+[guard](_snippets/core_concepts/errors_guard.dart.md ":include")
+
 ### Success Values (Right)
 
-A success should be returned as a `Right`. The `Right` class is a subclass of the `Either` type and can be returned from a method.
+A success is returned as a `Right`.
 
 ```dart
-Either<Failure, String> someMethod() {
-    try {
-        return Right('success!');
-    }
-    catch(e, stackTrace) {
-        // the code in the try is successful so we won't make it here
-    }
-}
+Either<Failure, String> greet(String name) => Right('Hello, $name');
 ```
 
 ### Working with Either Types
 
 Once you receive an `Either` type back from a `Repository` you need to know how to handle them correctly. The benefit of the `Either` type is you will never forget to handle possible errors because your code is making you handle them.
 
+#### Pattern matching
+
+`Either` is sealed, so a `switch` must handle both sides, and the compiler checks that it does:
+
+```dart
+final message = switch (await repository.read(docId)) {
+  Left(:final value) => 'Could not load: ${value.error}',
+  Right(:final value) => 'Loaded ${value?.name}',
+};
+```
+
 #### Fold
 
-The main way you'll "unbox" these values is with the `fold` method. The `fold` method requires two functions (callbacks) to be given to it as arguments. The first one is for the sad path (failure/left) the second is for the happy path (success value/right).
+The other way to "unbox" these values is the `fold` method. The `fold` method requires two functions (callbacks) to be given to it as arguments. The first one is for the sad path (failure/left) the second is for the happy path (success value/right).
 
 For this example we'll use one of the prebuilt methods on the `FirefuelRepository` called `read`. The `read` method returns either a `Failure` or a `T` (where `T` is the Type we expect when the method is successful).
 
@@ -259,7 +276,7 @@ The `map` method is considered "right bias", which means the value being passed 
 
 #### GetOrElse
 
-The last two methods provided by the `dartz` library that you should know about are the `getOrElse` and the `swap` methods.
+Two more methods are worth knowing: `getOrElse` and `swap`. (`leftMap` and `flatMap` are there too, for transforming the failure or chaining another operation that can fail.)
 
 `swap` switches the sides of your `Either` type so that what was on the left is now on the right and vice versa.
 

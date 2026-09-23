@@ -1,25 +1,21 @@
-Introduction
+**Introduction**
 
 - [Why Firefuel?](whyfirefuel.md)
 - [Getting Started](gettingstarted.md)
+- [Migrating to 0.5](migrating.md)
 
----
-
-Documentation
+**Documentation**
 
 - [Core Concepts](coreconcepts.md)
-- [Firefuel API Guide](firefuelapi.md)
+- [API Guide](firefuelapi.md)
 - [Architecture](architecture.md)
 - [Naming Conventions](firefuelnamingconventions.md)
 
----
-
-Code Generation
+**Code Generation**
 
 - [Build With Mason](firefuelbrick.md)
 
----
+**API Reference**
 
-API Reference
-
-- [firefuel](https://pub.dev/documentation/firefuel/latest/firefuel/firefuel-library.html)
+- [firefuel](https://pub.dev/documentation/firefuel/latest/)
+- [firefuel_core](https://pub.dev/documentation/firefuel_core/latest/)

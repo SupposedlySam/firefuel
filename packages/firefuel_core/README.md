@@ -1,6 +1,8 @@
 # firefuel_core
 
-The core classes required to run firefuel
+The pure-Dart types [firefuel](https://pub.dev/packages/firefuel) is built on: `Serializable`, `DocumentId`, `Failure`, `Either` and `FieldUpdate`.
+
+It depends on neither Flutter nor Firestore. A package of models shared between an app, a server and a CLI can depend on firefuel_core alone and still ask for server timestamps or return `Either` results.
 
 # Models
 
@@ -18,13 +20,41 @@ The `DocumentId` class should be used when you have a `String` that you intend t
 
 ```dart
 DocumentId('myDocId'); // valid
-DocumentId(r'my\Doc\Id'); // stores myDocId
-DocumentId(r'my\Doc\Id', throwsOnForwardSlash: true); // throws CannotContainForwardSlash
+DocumentId('my/Doc/Id'); // stores myDocId
+DocumentId('my/Doc/Id', throwsOnForwardSlash: true); // throws CannotContainForwardSlash
 DocumentId('.'); // throws CannotSolelyConsistOfASingleOrDoublePeriod
 DocumentId('..'); // throws CannotSolelyConsistOfASingleOrDoublePeriod
-DocumentId('__someValue__') // throws CannotStartAndEndWithDoubleUnderscore
-DocumentId(r'someReallyLongStringGreaterThan1500BytesInLength'); // throws CannotBeNoLongerThan1500Bytes
+DocumentId('__someValue__'); // throws CannotStartAndEndWithDoubleUnderscore
+DocumentId('x' * 1501); // throws CannotBeNoLongerThan1500Bytes
 ```
+
+# Either
+
+`Either<L, R>` holds a `Left` (by convention a failure) or a `Right` (a success). It's sealed, so a `switch` must handle both:
+
+```dart
+Either<Failure, int> parseAge(String input) { /* ... */ }
+
+final message = switch (parseAge(input)) {
+  Left(:final value) => 'Invalid: ${value.error}',
+  Right(:final value) => 'Age $value',
+};
+```
+
+It also provides `fold`, `map`, `leftMap`, `flatMap`, `getOrElse`, `swap`, `isLeft` and `isRight`, plus the `left()` / `right()` constructors. Up to firefuel 0.4 this type came from `package:dartz`; the names are unchanged.
+
+# FieldUpdate
+
+A value the database computes when a write lands. Use one in firefuel's `updateFields`, or return one from a model's `toJson`:
+
+```dart
+Map<String, dynamic> toJson() => {
+  fieldText: text,
+  fieldCreatedAt: createdAt ?? const ServerTimestamp(),
+};
+```
+
+The variants are `FieldUpdate.increment(n)`, `.arrayUnion(values)`, `.arrayRemove(values)`, `.delete()` and `.serverTimestamp()` (also available as `const ServerTimestamp()`). firefuel turns each into Firestore's `FieldValue` when it writes.
 
 # Base Classes (abstract)
 
