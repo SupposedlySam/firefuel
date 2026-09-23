@@ -11,6 +11,7 @@ abstract class ReadableQuery<T extends Serializable>
         CollectionCount<int>,
         CollectionPaginate<Chunk<T>, T>,
         CollectionRead<List<T>, T>,
+        QueryAggregate<AggregateResult>,
         QueryListen<FirefuelQuerySnapshot<T>> {}
 
 abstract class Collection<T extends Serializable>

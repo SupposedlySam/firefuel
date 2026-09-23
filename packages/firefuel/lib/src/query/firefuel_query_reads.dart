@@ -1,3 +1,7 @@
+// `count` is also this file's parameter name, so the class is prefixed.
+import 'package:cloud_firestore/cloud_firestore.dart'
+    as cf
+    show AggregateField, AggregateQuery, count;
 import 'package:firefuel/firefuel.dart';
 import 'package:firefuel/src/utils/snapshot_converters.dart';
 
@@ -207,6 +211,41 @@ mixin FirefuelQueryReads<T extends Serializable> implements ReadableQuery<T> {
         .get(source: source ?? AggregateSource.server);
 
     return snapshot.getAverage(field);
+  }
+
+  @override
+  Future<AggregateResult> aggregate(
+    FirefuelQuery query, {
+    bool count = false,
+    List<String> sums = const [],
+    List<String> averages = const [],
+    AggregateSource? source,
+  }) async {
+    final fields = <cf.AggregateField>[
+      if (count) cf.count(),
+      for (final field in sums) sum(field),
+      for (final field in averages) average(field),
+    ];
+    if (fields.isEmpty) {
+      throw ArgumentError('aggregate needs count, sums or averages');
+    }
+
+    // Query.aggregate takes its fields positionally (1 to 30), not as a
+    // list.
+    final aggregateQuery =
+        Function.apply(query.applyTo(untypedBaseQuery).aggregate, fields)
+            as cf.AggregateQuery;
+    final snapshot = await aggregateQuery.get(
+      source: source ?? AggregateSource.server,
+    );
+
+    return AggregateResult(
+      count: count ? snapshot.count : null,
+      sums: {for (final field in sums) field: snapshot.getSum(field)},
+      averages: {
+        for (final field in averages) field: snapshot.getAverage(field),
+      },
+    );
   }
 
   Future<int> _count(FirefuelQuery query, {AggregateSource? source}) async {

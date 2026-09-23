@@ -7,6 +7,7 @@ abstract class QueryRepository<T extends Serializable>
         CollectionCount<Either<Failure, int>>,
         CollectionRead<Either<Failure, List<T>>, T>,
         CollectionPaginate<Either<Failure, Chunk<T>>, T>,
+        QueryAggregate<Either<Failure, AggregateResult>>,
         QueryListen<Either<Failure, FirefuelQuerySnapshot<T>>> {}
 
 abstract class Repository<T extends Serializable>

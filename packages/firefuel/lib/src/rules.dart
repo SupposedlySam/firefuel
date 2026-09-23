@@ -49,6 +49,23 @@ abstract class CollectionCount<T> {
 ///
 /// The optional `source` argument is passed to `AggregateQuery.get`. The
 /// FlutterFire plugin currently exposes `AggregateSource.server` only.
+/// Several aggregations over one query in a single round trip.
+abstract class QueryAggregate<R> {
+  /// Computes, over the documents [query] matches, the count (when [count]
+  /// is true), the sum of each of [sums], and the average of each of
+  /// [averages], in one request.
+  ///
+  /// Firestore allows up to 5 aggregations per request. [query]'s order,
+  /// limits and cursors apply too, so `limit` bounds what is aggregated.
+  Future<R> aggregate(
+    FirefuelQuery query, {
+    bool count = false,
+    List<String> sums = const [],
+    List<String> averages = const [],
+    AggregateSource? source,
+  });
+}
+
 abstract class CollectionAggregate<T> {
   /// Sum of [field] over all documents in the collection.
   Future<T> sumAll(String field, {AggregateSource? source});

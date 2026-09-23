@@ -2,10 +2,13 @@ import 'package:equatable/equatable.dart';
 
 import 'package:firefuel/firefuel.dart';
 
-/// Creates a condition to filter your Collection
+/// A condition documents must meet to be returned.
 ///
-/// [field] must be provided and is normally the string representation of the
-/// field on your document to match against.
+/// Build one with `Clause(field, ...)` for a single field, or combine
+/// clauses with [Clause.or] and [Clause.and].
+///
+/// `field` is normally the string representation of the field on your
+/// document to match against.
 ///
 /// It's recommended to store field names on your model so you can access them
 /// with `MyModel.field<YourField>` where `MyModel` references the class you're
@@ -19,13 +22,127 @@ import 'package:firefuel/firefuel.dart';
 /// Clause(MyModel.fieldAge, isEqualTo: 23);
 /// ```
 ///
+/// ### Either of two conditions
+/// ```dart
+/// Clause.or([
+///   Clause(MyModel.fieldAge, isLessThan: 18),
+///   Clause(MyModel.fieldAge, isGreaterThan: 65),
+/// ]);
+/// ```
+///
+/// A list of clauses passed to a query means "all of them" (AND), so
+/// [Clause.and] is only needed inside an [Clause.or].
+///
 /// ### Bad - Throws [TooManyArgumentsException]
 ///
 /// ```dart
 /// Clause(MyModel.fieldVehicle, isEqualTo: 'Mazda', isNotEqualTo: 'Honda');
 /// ```
-class Clause extends Equatable {
-  Clause(
+sealed class Clause extends Equatable {
+  /// A condition on one [field]. Give exactly one operator.
+  factory Clause(
+    String field, {
+    Object? isEqualTo,
+    Object? isNotEqualTo,
+    Object? isLessThan,
+    Object? isLessThanOrEqualTo,
+    Object? isGreaterThan,
+    Object? isGreaterThanOrEqualTo,
+    Object? arrayContains,
+    List<Object?>? arrayContainsAny,
+    List<Object?>? whereIn,
+    List<Object?>? whereNotIn,
+    bool? isNull,
+  }) = FieldClause;
+
+  const Clause._();
+
+  /// Matches documents meeting **any** of [clauses].
+  ///
+  /// Firestore limits a query to 30 disjunctions once it is expanded, and
+  /// requires an index covering each branch.
+  factory Clause.or(List<Clause> clauses) = ClauseGroup.or;
+
+  /// Matches documents meeting **all** of [clauses]. Only needed inside
+  /// [Clause.or]; a list of clauses is already an AND.
+  factory Clause.and(List<Clause> clauses) = ClauseGroup.and;
+
+  /// Clauses that are single-field conditions, ignoring groups.
+  ///
+  /// The orderBy rules below are about top-level field conditions: Firestore
+  /// applies them to the fields a query filters on directly.
+  static Iterable<FieldClause> _fieldClauses(List<Clause> clauses) {
+    return clauses.whereType<FieldClause>();
+  }
+
+  /// Get a subset of the given clauses that are either equality or in
+  /// (contains) comparisons
+  static List<String> getEqualityOrInComparisonFields(List<Clause> clauses) {
+    return _fieldClauses(clauses)
+        .where((clause) => clause.isEqualityOrInComparison)
+        .map((clause) => clause.field)
+        .toList();
+  }
+
+  /// Checks to see whether any of the clauses given are equality or in
+  /// (contains) comparisons
+  static bool hasEqualityOrInComparison(List<Clause> clauses) {
+    return _fieldClauses(
+      clauses,
+    ).any((clause) => clause.isEqualityOrInComparison);
+  }
+
+  /// Checks to see if more than one field is found between all range
+  /// comparisons
+  @Deprecated(
+    'Firestore allows range filters on several fields; unused since 0.5',
+  )
+  static bool hasMoreThanOneFieldInRangeComparisons(List<Clause> clauses) {
+    final rangeClauses = _fieldClauses(
+      clauses,
+    ).where((clause) => clause.isRangeComparison);
+    final uniqueFields = rangeClauses.map((clause) => clause.field).toSet();
+
+    return uniqueFields.length > 1;
+  }
+
+  /// Checks to see whether any of the clauses given are range comparisons
+  static bool hasRangeComparison(List<Clause> clauses) {
+    return _fieldClauses(clauses).any((clause) => clause.isRangeComparison);
+  }
+
+  /// Field Firestore uses for "first orderBy must match your range filter."
+  ///
+  /// This is the first **range** clause's field, not necessarily the first
+  /// clause in the list, so callers can list equality filters before range
+  /// filters.
+  ///
+  /// With range filters on several fields, a caller whose first [orderBy]
+  /// already names one of them keeps that order: any range field may lead.
+  static String? fieldMatchingRangeOrderingRule(
+    List<Clause> clauses, {
+    List<OrderBy>? orderBy,
+  }) {
+    final fieldClauses = _fieldClauses(clauses);
+    final rangeFields = fieldClauses
+        .where((c) => c.isRangeComparison)
+        .map((c) => c.field)
+        .toList();
+
+    if (rangeFields.isEmpty) return fieldClauses.firstOrNull?.field;
+
+    final leadingOrder = orderBy?.firstOrNull;
+    if (leadingOrder != null && rangeFields.contains(leadingOrder.field)) {
+      return leadingOrder.field;
+    }
+
+    return rangeFields.first;
+  }
+}
+
+/// A condition on a single field. Build with [Clause.new].
+final class FieldClause extends Clause {
+  FieldClause(
     this.field, {
     this.isEqualTo,
     this.isNotEqualTo,
@@ -44,7 +161,8 @@ class Clause extends Equatable {
          isGreaterThan,
          isGreaterThanOrEqualTo,
        ]),
-       isEqualityOrInComparison = _hasAny([isEqualTo, whereIn, isNull]) {
+       isEqualityOrInComparison = _hasAny([isEqualTo, whereIn, isNull]),
+       super._() {
     _ensureSingleOptionChosen([
       isEqualTo,
       isNotEqualTo,
@@ -102,63 +220,33 @@ class Clause extends Equatable {
     throw TooManyArgumentsException();
   }
 
-  /// Get a subset of the given clauses that are either equality or in
-  /// (contains) comparisons
-  static List<String> getEqualityOrInComparisonFields(List<Clause> clauses) {
-    return clauses
-        .where((clause) => clause.isEqualityOrInComparison)
-        .map((clause) => clause.field)
-        .toList();
-  }
-
-  /// Checks to see whether any of the clauses given are equality or in
-  /// (contains) comparisons
-  static bool hasEqualityOrInComparison(List<Clause> clauses) {
-    return clauses.any((clause) => clause.isEqualityOrInComparison);
-  }
-
-  /// Checks to see if more than one field is found between all range
-  /// comparisons
-  static bool hasMoreThanOneFieldInRangeComparisons(List<Clause> clauses) {
-    final rangeClauses = clauses.where((clause) => clause.isRangeComparison);
-    final uniqueFields = rangeClauses.map((clause) => clause.field).toSet();
-
-    return uniqueFields.length > 1;
-  }
-
-  /// Checks to see whether any of the clauses given are range comparisons
-  static bool hasRangeComparison(List<Clause> clauses) {
-    return clauses.any((clause) => clause.isRangeComparison);
-  }
-
-  /// Field Firestore uses for "first orderBy must match your range filter."
-  ///
-  /// This is the first **range** clause's field, not necessarily the first
-  /// clause in the list, so callers can list equality filters before range
-  /// filters.
-  ///
-  /// With range filters on several fields, a caller whose first [orderBy]
-  /// already names one of them keeps that order: any range field may lead.
-  static String fieldMatchingRangeOrderingRule(
-    List<Clause> clauses, {
-    List<OrderBy>? orderBy,
-  }) {
-    final rangeFields = clauses
-        .where((c) => c.isRangeComparison)
-        .map((c) => c.field)
-        .toList();
-
-    if (rangeFields.isEmpty) return clauses.first.field;
-
-    final leadingOrder = orderBy?.firstOrNull;
-    if (leadingOrder != null && rangeFields.contains(leadingOrder.field)) {
-      return leadingOrder.field;
-    }
-
-    return rangeFields.first;
-  }
-
   static bool _hasAny(List<dynamic> options) {
     return options.any((option) => option != null);
   }
+}
+
+/// Clauses combined with OR or AND. Build with [Clause.or] or [Clause.and].
+final class ClauseGroup extends Clause {
+  ClauseGroup.or(this.clauses) : isOr = true, super._() {
+    _ensureNotEmpty();
+  }
+
+  ClauseGroup.and(this.clauses) : isOr = false, super._() {
+    _ensureNotEmpty();
+  }
+
+  /// The combined clauses.
+  final List<Clause> clauses;
+
+  /// Whether a document must meet any clause (OR) rather than all (AND).
+  final bool isOr;
+
+  void _ensureNotEmpty() {
+    if (clauses.isEmpty) {
+      throw ArgumentError.value(clauses, 'clauses', 'must not be empty');
+    }
+  }
+
+  @override
+  List<Object?> get props => [isOr, clauses];
 }

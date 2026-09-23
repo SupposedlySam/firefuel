@@ -36,29 +36,6 @@ void main() {
     });
   });
 
-  group('.hasMoreThanOneFieldInRangeComparisons', () {
-    test(
-      'should return true when given more than one field in range comparison',
-      () {
-        final result = Clause.hasMoreThanOneFieldInRangeComparisons([
-          Clause('age', isLessThan: 20),
-          Clause('birthYear', isLessThan: 2000),
-        ]);
-
-        expect(result, isTrue);
-      },
-    );
-
-    test('should return false when given one field in range comparison', () {
-      final result = Clause.hasMoreThanOneFieldInRangeComparisons([
-        Clause('age', isLessThan: 20),
-        Clause('age', isGreaterThan: 10),
-      ]);
-
-      expect(result, isFalse);
-    });
-  });
-
   group('.getEqualityOrInComparisonFields', () {
     test('should filter out all non-equality or in comparison fields', () {
       const equalToAge = 'age1';

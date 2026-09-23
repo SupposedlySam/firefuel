@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart' show Filter;
 import 'package:firefuel/firefuel.dart';
 
 /// Lowers firefuel's filters and order onto a cloud_firestore [Query].
@@ -8,20 +9,23 @@ extension QueryX<T> on Query<T> {
   /// Adds every clause as an AND-ed `where`.
   Query<T> filter(List<Clause> clauses) {
     return clauses.fold(this, (result, clause) {
-      return result.where(
-        clause.field,
-        isEqualTo: clause.isEqualTo,
-        isNotEqualTo: clause.isNotEqualTo,
-        isLessThan: clause.isLessThan,
-        isLessThanOrEqualTo: clause.isLessThanOrEqualTo,
-        isGreaterThan: clause.isGreaterThan,
-        isGreaterThanOrEqualTo: clause.isGreaterThanOrEqualTo,
-        arrayContains: clause.arrayContains,
-        arrayContainsAny: clause.arrayContainsAny,
-        whereIn: clause.whereIn,
-        whereNotIn: clause.whereNotIn,
-        isNull: clause.isNull,
-      );
+      return switch (clause) {
+        final FieldClause clause => result.where(
+          clause.field,
+          isEqualTo: clause.isEqualTo,
+          isNotEqualTo: clause.isNotEqualTo,
+          isLessThan: clause.isLessThan,
+          isLessThanOrEqualTo: clause.isLessThanOrEqualTo,
+          isGreaterThan: clause.isGreaterThan,
+          isGreaterThanOrEqualTo: clause.isGreaterThanOrEqualTo,
+          arrayContains: clause.arrayContains,
+          arrayContainsAny: clause.arrayContainsAny,
+          whereIn: clause.whereIn,
+          whereNotIn: clause.whereNotIn,
+          isNull: clause.isNull,
+        ),
+        final ClauseGroup group => result.where(_toFilter(group)),
+      };
     });
   }
 
@@ -35,3 +39,30 @@ extension QueryX<T> on Query<T> {
     });
   }
 }
+
+/// The cloud_firestore [Filter] for any [Clause].
+Filter _toFilter(Clause clause) => switch (clause) {
+  FieldClause() => Filter(
+    clause.field,
+    isEqualTo: clause.isEqualTo,
+    isNotEqualTo: clause.isNotEqualTo,
+    isLessThan: clause.isLessThan,
+    isLessThanOrEqualTo: clause.isLessThanOrEqualTo,
+    isGreaterThan: clause.isGreaterThan,
+    isGreaterThanOrEqualTo: clause.isGreaterThanOrEqualTo,
+    arrayContains: clause.arrayContains,
+    arrayContainsAny: clause.arrayContainsAny,
+    whereIn: clause.whereIn,
+    whereNotIn: clause.whereNotIn,
+    isNull: clause.isNull,
+  ),
+  ClauseGroup(clauses: [final only]) => _toFilter(only),
+  ClauseGroup(:final clauses, :final isOr) =>
+    Function.apply(
+          // Filter.or and Filter.and take 2 to 30 positional filters, not
+          // a list.
+          isOr ? Filter.or : Filter.and,
+          clauses.map(_toFilter).toList(),
+        )
+        as Filter,
+};

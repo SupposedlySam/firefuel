@@ -99,13 +99,16 @@ class FirefuelQuery extends Equatable {
   /// The rewrite only applies when there are both clauses and an order:
   /// ordering without filters is always valid as given.
   List<OrderBy> get effectiveOrderBy {
-    if (clauses.isEmpty || orderBy.isEmpty) return orderBy;
+    final fieldToMatch = Clause.fieldMatchingRangeOrderingRule(
+      clauses,
+      orderBy: orderBy,
+    );
+    // Only top-level field clauses take part in Firestore's ordering rules;
+    // a query filtered solely by OR/AND groups keeps the order given.
+    if (fieldToMatch == null || orderBy.isEmpty) return orderBy;
 
     final withRangeFieldFirst = OrderBy.moveOrCreateMatchingField(
-      fieldToMatch: Clause.fieldMatchingRangeOrderingRule(
-        clauses,
-        orderBy: orderBy,
-      ),
+      fieldToMatch: fieldToMatch,
       orderBy: orderBy,
       isRangeComparison: Clause.hasRangeComparison(clauses),
     );

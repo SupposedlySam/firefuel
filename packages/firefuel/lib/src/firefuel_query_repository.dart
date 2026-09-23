@@ -171,4 +171,23 @@ abstract class FirefuelQueryRepository<T extends Serializable>
       ),
     );
   }
+
+  @override
+  Future<Either<Failure, AggregateResult>> aggregate(
+    FirefuelQuery query, {
+    bool count = false,
+    List<String> sums = const [],
+    List<String> averages = const [],
+    AggregateSource? source,
+  }) {
+    return guard(
+      () => _source.aggregate(
+        query,
+        count: count,
+        sums: sums,
+        averages: averages,
+        source: source,
+      ),
+    );
+  }
 }

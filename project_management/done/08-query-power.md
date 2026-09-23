@@ -3,7 +3,7 @@
 ## Metadata
 - **Type:** Feature
 - **Appetite:** 3 days
-- **Status:** Pitch
+- **Status:** Done (2026-09-23)
 - **Created:** 2026-09-23
 - **Breaking:** no
 
@@ -29,3 +29,18 @@ aggregations in one round trip (`aggregate(count(), sum(a), average(b))`).
 ## flyby's answer (2026-09-23)
 **No current need.** Message lists paginate from local storage. Justified by issue #35 and
 pass-through completeness.
+
+## Outcome (2026-09-23)
+- `Clause` is sealed ([DESIGN.md](../DESIGN.md) D7). `Clause(field, ...)` still compiles and returns
+  a `FieldClause`, and `Clause.or([...])`/`Clause.and([...])` return a `ClauseGroup` that lowers to
+  `Filter.or`/`Filter.and`. Groups nest. The orderBy rewrite reads top-level field clauses only.
+  This closes issue #35.
+- `aggregate(FirefuelQuery, {count, sums, averages, source})` returns an `AggregateResult` in
+  one round trip. It's on collections, groups and repositories (new `QueryAggregate` rule).
+- Cursors, `limitToLast` and descending pagination already shipped with 12.
+- `Clause.hasMoreThanOneFieldInRangeComparisons` is deprecated (unused since 02).
+- **Breaking:** code that read `Clause` properties (`clause.field`) through a `Clause`-typed variable
+  must now match `FieldClause`. That's unlikely outside firefuel.
+- Issue #34 (`isNotEqualTo` on numbers) is **obsolete**: Firestore has supported `!=` natively
+  since 2020. It's left open on GitHub because firefuel-owner doesn't comment publicly. Closing it
+  is for the maintainer.

@@ -24,6 +24,29 @@ class ListenOptions extends Equatable {
   List<Object?> get props => [includeMetadataChanges, source];
 }
 
+/// The results of `aggregate`.
+class AggregateResult extends Equatable {
+  const AggregateResult({
+    this.count,
+    this.sums = const {},
+    this.averages = const {},
+  });
+
+  /// How many documents matched, if a count was requested.
+  final int? count;
+
+  /// The sum of each requested field. `null` for a field no matching
+  /// document holds a number in.
+  final Map<String, double?> sums;
+
+  /// The average of each requested field. `null` for a field no matching
+  /// document holds a number in.
+  final Map<String, double?> averages;
+
+  @override
+  List<Object?> get props => [count, sums, averages];
+}
+
 /// A value read from Firestore, together with where it came from.
 class FirefuelSnapshot<R> extends Equatable {
   const FirefuelSnapshot({
