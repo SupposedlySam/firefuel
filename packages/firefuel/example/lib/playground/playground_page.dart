@@ -133,6 +133,43 @@ class _PlaygroundPageState extends State<PlaygroundPage> {
         ),
       ),
       _FeatureCard(
+        apis: const ['Clause.or()', 'FirefuelQuery', 'limitToLast'],
+        description: 'Match either condition, then keep the last two.',
+        title: 'OR queries and cursors',
+        onPressed: () =>
+            _runAction(label: 'Ran an OR query', action: _showOrQuery),
+      ),
+      _FeatureCard(
+        apis: const ['FirefuelCollection.aggregate()'],
+        description: 'Count, sum and average in one request.',
+        title: 'One-shot aggregate',
+        onPressed: () =>
+            _runAction(label: 'Aggregated in one call', action: _aggregate),
+      ),
+      _FeatureCard(
+        apis: const ['FieldUpdate', 'updateFields()'],
+        description: 'Increment, tag and stamp a note in one atomic write.',
+        title: 'Field updates',
+        onPressed: () => _runAction(
+          label: 'Applied field updates',
+          action: _applyFieldUpdates,
+        ),
+      ),
+      _FeatureCard(
+        apis: const ['Firefuel.runTransaction()', 'transaction.of()'],
+        description: 'Read two notes and move a view between them atomically.',
+        title: 'Transaction',
+        onPressed: () =>
+            _runAction(label: 'Ran a transaction', action: _moveAView),
+      ),
+      _FeatureCard(
+        apis: const ['FirefuelCollection.snapshots()', 'ListenOptions'],
+        description: 'See what changed and whether it came from the cache.',
+        title: 'Snapshot metadata',
+        onPressed: () =>
+            _runAction(label: 'Read a snapshot', action: _showSnapshot),
+      ),
+      _FeatureCard(
         apis: const ['FirefuelCollection.delete()'],
         description: 'Remove the newest demo-created note.',
         title: 'Delete',
@@ -330,6 +367,96 @@ class _PlaygroundPageState extends State<PlaygroundPage> {
 
     return 'Pinned: $pinnedCount (${pinned.length} read), '
         'views: ${totalViews ?? 0}, avg rating: ${averageRating ?? 0}.';
+  }
+
+  Future<String> _showOrQuery() async {
+    final notes = await _collection.query(
+      FirefuelQuery(
+        clauses: [
+          Clause.or([
+            Clause(PlaygroundNote.fieldPinned, isEqualTo: true),
+            Clause(PlaygroundNote.fieldViews, isGreaterThan: 6),
+          ]),
+        ],
+        orderBy: [OrderBy(field: PlaygroundNote.fieldTitle)],
+        limitToLast: 2,
+      ),
+    );
+
+    return 'Pinned or popular, last two by title: '
+        '${notes.map((note) => note.title).join(', ')}';
+  }
+
+  Future<String> _aggregate() async {
+    final stats = await _collection.aggregate(
+      FirefuelQuery(),
+      count: true,
+      sums: [PlaygroundNote.fieldViews],
+      averages: [PlaygroundNote.fieldRating],
+    );
+
+    return '${stats.count} notes, '
+        '${stats.sums[PlaygroundNote.fieldViews] ?? 0} views, '
+        'avg rating ${stats.averages[PlaygroundNote.fieldRating] ?? 0}.';
+  }
+
+  Future<String> _applyFieldUpdates() async {
+    final note = await _firstNote();
+    if (note?.docId == null) return 'Create a note first.';
+
+    await _collection.updateFields(
+      docId: DocumentId(note!.docId!),
+      fields: {
+        PlaygroundNote.fieldViews: const FieldUpdate.increment(10),
+        PlaygroundNote.fieldTags: const FieldUpdate.arrayUnion(['updated']),
+        PlaygroundNote.fieldUpdatedAt: const ServerTimestamp(),
+      },
+    );
+
+    return 'Added 10 views, a tag and a timestamp to "${note.title}" at once.';
+  }
+
+  Future<String> _moveAView() async {
+    final notes = await _collection.orderBy([
+      OrderBy(field: PlaygroundNote.fieldTitle),
+    ], limit: 2);
+    if (notes.length < 2) return 'Seed at least two notes first.';
+
+    final fromId = DocumentId(notes[0].docId!);
+    final toId = DocumentId(notes[1].docId!);
+
+    return Firefuel.runTransaction((transaction) async {
+      final scope = transaction.of(_collection);
+      final from = await scope.read(fromId);
+      final to = await scope.read(toId);
+      if (from == null || to == null) return 'A note disappeared; try again.';
+      if (from.views == 0) return '"${from.title}" has no views to give.';
+
+      scope
+        ..update(
+          docId: fromId,
+          value: from.copyWith(views: from.views - 1),
+        )
+        ..update(
+          docId: toId,
+          value: to.copyWith(views: to.views + 1),
+        );
+
+      return 'Moved a view from "${from.title}" to "${to.title}".';
+    });
+  }
+
+  Future<String> _showSnapshot() async {
+    final snapshot = await _collection
+        .snapshots(
+          FirefuelQuery(),
+          options: const ListenOptions(includeMetadataChanges: true),
+        )
+        .first;
+
+    return '${snapshot.value.length} notes, ${snapshot.changes.length} '
+        'changes, fromCache: ${snapshot.isFromCache}, '
+        'pendingWrites: ${snapshot.hasPendingWrites}.';
   }
 
   Future<String> _showFirstPage() async {
