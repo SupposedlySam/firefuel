@@ -328,14 +328,14 @@ abstract class DocRead<R> {
 abstract class DocReplace<R, T extends Serializable> {
   /// Replaces the document at [docId] with [value].
   ///
-  /// If no document exists yet, the replace will fail silently.
+  /// Fails with a `not-found` error when no document exists yet. Firestore
+  /// checks that on the server as the write lands, so replace is atomic,
+  /// costs no read, works offline, and inside a batch can replace a document
+  /// created earlier in the same batch.
   ///
-  /// *Requires 1 read of doc to perform replace*
-  Future<R> replace({
-    required DocumentId docId,
-    required T value,
-    GetOptions? getOptions,
-  });
+  /// Every field [value] serializes is written. A stored field your model
+  /// does not serialize at all is left in place.
+  Future<R> replace({required DocumentId docId, required T value});
 
   /// Replaces the fields of the document at [docId] with the matching
   /// [fieldPaths] from [value]

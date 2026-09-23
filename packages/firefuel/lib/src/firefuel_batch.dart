@@ -39,17 +39,15 @@ class FirefuelBatch<T extends Serializable> extends Batch<T> with _BatchMixin {
   }
 
   @override
-  Future<void> replace({
-    required DocumentId docId,
-    required T value,
-    GetOptions? getOptions,
-  }) async {
-    await _addToBatch((batch) async {
-      final existingDoc = await collection.read(docId, getOptions: getOptions);
-
-      if (existingDoc == null) return;
-
-      batch.set(collection.ref.doc(docId.docId), value);
+  Future<void> replace({required DocumentId docId, required T value}) async {
+    // Reading here would run before the batch commits, so a createById
+    // earlier in the same batch was invisible and the replace was silently
+    // dropped (#43). update() checks existence at commit instead.
+    await _addToBatch((batch) {
+      batch.update(
+        collection.untypedRef.doc(docId.docId),
+        collection.toFirestore(value, null),
+      );
     });
   }
 

@@ -240,18 +240,11 @@ abstract class FirefuelCollection<T extends Serializable>
   }
 
   @override
-  Future<void> replace({
-    required DocumentId docId,
-    required T value,
-    GetOptions? getOptions,
-  }) async {
-    final existingDoc = await read(docId, getOptions: getOptions);
-
-    if (existingDoc == null) return;
-
-    await ref.doc(docId.docId).set(value);
-
-    return;
+  Future<void> replace({required DocumentId docId, required T value}) {
+    // update(), not a read followed by set(): the existence check then runs
+    // on the server at commit, which is atomic, read-free and offline-safe.
+    // See project_management/DESIGN.md D4.
+    return untypedRef.doc(docId.docId).update(toFirestore(value, null));
   }
 
   @override

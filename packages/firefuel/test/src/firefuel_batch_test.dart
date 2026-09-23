@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart' show FirebaseException;
 import 'package:fake_cloud_firestore/fake_cloud_firestore.dart';
 import 'package:firefuel/firefuel.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -201,7 +202,7 @@ void main() {
   group('#replace', () {
     final originalDocId = DocumentId('originalDocId');
 
-    test('should fail silently when document does not exist', () async {
+    test('should fail the commit when document does not exist', () async {
       final dodoId = DocumentId('dodoId');
 
       await testBatch.replace(
@@ -209,28 +210,41 @@ void main() {
         value: const TestUser('Clark Kent'),
       );
 
-      await testBatch.commit();
-
-      final readResult = await testCollection.read(dodoId);
-
-      expect(readResult, isNull);
+      await expectLater(
+        testBatch.commit(),
+        throwsA(
+          isA<FirebaseException>().having((e) => e.code, 'code', 'not-found'),
+        ),
+      );
+      expect(await testCollection.read(dodoId), isNull);
     });
 
     test('should overwrite all values in document', () async {
       const newUser = TestUser('newUser');
       const updatedUser = TestUser('updatedUser');
 
-      await testBatch.createById(value: newUser, docId: originalDocId);
-      await testBatch.commit();
+      await testCollection.createById(value: newUser, docId: originalDocId);
 
       await testBatch.replace(value: updatedUser, docId: originalDocId);
-
       await testBatch.commit();
 
-      final readUser = await testCollection.read(originalDocId);
-
-      expect(updatedUser, readUser);
+      expect(await testCollection.read(originalDocId), updatedUser);
     });
+
+    // https://github.com/SupposedlySam/firefuel/issues/43
+    test(
+      'should replace a document created earlier in the same batch',
+      () async {
+        const newUser = TestUser('newUser');
+        const updatedUser = TestUser('updatedUser');
+
+        await testBatch.createById(value: newUser, docId: originalDocId);
+        await testBatch.replace(value: updatedUser, docId: originalDocId);
+        await testBatch.commit();
+
+        expect(await testCollection.read(originalDocId), updatedUser);
+      },
+    );
   });
 
   group('#replaceFields', () {

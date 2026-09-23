@@ -190,15 +190,8 @@ abstract class FirefuelRepository<T extends Serializable>
   Future<Either<Failure, void>> replace({
     required DocumentId docId,
     required T value,
-    GetOptions? getOptions,
   }) {
-    return guard(
-      () => _collection.replace(
-        docId: docId,
-        value: value,
-        getOptions: getOptions,
-      ),
-    );
+    return guard(() => _collection.replace(docId: docId, value: value));
   }
 
   @override

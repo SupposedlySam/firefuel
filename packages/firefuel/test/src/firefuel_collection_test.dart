@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart' show FirebaseException;
 import 'package:fake_cloud_firestore/fake_cloud_firestore.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -887,23 +888,20 @@ void main() {
   group('#replace', () {
     final originalDocId = DocumentId('originalDocId');
 
-    test('should fail silently when document does not exist', () async {
+    test('should throw not-found when document does not exist', () async {
       final nonExistentDoc = DocumentId('dodoBird');
-      const newValue = TestUser('Clark Kent');
 
-      final nonExistentDocReadBeforeReplace = await testCollection.read(
-        nonExistentDoc,
+      await expectLater(
+        testCollection.replace(
+          docId: nonExistentDoc,
+          value: const TestUser('Clark Kent'),
+        ),
+        throwsA(
+          isA<FirebaseException>().having((e) => e.code, 'code', 'not-found'),
+        ),
       );
 
-      expect(nonExistentDocReadBeforeReplace, isNull);
-
-      await testCollection.replace(docId: nonExistentDoc, value: newValue);
-
-      final nonExistentDocReadAfterReplace = await testCollection.read(
-        nonExistentDoc,
-      );
-
-      expect(nonExistentDocReadAfterReplace, isNull);
+      expect(await testCollection.read(nonExistentDoc), isNull);
     });
 
     test('should overwrite all values in document', () async {

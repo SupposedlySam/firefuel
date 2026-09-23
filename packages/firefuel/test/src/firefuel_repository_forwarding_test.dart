@@ -168,6 +168,16 @@ void main() {
     );
   });
 
+  test('replace', () async {
+    when(
+      () => collection.replace(docId: docId, value: user),
+    ).thenAnswer((_) async {});
+
+    final result = await repository.replace(docId: docId, value: user);
+
+    expect(result.isRight(), isTrue);
+  });
+
   test('replaceFields', () async {
     when(
       () => collection.replaceFields(
