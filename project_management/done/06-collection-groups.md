@@ -3,7 +3,7 @@
 ## Metadata
 - **Type:** Feature
 - **Appetite:** 2 days
-- **Status:** Pitch
+- **Status:** Done (2026-09-23)
 - **Created:** 2026-09-23
 - **Breaking:** no
 
@@ -25,3 +25,15 @@ for it, so flyby's reactions run a raw, untyped listener.
 Would adopt; it replaces the raw reactions listener. The same `where`/`streamWhere`/`Clause`
 API is needed, and **callers must be able to recover parent ids from the doc path**, since
 reactions need the message-pod id.
+
+## Outcome (2026-09-23)
+- `FirefuelCollectionGroup<T>(collectionId, {firestore})` has just one abstract method,
+  `fromFirestore`. Every read comes from the `FirefuelQueryReads` mixin (12), including
+  `snapshots`, whose `FirefuelDoc.ancestorId` covers flyby's need for the parent id.
+- Rules: `ReadableQuery<T>` bundles the read rules. `Collection<T>` is `ReadableQuery` plus the doc
+  rules, and `CollectionGroup<T>` is `ReadableQuery`. `QueryRepository` and
+  `FirefuelQueryRepository<T>({source})` hold the Either-wrapped reads once, and
+  `FirefuelRepository` extends that. This follows the architecture review's Q3.
+- `FirebaseFirestore` and `Timestamp` are now re-exported (issue #60, fewer required imports).
+- **Known limit, documented on the class:** `Firefuel.env` prefixes only top-level collection
+  names, so a group spans every environment that shares a database.

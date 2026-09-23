@@ -1,60 +1,13 @@
 import 'package:firefuel/firefuel.dart';
 
 abstract class FirefuelRepository<T extends Serializable>
-    with FirefuelFetchMixin
+    extends FirefuelQueryRepository<T>
     implements Repository<T> {
   const FirefuelRepository({required Collection<T> collection})
-    : _collection = collection;
+    : _collection = collection,
+      super(source: collection);
+
   final Collection<T> _collection;
-
-  @override
-  Future<Either<Failure, int>> countAll({AggregateSource? source}) {
-    return guard(() => _collection.countAll(source: source));
-  }
-
-  @override
-  Future<Either<Failure, int>> countWhere(
-    List<Clause> clauses, {
-    AggregateSource? source,
-  }) {
-    return guard(() => _collection.countWhere(clauses, source: source));
-  }
-
-  @override
-  Future<Either<Failure, double?>> sumAll(
-    String field, {
-    AggregateSource? source,
-  }) {
-    return guard(() => _collection.sumAll(field, source: source));
-  }
-
-  @override
-  Future<Either<Failure, double?>> sumWhere(
-    List<Clause> clauses,
-    String field, {
-    AggregateSource? source,
-  }) {
-    return guard(() => _collection.sumWhere(clauses, field, source: source));
-  }
-
-  @override
-  Future<Either<Failure, double?>> averageAll(
-    String field, {
-    AggregateSource? source,
-  }) {
-    return guard(() => _collection.averageAll(field, source: source));
-  }
-
-  @override
-  Future<Either<Failure, double?>> averageWhere(
-    List<Clause> clauses,
-    String field, {
-    AggregateSource? source,
-  }) {
-    return guard(
-      () => _collection.averageWhere(clauses, field, source: source),
-    );
-  }
 
   @override
   Future<Either<Failure, DocumentId>> create(T value) {
@@ -75,11 +28,6 @@ abstract class FirefuelRepository<T extends Serializable>
   }
 
   @override
-  Future<Either<Failure, List<T>>> limit(int limit, {GetOptions? getOptions}) {
-    return guard(() => _collection.limit(limit, getOptions: getOptions));
-  }
-
-  @override
   Stream<Either<Failure, T?>> stream(DocumentId docId) {
     return guardStream(() => _collection.stream(docId));
   }
@@ -87,70 +35,6 @@ abstract class FirefuelRepository<T extends Serializable>
   @override
   Stream<Either<Failure, List<T?>>> streamMany(List<DocumentId> docIds) {
     return guardStream(() => _collection.streamMany(docIds));
-  }
-
-  @override
-  Stream<Either<Failure, List<T>>> streamAll() {
-    return guardStream(_collection.streamAll);
-  }
-
-  @override
-  Stream<Either<Failure, List<T>>> streamChanges({
-    bool includeRemoved = false,
-  }) {
-    return guardStream(
-      () => _collection.streamChanges(includeRemoved: includeRemoved),
-    );
-  }
-
-  @override
-  Stream<Either<Failure, int>> streamCountAll() {
-    return guardStream(_collection.streamCountAll);
-  }
-
-  @override
-  Stream<Either<Failure, int>> streamCountWhere(List<Clause> clauses) {
-    return guardStream(() => _collection.streamCountWhere(clauses));
-  }
-
-  @override
-  Stream<Either<Failure, List<T>>> streamLimited(int limit) {
-    return guardStream(() => _collection.streamLimited(limit));
-  }
-
-  @override
-  Stream<Either<Failure, List<T>>> streamOrdered(List<OrderBy> orderBy) {
-    return guardStream(() => _collection.streamOrdered(orderBy));
-  }
-
-  @override
-  Stream<Either<Failure, List<T>>> streamWhere(
-    List<Clause> clauses, {
-    List<OrderBy>? orderBy,
-    int? limit,
-  }) {
-    return guardStream(
-      () => _collection.streamWhere(clauses, orderBy: orderBy, limit: limit),
-    );
-  }
-
-  @override
-  Future<Either<Failure, List<T>>> orderBy(
-    List<OrderBy> orderBy, {
-    int? limit,
-    GetOptions? getOptions,
-  }) {
-    return guard(
-      () => _collection.orderBy(orderBy, limit: limit, getOptions: getOptions),
-    );
-  }
-
-  @override
-  Future<Either<Failure, Chunk<T>>> paginate(
-    Chunk<T> chunk, {
-    GetOptions? getOptions,
-  }) {
-    return guard(() => _collection.paginate(chunk, getOptions: getOptions));
   }
 
   @override
@@ -167,37 +51,11 @@ abstract class FirefuelRepository<T extends Serializable>
   }
 
   @override
-  Future<Either<Failure, List<T>>> query(
-    FirefuelQuery query, {
-    GetOptions? getOptions,
-  }) {
-    return guard(() => _collection.query(query, getOptions: getOptions));
-  }
-
-  @override
-  Stream<Either<Failure, List<T>>> streamQuery(FirefuelQuery query) {
-    return guardStream(() => _collection.streamQuery(query));
-  }
-
-  @override
-  Stream<Either<Failure, FirefuelQuerySnapshot<T>>> snapshots(
-    FirefuelQuery query, {
-    ListenOptions options = const ListenOptions(),
-  }) {
-    return guardStream(() => _collection.snapshots(query, options: options));
-  }
-
-  @override
   Stream<Either<Failure, FirefuelSnapshot<T?>>> docSnapshots(
     DocumentId docId, {
     ListenOptions options = const ListenOptions(),
   }) {
     return guardStream(() => _collection.docSnapshots(docId, options: options));
-  }
-
-  @override
-  Future<Either<Failure, List<T>>> readAll({GetOptions? getOptions}) {
-    return guard(() => _collection.readAll(getOptions: getOptions));
   }
 
   @override
@@ -311,23 +169,6 @@ abstract class FirefuelRepository<T extends Serializable>
     required T value,
   }) {
     return guard(() => _collection.updateOrCreate(docId: docId, value: value));
-  }
-
-  @override
-  Future<Either<Failure, List<T>>> where(
-    List<Clause> clauses, {
-    List<OrderBy>? orderBy,
-    int? limit,
-    GetOptions? getOptions,
-  }) {
-    return guard(
-      () => _collection.where(
-        clauses,
-        orderBy: orderBy,
-        limit: limit,
-        getOptions: getOptions,
-      ),
-    );
   }
 
   @override

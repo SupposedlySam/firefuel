@@ -8,13 +8,7 @@ import 'package:firefuel/src/utils/snapshot_converters.dart';
 /// aggregate, pagination and stream surface. Each method builds a
 /// [FirefuelQuery] and lowers it through [FirefuelQuery.applyTo], so every
 /// read applies filters, order, cursors and limits the same way.
-mixin FirefuelQueryReads<T extends Serializable>
-    implements
-        CollectionAggregate<double?>,
-        CollectionCount<int>,
-        CollectionPaginate<Chunk<T>, T>,
-        CollectionRead<List<T>, T>,
-        QueryListen<FirefuelQuerySnapshot<T>> {
+mixin FirefuelQueryReads<T extends Serializable> implements ReadableQuery<T> {
   /// The documents every read starts from, converted to [T].
   Query<T?> get baseQuery;
 

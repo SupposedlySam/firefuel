@@ -6,6 +6,7 @@ export 'package:cloud_firestore/cloud_firestore.dart'
         DocumentSnapshot,
         FieldPath,
         FieldValue,
+        FirebaseFirestore,
         GetOptions,
         ListenSource,
         Query,
@@ -15,6 +16,7 @@ export 'package:cloud_firestore/cloud_firestore.dart'
         SetOptions,
         SnapshotOptions,
         Source,
+        Timestamp,
         average,
         sum;
 export 'package:firefuel/src/batch.dart';
@@ -28,8 +30,10 @@ export 'package:firefuel/src/repository.dart';
 export 'package:firefuel/src/firefuel.dart';
 export 'package:firefuel/src/firefuel_batch.dart';
 export 'package:firefuel/src/firefuel_collection.dart';
+export 'package:firefuel/src/firefuel_collection_group.dart';
 export 'package:firefuel/src/firefuel_failure.dart';
 export 'package:firefuel/src/firefuel_fetch_mixin.dart';
+export 'package:firefuel/src/firefuel_query_repository.dart';
 export 'package:firefuel/src/firefuel_repository.dart';
 export 'package:firefuel/src/rules.dart';
 export 'package:firefuel/src/snapshot_conversion_mixin.dart';
