@@ -8,16 +8,16 @@ abstract class FirefuelRepository<T extends Serializable>
   final Collection<T> _collection;
 
   @override
-  Future<Either<Failure, int>> countAll({GetOptions? getOptions}) {
-    return guard(() => _collection.countAll(getOptions: getOptions));
+  Future<Either<Failure, int>> countAll({AggregateSource? source}) {
+    return guard(() => _collection.countAll(source: source));
   }
 
   @override
   Future<Either<Failure, int>> countWhere(
     List<Clause> clauses, {
-    GetOptions? getOptions,
+    AggregateSource? source,
   }) {
-    return guard(() => _collection.countWhere(clauses, getOptions: getOptions));
+    return guard(() => _collection.countWhere(clauses, source: source));
   }
 
   @override

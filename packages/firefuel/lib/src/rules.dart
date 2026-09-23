@@ -9,7 +9,7 @@ abstract class CollectionCount<T> {
   /// {@template firefuel.rules.count.footer}
   /// See also: [countWhere]
   /// {@endtemplate}
-  Future<T> countAll({GetOptions? getOptions});
+  Future<T> countAll({AggregateSource? source});
 
   /// {@template firefuel.rules.countwhere.definition}
   /// Gets the amount of documents filtered by the provided clauses.
@@ -18,7 +18,7 @@ abstract class CollectionCount<T> {
   /// {@template firefuel.rules.countwhere.footer}
   /// See also: [countAll]
   /// {@endtemplate}
-  Future<T> countWhere(List<Clause> clauses, {GetOptions? getOptions});
+  Future<T> countWhere(List<Clause> clauses, {AggregateSource? source});
 
   /// {@template firefuel.rules.streamcount.definition}
   /// Gets the amount of all documents from the collection

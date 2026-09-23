@@ -42,8 +42,10 @@ abstract class FirefuelCollection<T extends Serializable>
   ///
   /// {@macro firefuel.rules.count.footer}
   @override
-  Future<int> countAll({GetOptions? getOptions}) async {
-    final snapshot = await untypedRef.count().get();
+  Future<int> countAll({AggregateSource? source}) async {
+    final snapshot = await untypedRef.count().get(
+      source: source ?? AggregateSource.server,
+    );
 
     return snapshot.count ?? 0;
   }
@@ -54,8 +56,14 @@ abstract class FirefuelCollection<T extends Serializable>
   ///
   /// {@macro firefuel.rules.countwhere.footer}
   @override
-  Future<int> countWhere(List<Clause> clauses, {GetOptions? getOptions}) async {
-    final snapshot = await untypedRef.filter(clauses).count().get();
+  Future<int> countWhere(
+    List<Clause> clauses, {
+    AggregateSource? source,
+  }) async {
+    final snapshot = await untypedRef
+        .filter(clauses)
+        .count()
+        .get(source: source ?? AggregateSource.server);
 
     return snapshot.count ?? 0;
   }

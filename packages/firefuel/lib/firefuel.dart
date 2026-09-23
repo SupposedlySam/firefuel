@@ -9,8 +9,10 @@ export 'package:cloud_firestore/cloud_firestore.dart'
         Query,
         QueryDocumentSnapshot,
         QuerySnapshot,
+        ServerTimestampBehavior,
         SetOptions,
         SnapshotOptions,
+        Source,
         average,
         sum;
 export 'package:dartz/dartz.dart' show Either, Left, Right, left, right;
