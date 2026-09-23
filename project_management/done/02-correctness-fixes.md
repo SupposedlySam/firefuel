@@ -3,7 +3,7 @@
 ## Metadata
 - **Type:** Fix
 - **Appetite:** 2 days
-- **Status:** Bet (started 2026-09-23)
+- **Status:** Done (2026-09-23)
 - **Created:** 2026-09-23
 - **Breaking:** behaviour changes in 1, 3 and 6 (each one is currently wrong)
 
@@ -42,3 +42,14 @@ source, and each one has a failing test to prove it before the fix.
 ## How it fails
 - 1 changes results for anyone who compensated for the bug. flyby's only uses are dead code
   (confirmed by its audit). The CHANGELOG must call it out as **BREAKING (fix)**.
+
+## Outcome (2026-09-23)
+- 1, 1b, 2, 3, 6: `a7d785b`. Each has a regression test that failed first.
+- 4: `f058fb1`. The old auto-commit test passed on the bug because the two
+  miscounts cancelled out. The new test pins the rollover point.
+- 5: `7c59e75`. `source:` replaces the ignored `getOptions:`. Also adds a forwarding test
+  for every repository method, mutation-checked.
+- 7 and `replace` in 8: `7966028`. `replace` is a server-checked `update`
+  ([DESIGN.md](../DESIGN.md) D4), not a transaction, so it still works offline.
+- `readOrCreate` atomicity **moved to [07](../pitches/07-transactions.md)** as an opt-in.
+  A transaction would make it fail offline.

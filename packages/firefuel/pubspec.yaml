@@ -13,7 +13,6 @@ resolution: workspace
 
 dependencies:
   cloud_firestore: ^6.3.0
-  dartz: ^0.10.1
   equatable: ^2.0.8
   firefuel_core: ^0.1.7
   flutter:

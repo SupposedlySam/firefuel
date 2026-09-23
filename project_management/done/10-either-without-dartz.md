@@ -3,7 +3,7 @@
 ## Metadata
 - **Type:** Improvement
 - **Appetite:** 2 days
-- **Status:** Pitch
+- **Status:** Done (2026-09-23)
 - **Created:** 2026-09-23
 - **Breaking:** possibly, for anyone using dartz methods beyond the core ones
 

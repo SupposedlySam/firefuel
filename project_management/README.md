@@ -74,8 +74,8 @@ from 2026-09-23.
 | Order | # | Title | Type | flyby demand |
 |---|---|---|---|---|
 | 1 | 01 | [Toolchain, workspace, hygiene](bet/01-toolchain-and-workspace.md) | Chore | — |
-| 2 | 02 | [Correctness fixes](bet/02-correctness-fixes.md) | Fix | direction bug (latent) |
-| 3 | 10 | [Own the Either](pitches/10-either-without-dartz.md) | Improvement | ok, keep names |
+| 2 | 02 | [Correctness fixes](done/02-correctness-fixes.md) | Fix | direction bug (latent) |
+| 3 | 10 | [Own the Either](done/10-either-without-dartz.md) | Improvement | ok, keep names |
 | 4 | 12 | [The query is a value](pitches/12-query-layer.md) | Infrastructure | enables 05/06 |
 | 5 | 03 | [Instance resolution](pitches/03-firestore-instance-resolution.md) | Feature | low |
 | 6 | 04 | [Server values and multi-field updates](pitches/04-write-values.md) | Feature | **yes** |

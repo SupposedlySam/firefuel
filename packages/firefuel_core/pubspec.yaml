@@ -10,6 +10,7 @@ resolution: workspace
 
 dependencies:
   equatable: ^2.0.8
+  meta: ^1.16.0
   stack_trace: ^1.12.1
 
 dev_dependencies:
