@@ -1,6 +1,6 @@
 name: firefuel
 description: A Firebase Cloud Firestore library to fuel your application's growth!
-version: 0.4.7
+version: 0.5.0
 repository: https://github.com/SupposedlySam/firefuel/tree/main/packages/firefuel
 homepage: https://github.com/SupposedlySam/firefuel
 documentation: https://firefueldocs.com
@@ -12,12 +12,15 @@ environment:
 resolution: workspace
 
 dependencies:
-  cloud_firestore: ^6.3.0
-  equatable: ^2.0.8
-  firefuel_core: ^0.1.7
+  cloud_firestore: ^6.10.0
+  # 3.x removed EquatableMixin and runtimeType comparison; neither is relied on
+  # (see the equality tests). 2.1 is resolved here because fake_cloud_firestore
+  # still requires it.
+  equatable: ">=2.1.0 <4.0.0"
+  firefuel_core: ^0.2.0
   flutter:
     sdk: flutter
-  stack_trace: ^1.12.1
+  stack_trace: ^1.12.2
 
 dev_dependencies:
   fake_cloud_firestore: ^4.3.0

@@ -1,3 +1,57 @@
+## 0.5.0
+
+Requires Dart 3.10 / Flutter 3.38 and firefuel_core 0.2.0. Read the migration guide: https://firefueldocs.com/#/migrating
+
+fix!: make queries and writes do what their names say
+
+- `OrderDirection.newestToOldest` / `oldestToNewest` sorted in reverse; `OrderBy.docId` ignored descending aliases
+- `paginate` dropped the chunk's clauses and limit after the first page
+- `Clause(arrayContainsAny:)` was never sent to Firestore
+- Range filters on several fields are allowed (Firestore supports up to 10); `MoreThanOneFieldInRangeClauseException` is removed
+- `replace` is a server-checked `update`: atomic, read-free, offline-safe, works after a `createById` in the same batch (#43), and fails `not-found` for a missing document instead of doing nothing
+- `countAll` / `countWhere` take the `AggregateSource? source` they use, instead of an ignored `GetOptions`
+- `FirefuelBatch` rolled over one op early and over-counted `totalTransactionsCommitted`
+- `update` / `replaceFields` serialize through `toFirestore` like every other write
+- Collections resolve `Firefuel.firestore` per call instead of capturing it at construction; `Firefuel.firestore` throws a `StateError` before `initialize`
+
+feat!: own the `Either`
+
+- `Either`, `Left`, `Right`, `left`, `right` come from firefuel_core instead of `package:dartz` (unmaintained since 2021). Same names and methods, plus `leftMap`, `flatMap` and exhaustive `switch`
+
+feat: queries as values
+
+- `FirefuelQuery` (clauses, orderBy, limit / `limitToLast`, `StartCursor` / `EndCursor`) read through `query` / `streamQuery`, paginated with `Chunk.query`
+- `Clause.or` / `Clause.and` (#35); `Clause` is sealed
+- `aggregate(query, count:, sums:, averages:)` in one request
+
+feat: listening with metadata
+
+- `snapshots(query, options:)` → `FirefuelQuerySnapshot` (values, docs with id/path, changes, `isFromCache`, `hasPendingWrites`); `docSnapshots(docId)`
+- `ListenOptions` (`includeMetadataChanges`, `ListenSource`); `FirefuelDoc.ancestorId`
+
+feat: collection groups
+
+- `FirefuelCollectionGroup<T>` with the full read surface; `FirefuelQueryRepository<T>` for `Either` results over any readable query
+
+feat: writes
+
+- `FieldUpdate` values (increment, arrayUnion, arrayRemove, delete, serverTimestamp) in `updateFields`, and `ServerTimestamp` returned from `toJson`, on every write path
+- `increment` and `deleteField` helpers
+- `Firefuel.runTransaction` with typed `transaction.of(collection)` scopes and an atomic `readOrCreate`
+- `Firefuel.batch()`: atomic batches across collections
+- `FirefuelCollection(path, firestore:)` pins a collection to an instance
+
+feat: observing and offline
+
+- `FirefuelObserver` hears every failure `guard` / `guardStream` handle (#18, in part); failures are no longer printed
+- `WriteAcknowledgement.local` completes writes once queued locally, so offline UIs do not hang (#62); `Firefuel.waitForPendingWrites`
+
+chore: upgrade dependencies
+
+- `cloud_firestore` ^6.3.0 → ^6.10.0, `fake_cloud_firestore` ^4.3.0, `very_good_analysis` ^11.0.0, `equatable` >=2.1.0 <4.0.0
+- Removed `dartz` and `universal_io`
+- Re-exports `FirebaseFirestore`, `Timestamp`, `Source`, `ListenSource`, `ServerTimestampBehavior`, `DocumentChangeType`, `DocumentReference`, `Transaction`, `WriteBatch` (#60); `QueryX` helpers are internal
+
 ## 0.4.7
 
 feat: add `readMany` and `streamMany` for reading documents by id
