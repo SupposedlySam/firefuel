@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firefuel/src/firefuel_observer.dart';
 import 'package:firefuel/src/write_scopes.dart';
 
 class Firefuel {
@@ -27,6 +28,18 @@ class Firefuel {
 
   static String? _env;
 
+  /// Where failures are reported. See [FirefuelObserver].
+  static FirefuelObserver get observer => _observer;
+
+  static FirefuelObserver _observer = const FirefuelObserver();
+
+  /// When writes complete, unless a collection overrides it. See
+  /// [WriteAcknowledgement].
+  static WriteAcknowledgement get writeAcknowledgement => _writeAcknowledgement;
+
+  static WriteAcknowledgement _writeAcknowledgement =
+      WriteAcknowledgement.server;
+
   /// Initializes Firefuel with instance of [FirebaseFirestore]
   ///
   /// This method must be called before any other method of Firefuel
@@ -41,9 +54,33 @@ class Firefuel {
   /// [env] is optional and will be prepended to all collection names
   ///
   /// Useful for separating collections between app flavors / environments
-  static void initialize(FirebaseFirestore firestore, {String? env}) {
+  ///
+  /// ---
+  ///
+  /// [observer] hears about every failure firefuel handles; the default logs
+  /// to `dart:developer`.
+  ///
+  /// [writeAcknowledgement] decides whether writes complete when the server
+  /// accepts them (the default) or as soon as they are queued locally, which
+  /// keeps offline UIs from hanging.
+  static void initialize(
+    FirebaseFirestore firestore, {
+    String? env,
+    FirefuelObserver observer = const FirefuelObserver(),
+    WriteAcknowledgement writeAcknowledgement = WriteAcknowledgement.server,
+  }) {
     _env = env;
     _firestore = firestore;
+    _observer = observer;
+    _writeAcknowledgement = writeAcknowledgement;
+  }
+
+  /// Completes once every write queued so far has reached the server.
+  ///
+  /// Useful with [WriteAcknowledgement.local], for example before signing
+  /// out. Writes made after the call are not waited for.
+  static Future<void> waitForPendingWrites({FirebaseFirestore? firestore}) {
+    return (firestore ?? Firefuel.firestore).waitForPendingWrites();
   }
 
   /// Clears all local properties
@@ -53,6 +90,8 @@ class Firefuel {
   static void reset() {
     _env = null;
     _firestore = null;
+    _observer = const FirefuelObserver();
+    _writeAcknowledgement = WriteAcknowledgement.server;
   }
 
   /// Runs [handler] as a Firestore transaction and returns its result.

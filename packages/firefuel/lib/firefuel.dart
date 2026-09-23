@@ -36,6 +36,7 @@ export 'package:firefuel/src/firefuel_collection.dart';
 export 'package:firefuel/src/firefuel_collection_group.dart';
 export 'package:firefuel/src/firefuel_failure.dart';
 export 'package:firefuel/src/firefuel_fetch_mixin.dart';
+export 'package:firefuel/src/firefuel_observer.dart';
 export 'package:firefuel/src/firefuel_query_repository.dart';
 export 'package:firefuel/src/firefuel_repository.dart';
 export 'package:firefuel/src/rules.dart';

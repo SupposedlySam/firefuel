@@ -3,7 +3,7 @@
 ## Metadata
 - **Type:** Feature
 - **Appetite:** 1 day
-- **Status:** Pitch
+- **Status:** Done (2026-09-23)
 - **Created:** 2026-09-23
 - **Breaking:** yes (stdout printing removed from the `FirefuelFailure` constructor)
 
@@ -18,3 +18,13 @@ hook to see which database calls are being made.
   set through `Firefuel.initialize(observer:)`. The default observer logs through
   `dart:developer` `log`, not `print`, so it reaches DevTools and stays quiet in release.
 - `FirefuelFailure` constructs silently. `guard`/`guardStream` report to the observer.
+
+## Outcome (2026-09-23)
+- `FirefuelObserver.onFailure` is set through `Firefuel.initialize(observer:)`. The default logs to
+  `dart:developer`; `SilentFirefuelObserver` ignores everything.
+- `guard` and `guardStream` report through `FirefuelFetchMixin.report`, which is public so apps'
+  own catch blocks can report the same way. The `print` of `FormatException`s is gone. The
+  constructor `print` went in 01.
+- **Issue #18 is only partly met.** Failures are observable, but there's no `onOperation`
+  hook for every database call. Hooking every method adds a call to each of about 40 methods
+  on three layers, and nobody has asked for it since 2021. Revisit if a consumer does.

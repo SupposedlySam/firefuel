@@ -83,8 +83,8 @@ from 2026-09-23.
 | 8 | 06 | [Collection groups](done/06-collection-groups.md) | Feature | **yes** |
 | 9 | 05 | [Snapshot metadata](done/05-snapshot-metadata.md) | Feature | **highest** |
 | 10 | 08 | [Query power](done/08-query-power.md) | Feature | no |
-| 11 | 09 | [Observer, quieter failures](pitches/09-observer-and-failures.md) | Feature | — |
-| 12 | 13 | [Offline writes](pitches/13-offline-writes.md) | Feature | — |
+| 11 | 09 | [Observer, quieter failures](done/09-observer-and-failures.md) | Feature | — |
+| 12 | 13 | [Offline writes](done/13-offline-writes.md) | Feature | — |
 | 13 | 11 | [Docs and site](pitches/11-docs-site-refresh.md) | Chore | — |
 
 Capability coverage: [pass-through.md](pass-through.md).

@@ -55,9 +55,12 @@ abstract class FirefuelCollection<T extends Serializable>
 
   @override
   Future<DocumentId> create(T value) async {
-    final documentRef = await ref.add(value);
+    // doc() + set() instead of add(): the id exists before the write, so it
+    // can be returned without waiting for the server.
+    final doc = ref.doc();
+    await _write(() => doc.set(value));
 
-    return DocumentId(documentRef.id);
+    return DocumentId(doc.id);
   }
 
   @override
@@ -65,16 +68,14 @@ abstract class FirefuelCollection<T extends Serializable>
     required T value,
     required DocumentId docId,
   }) async {
-    await ref.doc(docId.docId).set(value);
+    await _write(() => ref.doc(docId.docId).set(value));
 
     return docId;
   }
 
   @override
   Future<void> delete(DocumentId docId) async {
-    await ref.doc(docId.docId).delete();
-
-    return;
+    await _write(() => ref.doc(docId.docId).delete());
   }
 
   /// Converts a [DocumentSnapshot] to a [T?]
@@ -124,7 +125,7 @@ abstract class FirefuelCollection<T extends Serializable>
     // update(), not a read followed by set(): the existence check then runs
     // on the server at commit, which is atomic, read-free and offline-safe.
     // See project_management/DESIGN.md D4.
-    return ref.doc(docId.docId).update(encode(value));
+    return _write(() => ref.doc(docId.docId).update(encode(value)));
   }
 
   @override
@@ -133,7 +134,9 @@ abstract class FirefuelCollection<T extends Serializable>
     required T value,
     required List<String> fieldPaths,
   }) async {
-    await ref.doc(docId.docId).update(encodeFields(value, fieldPaths));
+    await _write(
+      () => ref.doc(docId.docId).update(encodeFields(value, fieldPaths)),
+    );
 
     return;
   }
@@ -221,7 +224,7 @@ abstract class FirefuelCollection<T extends Serializable>
 
   @override
   Future<void> update({required DocumentId docId, required T value}) async {
-    await ref.doc(docId.docId).update(encode(value));
+    await _write(() => ref.doc(docId.docId).update(encode(value)));
 
     return;
   }
@@ -231,7 +234,7 @@ abstract class FirefuelCollection<T extends Serializable>
     required DocumentId docId,
     required Map<String, Object?> fields,
   }) async {
-    await ref.doc(docId.docId).update(FieldUpdates.lower(fields));
+    await _write(() => ref.doc(docId.docId).update(FieldUpdates.lower(fields)));
 
     return;
   }
@@ -296,7 +299,9 @@ abstract class FirefuelCollection<T extends Serializable>
     required DocumentId docId,
     required T value,
   }) async {
-    await ref.doc(docId.docId).set(value, SetOptions(merge: true));
+    await _write(
+      () => ref.doc(docId.docId).set(value, SetOptions(merge: true)),
+    );
 
     return value;
   }
@@ -312,6 +317,27 @@ abstract class FirefuelCollection<T extends Serializable>
     if (docs.isEmpty) return null;
 
     return docs.first.data();
+  }
+
+  /// When this collection's writes complete. Defaults to
+  /// `Firefuel.writeAcknowledgement`; override it to decide per collection.
+  WriteAcknowledgement get writeAcknowledgement =>
+      Firefuel.writeAcknowledgement;
+
+  /// Runs [write] and completes as [writeAcknowledgement] says.
+  ///
+  /// With [WriteAcknowledgement.local] the write is queued and this returns
+  /// at once; a later failure is reported to `Firefuel.observer`, since no
+  /// caller is waiting for it any more.
+  Future<void> _write(Future<void> Function() write) async {
+    switch (writeAcknowledgement) {
+      case WriteAcknowledgement.server:
+        await write();
+      case WriteAcknowledgement.local:
+        unawaited(
+          write().catchError(FirefuelFetchMixin.report),
+        );
+    }
   }
 
   /// Prefix the collection path with the environment
