@@ -175,8 +175,9 @@ abstract class CollectionRead<R, T extends Serializable> {
   ///
   /// {@template firefuel.rules.whereExceptions}
   /// throws a [MissingValueException] when no [Clause]s are given
-  /// throws a [MoreThanOneFieldInRangeClauseException] when range filters are
-  /// on different fields
+  ///
+  /// Range filters may target up to 10 different fields; Firestore enforces
+  /// the limit and requires a composite index for the combination.
   /// {@endtemplate}
   Stream<R> streamWhere(
     List<Clause> clauses, {

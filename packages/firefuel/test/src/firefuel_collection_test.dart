@@ -552,20 +552,6 @@ void main() {
           throwsA(isA<MissingValueException>()),
         );
       });
-
-      test(
-        'should throw $MoreThanOneFieldInRangeClauseException when more than '
-        'one field is used in multiple range clauses',
-        () {
-          expect(
-            () => testCollection.streamWhere([
-              Clause('firstField', isGreaterThan: 44),
-              Clause('secondField', isLessThan: 22),
-            ]),
-            throwsA(isA<MoreThanOneFieldInRangeClauseException>()),
-          );
-        },
-      );
     });
 
     group('with orderBy should return a subset of the existing list', () {
@@ -1138,20 +1124,6 @@ void main() {
           throwsA(isA<MissingValueException>()),
         );
       });
-
-      test(
-        'should throw $MoreThanOneFieldInRangeClauseException when more than '
-        'one field is used in multiple range clauses',
-        () {
-          expect(
-            () => testCollection.streamWhere([
-              Clause('firstField', isGreaterThan: 44),
-              Clause('secondField', isLessThan: 22),
-            ]),
-            throwsA(isA<MoreThanOneFieldInRangeClauseException>()),
-          );
-        },
-      );
     });
 
     group('with orderBy should return a subset of the existing list', () {
@@ -1269,6 +1241,138 @@ void main() {
       final readResult = await testCollection.whereById(DocumentId('dodoBird'));
 
       expect(readResult, isNull);
+    });
+  });
+
+  group('regressions', () {
+    group('$OrderDirection', () {
+      setUp(() async {
+        // `age` stands in for a timestamp: a larger value is newer.
+        await testCollection.create(const TestUser('oldest', age: 1));
+        await testCollection.create(const TestUser('middle', age: 2));
+        await testCollection.create(const TestUser('newest', age: 3));
+      });
+
+      Future<List<String>> namesOrderedBy(OrderDirection direction) async {
+        final users = await testCollection.orderBy([
+          OrderBy(field: TestUser.fieldAge, direction: direction),
+        ]);
+
+        return users.map((user) => user.name).toList();
+      }
+
+      test('newestToOldest should put the largest value first', () async {
+        expect(await namesOrderedBy(OrderDirection.newestToOldest), [
+          'newest',
+          'middle',
+          'oldest',
+        ]);
+      });
+
+      test('oldestToNewest should put the smallest value first', () async {
+        expect(await namesOrderedBy(OrderDirection.oldestToNewest), [
+          'oldest',
+          'middle',
+          'newest',
+        ]);
+      });
+    });
+
+    group('OrderBy.docId', () {
+      test('should honour a descending alias', () async {
+        await testCollection.createById(
+          value: const TestUser('a'),
+          docId: DocumentId('a'),
+        );
+        await testCollection.createById(
+          value: const TestUser('z'),
+          docId: DocumentId('z'),
+        );
+
+        final users = await testCollection.orderBy([
+          const OrderBy.docId(OrderDirection.zToA),
+        ]);
+
+        expect(users.first.name, 'z');
+      });
+    });
+
+    group('arrayContainsAny', () {
+      test('should filter on the clause instead of dropping it', () async {
+        await testCollection.create(
+          const TestUser('flutter fan', tags: ['flutter']),
+        );
+        await testCollection.create(const TestUser('dart fan', tags: ['dart']));
+        await testCollection.create(const TestUser('no tags'));
+
+        final users = await testCollection.where([
+          Clause(TestUser.fieldTags, arrayContainsAny: const ['flutter', 'go']),
+        ]);
+
+        // Positive control and population: 3 documents exist, exactly one
+        // matches.
+        expect(await testCollection.countAll(), 3);
+        expect(users.map((user) => user.name), ['flutter fan']);
+      });
+    });
+
+    group('#paginate', () {
+      setUp(() async {
+        // 6 matching and 6 non-matching documents, interleaved by name.
+        for (var i = 0; i < 12; i++) {
+          await testCollection.create(
+            TestUser(
+              'user${i.toString().padLeft(2, '0')}',
+              occupation: i.isEven ? 'pilot' : 'chef',
+            ),
+          );
+        }
+      });
+
+      test('should keep clauses and limit on every page', () async {
+        final pages = <Chunk<TestUser>>[];
+        var chunk = Chunk<TestUser>(
+          orderBy: [OrderBy(field: TestUser.fieldName)],
+          clauses: [Clause(TestUser.fieldOccupation, isEqualTo: 'pilot')],
+          limit: 2,
+        );
+
+        do {
+          chunk = await testCollection.paginate(chunk);
+          pages.add(chunk);
+        } while (chunk.status == ChunkStatus.nextAvailable);
+
+        final users = pages.expand((page) => page.data).toList();
+
+        expect(users, hasLength(6));
+        expect(users.every((user) => user.occupation == 'pilot'), isTrue);
+        expect(
+          pages.map((page) => page.data.length),
+          everyElement(lessThanOrEqualTo(2)),
+        );
+        expect(pages.every((page) => page.limit == 2), isTrue);
+      });
+    });
+
+    group('range filters on more than one field', () {
+      test('should be sent to Firestore rather than refused', () async {
+        await testCollection.create(
+          const TestUser('match', age: 30, occupation: 'b'),
+        );
+        await testCollection.create(
+          const TestUser('too young', age: 10, occupation: 'b'),
+        );
+        await testCollection.create(
+          const TestUser('wrong occupation', age: 30, occupation: 'z'),
+        );
+
+        final users = await testCollection.where([
+          Clause(TestUser.fieldAge, isGreaterThan: 20),
+          Clause(TestUser.fieldOccupation, isLessThan: 'm'),
+        ]);
+
+        expect(users.map((user) => user.name), ['match']);
+      });
     });
   });
 }

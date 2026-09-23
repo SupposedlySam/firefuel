@@ -178,8 +178,20 @@ abstract class FirefuelCollection<T extends Serializable>
     final isNotLast = snapshotLength == chunk.limit;
 
     return isNotLast
-        ? Chunk<T>.next(data: data, cursor: cursor, orderBy: chunk.orderBy)
-        : Chunk<T>.last(data: data, cursor: cursor, orderBy: chunk.orderBy);
+        ? Chunk<T>.next(
+            data: data,
+            cursor: cursor,
+            orderBy: chunk.orderBy,
+            clauses: chunk.clauses,
+            limit: chunk.limit,
+          )
+        : Chunk<T>.last(
+            data: data,
+            cursor: cursor,
+            orderBy: chunk.orderBy,
+            clauses: chunk.clauses,
+            limit: chunk.limit,
+          );
   }
 
   @override
@@ -481,12 +493,13 @@ abstract class FirefuelCollection<T extends Serializable>
   }) {
     if (clauses.isEmpty) {
       throw MissingValueException(Clause);
-    } else if (Clause.hasMoreThanOneFieldInRangeComparisons(clauses)) {
-      throw MoreThanOneFieldInRangeClauseException();
     }
 
     final augmentedOrderBys = OrderBy.moveOrCreateMatchingField(
-      fieldToMatch: Clause.fieldMatchingRangeOrderingRule(clauses),
+      fieldToMatch: Clause.fieldMatchingRangeOrderingRule(
+        clauses,
+        orderBy: orderBy,
+      ),
       orderBy: orderBy,
       isRangeComparison: Clause.hasRangeComparison(clauses),
     );

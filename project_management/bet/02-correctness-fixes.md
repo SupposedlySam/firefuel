@@ -3,7 +3,7 @@
 ## Metadata
 - **Type:** Fix
 - **Appetite:** 2 days
-- **Status:** Pitch
+- **Status:** Bet (started 2026-09-23)
 - **Created:** 2026-09-23
 - **Breaking:** behaviour changes in 1, 3 and 6 (each one is currently wrong)
 

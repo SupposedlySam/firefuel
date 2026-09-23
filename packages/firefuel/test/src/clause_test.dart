@@ -105,5 +105,32 @@ void main() {
         'name',
       );
     });
+
+    group('with range filters on several fields', () {
+      final clauses = [
+        Clause('age', isGreaterThan: 4),
+        Clause('height', isLessThan: 200),
+      ];
+
+      test('should keep a leading orderBy that is a range field', () {
+        expect(
+          Clause.fieldMatchingRangeOrderingRule(
+            clauses,
+            orderBy: [OrderBy(field: 'height')],
+          ),
+          'height',
+        );
+      });
+
+      test('should use the first range field otherwise', () {
+        expect(
+          Clause.fieldMatchingRangeOrderingRule(
+            clauses,
+            orderBy: [OrderBy(field: 'name')],
+          ),
+          'age',
+        );
+      });
+    });
   });
 }

@@ -20,6 +20,7 @@ extension QueryX<T> on Query<T?> {
         isGreaterThan: clause.isGreaterThan,
         isGreaterThanOrEqualTo: clause.isGreaterThanOrEqualTo,
         arrayContains: clause.arrayContains,
+        arrayContainsAny: clause.arrayContainsAny,
         whereIn: clause.whereIn,
         whereNotIn: clause.whereNotIn,
         isNull: clause.isNull,
@@ -45,7 +46,7 @@ extension QueryX<T> on Query<T?> {
     return orderBy.fold(this, (result, orderBy) {
       return result.orderBy(
         orderBy.byId ? FieldPath.documentId : orderBy.field,
-        descending: orderBy.direction == OrderDirection.desc,
+        descending: orderBy.isDescending,
       );
     });
   }

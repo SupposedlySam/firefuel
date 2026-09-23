@@ -136,12 +136,26 @@ class Clause extends Equatable {
   /// This is the first **range** clause's field, not necessarily the first
   /// clause in the list, so callers can list equality filters before range
   /// filters.
-  static String fieldMatchingRangeOrderingRule(List<Clause> clauses) {
-    final rangeClauses = clauses.where((c) => c.isRangeComparison);
+  ///
+  /// With range filters on several fields, a caller whose first [orderBy]
+  /// already names one of them keeps that order: any range field may lead.
+  static String fieldMatchingRangeOrderingRule(
+    List<Clause> clauses, {
+    List<OrderBy>? orderBy,
+  }) {
+    final rangeFields = clauses
+        .where((c) => c.isRangeComparison)
+        .map((c) => c.field)
+        .toList();
 
-    return rangeClauses.isNotEmpty
-        ? rangeClauses.first.field
-        : clauses.first.field;
+    if (rangeFields.isEmpty) return clauses.first.field;
+
+    final leadingOrder = orderBy?.firstOrNull;
+    if (leadingOrder != null && rangeFields.contains(leadingOrder.field)) {
+      return leadingOrder.field;
+    }
+
+    return rangeFields.first;
   }
 
   static bool _hasAny(List<dynamic> options) {

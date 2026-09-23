@@ -10,5 +10,11 @@ class MissingValueException implements Exception {
 
 class TooManyArgumentsException implements Exception {}
 
-/// Firestore does not support Queries with range filters on different fields
+/// No longer thrown.
+///
+/// Firestore has supported range filters on up to 10 fields in one query
+/// since 2024, so firefuel stopped refusing them in 0.5.
+@Deprecated(
+  'No longer thrown; Firestore allows range filters on several fields',
+)
 class MoreThanOneFieldInRangeClauseException implements Exception {}
