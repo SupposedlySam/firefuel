@@ -103,3 +103,6 @@ app.*.map.json
 !**/ios/**/default.mode2v3
 !**/ios/**/default.pbxuser
 !**/ios/**/default.perspectivev3
+
+# llm_chat identity for this project
+.llm_chat/
