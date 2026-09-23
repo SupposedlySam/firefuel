@@ -76,6 +76,22 @@ void main() {
       );
     });
 
+    test(
+      'limitToLast before an end cursor should read the previous page',
+      () async {
+        expect(
+          await agesOf(
+            FirefuelQuery(
+              orderBy: byAge,
+              end: const EndCursor.before([5]),
+              limitToLast: 2,
+            ),
+          ),
+          [3, 4],
+        );
+      },
+    );
+
     test('limitToLast should keep the end of the order', () async {
       expect(await agesOf(FirefuelQuery(orderBy: byAge, limitToLast: 2)), [
         5,
@@ -205,6 +221,29 @@ void main() {
       final chunk = Chunk<TestUser>.query(FirefuelQuery(orderBy: byAge));
 
       expect(chunk.limit, Chunk.defaultLimit);
+    });
+
+    test('should page up to an end cursor', () async {
+      final seen = <int?>[];
+      var chunk = Chunk<TestUser>.query(
+        FirefuelQuery(orderBy: byAge, end: const EndCursor.at([4]), limit: 2),
+      );
+
+      do {
+        chunk = await collection.paginate(chunk);
+        seen.addAll(chunk.data.map((user) => user.age));
+      } while (chunk.status == ChunkStatus.nextAvailable);
+
+      expect(seen, [1, 2, 3, 4]);
+    });
+
+    test('should refuse a start cursor', () {
+      expect(
+        () => Chunk<TestUser>.query(
+          FirefuelQuery(orderBy: byAge, start: const StartCursor.at([1])),
+        ),
+        throwsArgumentError,
+      );
     });
 
     test('should refuse queries that do not walk forward', () {

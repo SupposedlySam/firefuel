@@ -156,6 +156,70 @@ void main() {
     );
   });
 
+  test('aggregate', () async {
+    final query = FirefuelQuery(clauses: clauses);
+
+    await expectForwarded(
+      () => collection.aggregate(
+        query,
+        count: true,
+        sums: const ['a'],
+        averages: const ['b'],
+        source: source,
+      ),
+      const AggregateResult(count: 1),
+      () => repository.aggregate(
+        query,
+        count: true,
+        sums: const ['a'],
+        averages: const ['b'],
+        source: source,
+      ),
+    );
+  });
+
+  test('update', () async {
+    when(
+      () => collection.update(docId: docId, value: user),
+    ).thenAnswer((_) async {});
+
+    final result = await repository.update(docId: docId, value: user);
+
+    expect(result.isRight(), isTrue);
+  });
+
+  test('updateOrCreate', () async {
+    await expectForwarded(
+      () => collection.updateOrCreate(docId: docId, value: user),
+      user,
+      () => repository.updateOrCreate(docId: docId, value: user),
+    );
+  });
+
+  test('increment', () async {
+    when(
+      () => collection.increment(docId: docId, field: field, by: 3),
+    ).thenAnswer((_) async {});
+
+    final result = await repository.increment(
+      docId: docId,
+      field: field,
+      by: 3,
+    );
+
+    expect(result.isRight(), isTrue);
+  });
+
+  test('deleteField', () async {
+    when(
+      () => collection.deleteField(docId: docId, field: field),
+    ).thenAnswer((_) async {});
+
+    final result = await repository.deleteField(docId: docId, field: field);
+
+    expect(result.isRight(), isTrue);
+  });
+
   test('readAll', () async {
     await expectForwarded(() => collection.readAll(getOptions: getOptions), [
       user,
@@ -281,6 +345,66 @@ void main() {
   });
 
   group('streams', () {
+    const options = ListenOptions(
+      includeMetadataChanges: true,
+      source: ListenSource.cache,
+    );
+
+    test('snapshots', () async {
+      final query = FirefuelQuery(clauses: clauses);
+      const snapshot = FirefuelQuerySnapshot<TestUser>(
+        value: [user],
+        docs: [],
+        changes: [],
+        isFromCache: true,
+        hasPendingWrites: false,
+      );
+      when(
+        () => collection.snapshots(query, options: options),
+      ).thenAnswer((_) => Stream.value(snapshot));
+
+      final result = await repository.snapshots(query, options: options).first;
+
+      expect(result.getRightOrElseNull(), snapshot);
+    });
+
+    test('docSnapshots', () async {
+      const snapshot = FirefuelSnapshot<TestUser?>(
+        value: user,
+        isFromCache: false,
+        hasPendingWrites: true,
+      );
+      when(
+        () => collection.docSnapshots(docId, options: options),
+      ).thenAnswer((_) => Stream.value(snapshot));
+
+      final result = await repository
+          .docSnapshots(docId, options: options)
+          .first;
+
+      expect(result.getRightOrElseNull(), snapshot);
+    });
+
+    test('streamLimited', () async {
+      when(
+        () => collection.streamLimited(3),
+      ).thenAnswer((_) => Stream.value([user]));
+
+      final result = await repository.streamLimited(3).first;
+
+      expect(result.getRightOrElseNull(), [user]);
+    });
+
+    test('streamOrdered', () async {
+      when(
+        () => collection.streamOrdered(orderBy),
+      ).thenAnswer((_) => Stream.value([user]));
+
+      final result = await repository.streamOrdered(orderBy).first;
+
+      expect(result.getRightOrElseNull(), [user]);
+    });
+
     test('streamQuery', () async {
       final query = FirefuelQuery(orderBy: orderBy, limit: 1);
       when(

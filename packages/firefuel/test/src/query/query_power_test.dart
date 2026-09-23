@@ -17,6 +17,11 @@ void main() {
     await users.create(const TestUser('leela', age: 27, occupation: 'captain'));
     await users.create(const TestUser('bender', age: 4, occupation: 'robot'));
     await users.create(const TestUser('farnsworth', age: 160));
+    // Meets only one side of the AND below, so an AND lowered as an OR
+    // would wrongly include him.
+    await users.create(
+      const TestUser('hermes', age: 25, occupation: 'bureaucrat'),
+    );
   });
 
   tearDown(Firefuel.reset);
@@ -117,9 +122,9 @@ void main() {
         averages: [TestUser.fieldAge],
       );
 
-      expect(result.count, 3);
-      expect(result.sums[TestUser.fieldAge], 56);
-      expect(result.averages[TestUser.fieldAge], closeTo(56 / 3, 1e-9));
+      expect(result.count, 4);
+      expect(result.sums[TestUser.fieldAge], 81);
+      expect(result.averages[TestUser.fieldAge], closeTo(81 / 4, 1e-9));
     });
 
     test('should leave count null when not requested', () async {
@@ -129,7 +134,7 @@ void main() {
       );
 
       expect(result.count, isNull);
-      expect(result.sums[TestUser.fieldAge], 216);
+      expect(result.sums[TestUser.fieldAge], 241);
     });
 
     test('should refuse a request for nothing', () {
@@ -141,7 +146,7 @@ void main() {
 
       final result = await repository.aggregate(FirefuelQuery(), count: true);
 
-      expect(result.getRightOrElseNull()?.count, 4);
+      expect(result.getRightOrElseNull()?.count, 5);
     });
   });
 }

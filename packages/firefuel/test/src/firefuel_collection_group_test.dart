@@ -133,6 +133,28 @@ void main() {
     expect(users.map((user) => user.name), ['amy']);
   });
 
+  test('should follow Firefuel.initialize after construction', () async {
+    final second = FakeFirebaseFirestore();
+    await second
+        .collection('x/1/reactions')
+        .doc('hermes')
+        .set(const TestUser('hermes').toJson());
+
+    await group.readAll();
+    Firefuel.initialize(second);
+
+    expect((await group.readAll()).map((user) => user.name), ['hermes']);
+  });
+
+  test(
+    'should ignore Firefuel.env, which prefixes top-level names only',
+    () async {
+      Firefuel.initialize(firestore, env: 'dev');
+
+      expect(await ReactionGroup().countAll(), 4);
+    },
+  );
+
   test('should expose no writes', () {
     // A group has no single parent to write into; the type system is the
     // guard, so no write method exists to call.

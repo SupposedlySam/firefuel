@@ -61,13 +61,19 @@ void main() {
     test('reset should restore the default observer', () {
       Firefuel.reset();
 
-      expect(Firefuel.observer, isNot(same(observer)));
+      expect(Firefuel.observer.runtimeType, FirefuelObserver);
     });
   });
 
   test('the default observer should not throw', () {
-    const FirefuelObserver().onFailure(_TestFailure('boom'));
-    const SilentFirefuelObserver().onFailure(_TestFailure('boom'));
+    expect(
+      () => const FirefuelObserver().onFailure(_TestFailure('boom')),
+      returnsNormally,
+    );
+    expect(
+      () => const SilentFirefuelObserver().onFailure(_TestFailure('boom')),
+      returnsNormally,
+    );
   });
 
   group('writeAcknowledgement', () {

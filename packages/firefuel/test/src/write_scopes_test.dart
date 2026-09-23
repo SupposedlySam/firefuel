@@ -74,6 +74,43 @@ void main() {
       );
     });
 
+    for (final (name, write) in [
+      (
+        'update',
+        (TransactionScope<TestUser> scope, DocumentId id) =>
+            scope.update(docId: id, value: fry),
+      ),
+      (
+        'delete',
+        (TransactionScope<TestUser> scope, DocumentId id) => scope.delete(id),
+      ),
+    ]) {
+      test('should refuse a read after $name', () async {
+        await users.createById(value: fry, docId: fryId);
+
+        await expectLater(
+          Firefuel.runTransaction((transaction) async {
+            final scope = transaction.of(users);
+            write(scope, fryId);
+            await scope.read(leelaId);
+          }),
+          throwsA(isA<ReadAfterWriteException>()),
+        );
+      });
+    }
+
+    test('should run on an instance it is given', () async {
+      final other = FakeFirebaseFirestore();
+      final elsewhere = TestCollection(firestore: other);
+
+      await Firefuel.runTransaction(firestore: other, (transaction) async {
+        transaction.of(elsewhere).createById(docId: fryId, value: fry);
+      });
+
+      expect(await elsewhere.read(fryId), fry);
+      expect(await users.read(fryId), isNull);
+    });
+
     test('readOrCreate should create only when missing', () async {
       final created = await Firefuel.runTransaction(
         (transaction) =>
@@ -139,6 +176,18 @@ void main() {
       await batch.commit();
 
       expect(await users.read(fryId), leela);
+    });
+
+    test('should write to an instance it is given', () async {
+      final other = FakeFirebaseFirestore();
+      final elsewhere = TestCollection(firestore: other);
+
+      final batch = Firefuel.batch(firestore: other);
+      batch.of(elsewhere).createById(docId: fryId, value: fry);
+      await batch.commit();
+
+      expect(await elsewhere.read(fryId), fry);
+      expect(await users.read(fryId), isNull);
     });
 
     test('should delete', () async {

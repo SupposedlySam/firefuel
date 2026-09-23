@@ -906,6 +906,25 @@ void main() {
       expect(await testCollection.read(nonExistentDoc), isNull);
     });
 
+    test('should overwrite what the model writes and keep the rest', () async {
+      await testCollection.createById(
+        value: const TestUser('old', age: 3, tags: ['x']),
+        docId: originalDocId,
+      );
+
+      await testCollection.replace(
+        docId: originalDocId,
+        value: const TestUser('new'),
+      );
+
+      final replaced = await testCollection.read(originalDocId);
+      // toJson always writes age, so a null age overwrites the stored 3...
+      expect(replaced!.name, 'new');
+      expect(replaced.age, isNull);
+      // ...but it omits tags when null, and a field it does not write stays.
+      expect(replaced.tags, ['x']);
+    });
+
     test('should overwrite all values in document', () async {
       const newUser = TestUser('newUser');
       const updatedUser = TestUser('updatedUser');
