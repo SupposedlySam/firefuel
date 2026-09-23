@@ -167,6 +167,19 @@ abstract class FirefuelRepository<T extends Serializable>
   }
 
   @override
+  Future<Either<Failure, List<T>>> query(
+    FirefuelQuery query, {
+    GetOptions? getOptions,
+  }) {
+    return guard(() => _collection.query(query, getOptions: getOptions));
+  }
+
+  @override
+  Stream<Either<Failure, List<T>>> streamQuery(FirefuelQuery query) {
+    return guardStream(() => _collection.streamQuery(query));
+  }
+
+  @override
   Future<Either<Failure, List<T>>> readAll({GetOptions? getOptions}) {
     return guard(() => _collection.readAll(getOptions: getOptions));
   }

@@ -2,34 +2,117 @@ import 'package:firefuel/firefuel.dart';
 
 enum ChunkStatus { nextAvailable, last }
 
-/// Used to keep track of state when paginating
+/// One page of a paginated read, and everything needed to fetch the next.
+///
+/// Pass a [Chunk] to `paginate`, then pass the returned [Chunk] back to get
+/// the following page, until [status] is [ChunkStatus.last].
+///
+/// Every page carries the same [query]: the next page is derived from the
+/// previous one rather than re-assembled from parts. Before 0.5 each page
+/// was rebuilt field by field, and the clauses and limit were silently
+/// dropped after page one.
 class Chunk<T> {
-  Chunk({required this.orderBy, this.clauses, this.limit = defaultLimit})
-    : data = [],
+  /// The first page of a query described by its parts.
+  Chunk({
+    List<OrderBy>? orderBy,
+    List<Clause>? clauses,
+    int limit = defaultLimit,
+  }) : this.query(
+         FirefuelQuery(
+           orderBy: orderBy ?? const [],
+           clauses: clauses ?? const [],
+           limit: limit,
+         ),
+       );
+
+  /// The first page of [query], [defaultLimit] documents at a time unless
+  /// the query sets its own limit.
+  ///
+  /// Paging walks forward from the start of the order, so a query using
+  /// `limitToLast` or a start cursor cannot be paginated.
+  Chunk.query(FirefuelQuery query)
+    : query = _withPageSize(query),
+      data = const [],
       cursor = null,
       status = ChunkStatus.nextAvailable;
 
   Chunk.next({
     required this.data,
     required this.cursor,
-    required this.orderBy,
-    this.clauses,
-    this.limit = defaultLimit,
-  }) : status = ChunkStatus.nextAvailable;
+    List<OrderBy>? orderBy,
+    List<Clause>? clauses,
+    int limit = defaultLimit,
+  }) : query = FirefuelQuery(
+         orderBy: orderBy ?? const [],
+         clauses: clauses ?? const [],
+         limit: limit,
+       ),
+       status = ChunkStatus.nextAvailable;
 
   Chunk.last({
     required this.data,
     required this.cursor,
-    required this.orderBy,
-    this.clauses,
-    this.limit = defaultLimit,
-  }) : status = ChunkStatus.last;
+    List<OrderBy>? orderBy,
+    List<Clause>? clauses,
+    int limit = defaultLimit,
+  }) : query = FirefuelQuery(
+         orderBy: orderBy ?? const [],
+         clauses: clauses ?? const [],
+         limit: limit,
+       ),
+       status = ChunkStatus.last;
+
+  Chunk._page({
+    required this.query,
+    required this.data,
+    required this.cursor,
+    required this.status,
+  });
+
   static const int defaultLimit = 25;
 
+  /// The query every page of this pagination reads from.
+  final FirefuelQuery query;
+
+  /// The last document of this page; the next page starts after it.
   final DocumentSnapshot<T?>? cursor;
+
+  /// The documents on this page.
   final List<T> data;
-  final int limit;
-  final List<OrderBy>? orderBy;
-  final List<Clause>? clauses;
+
   final ChunkStatus status;
+
+  /// Page size.
+  int get limit => query.limit!;
+
+  List<OrderBy> get orderBy => query.orderBy;
+
+  List<Clause> get clauses => query.clauses;
+
+  /// The page after this one, holding [data] and ending at [cursor].
+  ///
+  /// Used by `paginate`; you should not need to call it.
+  Chunk<T> followedBy({
+    required List<T> data,
+    required DocumentSnapshot<T?>? cursor,
+    required bool isLast,
+  }) {
+    return Chunk._page(
+      query: query,
+      data: data,
+      cursor: cursor,
+      status: isLast ? ChunkStatus.last : ChunkStatus.nextAvailable,
+    );
+  }
+
+  static FirefuelQuery _withPageSize(FirefuelQuery query) {
+    if (query.limitToLast != null || query.start != null) {
+      throw ArgumentError(
+        'paginate walks forward from the start of the order; '
+        'limitToLast and start cursors cannot be paginated',
+      );
+    }
+
+    return query.limit == null ? query.copyWith(limit: defaultLimit) : query;
+  }
 }

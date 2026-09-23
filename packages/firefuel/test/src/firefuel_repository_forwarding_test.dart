@@ -146,6 +146,16 @@ void main() {
     );
   });
 
+  test('query', () async {
+    final query = FirefuelQuery(orderBy: orderBy, limitToLast: 2);
+
+    await expectForwarded(
+      () => collection.query(query, getOptions: getOptions),
+      [user],
+      () => repository.query(query, getOptions: getOptions),
+    );
+  });
+
   test('readAll', () async {
     await expectForwarded(() => collection.readAll(getOptions: getOptions), [
       user,
@@ -271,6 +281,17 @@ void main() {
   });
 
   group('streams', () {
+    test('streamQuery', () async {
+      final query = FirefuelQuery(orderBy: orderBy, limit: 1);
+      when(
+        () => collection.streamQuery(query),
+      ).thenAnswer((_) => Stream.value([user]));
+
+      final result = await repository.streamQuery(query).first;
+
+      expect(result.getRightOrElseNull(), [user]);
+    });
+
     test('streamWhere', () async {
       when(
         () => collection.streamWhere(clauses, orderBy: orderBy, limit: 2),

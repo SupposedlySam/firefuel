@@ -1,15 +1,12 @@
 import 'package:firefuel/firefuel.dart';
 
-extension QueryX<T> on Query<T?> {
-  Query<T?> filterIfNotNull(List<Clause>? clauses) {
-    if (clauses == null) return this;
-
-    return filter(clauses);
-  }
-
-  Query<T?> filter(List<Clause> clauses) {
-    if (clauses.isEmpty) return this;
-
+/// Lowers firefuel's filters and order onto a cloud_firestore [Query].
+///
+/// Internal: `FirefuelQuery.applyTo` calls these, in the order Firestore
+/// requires, alongside cursors and limits.
+extension QueryX<T> on Query<T> {
+  /// Adds every clause as an AND-ed `where`.
+  Query<T> filter(List<Clause> clauses) {
     return clauses.fold(this, (result, clause) {
       return result.where(
         clause.field,
@@ -28,32 +25,13 @@ extension QueryX<T> on Query<T?> {
     });
   }
 
-  Query<T?> startAfterIfNotNull(DocumentSnapshot<T?>? cursor) {
-    if (cursor == null) return this;
-
-    return startAfterDocument(cursor);
-  }
-
-  Query<T?> sortIfNotNull(List<OrderBy>? orderBy) {
-    if (orderBy == null) return this;
-
-    return sort(orderBy);
-  }
-
-  Query<T?> sort(List<OrderBy> orderBy) {
-    if (orderBy.isEmpty) return this;
-
+  /// Adds every [OrderBy], first entry first.
+  Query<T> sort(List<OrderBy> orderBy) {
     return orderBy.fold(this, (result, orderBy) {
       return result.orderBy(
         orderBy.byId ? FieldPath.documentId : orderBy.field,
         descending: orderBy.isDescending,
       );
     });
-  }
-
-  Query<T?> limitIfNotNull(int? limit) {
-    if (limit == null) return this;
-
-    return this.limit(limit);
   }
 }

@@ -105,6 +105,20 @@ abstract class CollectionPaginate<R, T extends Serializable> {
 /// subclasses
 /// {@endtemplate}
 abstract class CollectionRead<R, T extends Serializable> {
+  /// Get the documents described by [query], once.
+  ///
+  /// The other reads are shorthands for common queries; reach for this when
+  /// you need cursors, `limitToLast`, or a query you build up in steps.
+  ///
+  /// Does NOT refresh automatically. Related: [streamQuery]
+  Future<R> query(FirefuelQuery query, {GetOptions? getOptions});
+
+  /// Get the documents described by [query].
+  ///
+  /// Refreshes automatically when matching data is added, changed or
+  /// removed.
+  Stream<R> streamQuery(FirefuelQuery query);
+
   /// Get a list of all documents from the collection as a list
   ///
   /// Refreshes automatically when new data is added/removed from the collection
