@@ -21,6 +21,7 @@ bricks:
           format: snakeCase
           value: document_name
         vars:
+          collection_name: __COLLECTION_NAME__
           document_name: __DOCUMENT_NAME__
       collection.dart: # file name under source directory
         # name: provides object with config for this file
@@ -30,3 +31,4 @@ bricks:
           suffix: _collection
         vars:
           document_name: __DOCUMENT_NAME__
+          collection_name: __COLLECTION_NAME__
