@@ -3,7 +3,7 @@
 ## Metadata
 - **Type:** Chore
 - **Appetite:** 1 day
-- **Status:** Pitch
+- **Status:** Bet (started 2026-09-23)
 - **Created:** 2026-09-23
 - **Breaking:** raises the SDK floor only
 

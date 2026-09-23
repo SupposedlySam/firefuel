@@ -1,0 +1,54 @@
+# Verifies every workspace member. It never publishes and never deploys:
+# the docs site is served by GitHub Pages straight from /docs on main.
+name: ci
+
+on:
+  pull_request:
+  push:
+    branches-ignore: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: kuhnroyal/flutter-fvm-config-action/setup@v3
+        with:
+          path: .fvmrc
+
+      - name: Resolve the workspace
+        run: flutter pub get
+
+      - name: Format
+        run: >-
+          dart format --output=none --set-exit-if-changed
+          packages/firefuel/lib packages/firefuel/test
+          packages/firefuel/example/lib packages/firefuel/example/test
+          packages/firefuel_core
+
+      - name: Analyze
+        run: dart analyze --fatal-infos
+
+      - name: Test firefuel_core
+        working-directory: packages/firefuel_core
+        run: dart test
+
+      - name: Test firefuel
+        working-directory: packages/firefuel
+        run: flutter test
+
+      - name: Test example
+        working-directory: packages/firefuel/example
+        run: flutter test
+
+      - name: Publish dry run
+        run: |
+          (cd packages/firefuel_core && dart pub publish --dry-run)
+          (cd packages/firefuel && flutter pub publish --dry-run)

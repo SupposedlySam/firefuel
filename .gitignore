@@ -106,3 +106,4 @@ app.*.map.json
 
 # llm_chat identity for this project
 .llm_chat/
+pubspec.lock

@@ -11,7 +11,7 @@ void main() {
     setUp(() {
       try {
         throw Exception('test message');
-      } catch (e, trace) {
+      } on Exception catch (e, trace) {
         error = e;
         chain = Chain.forTrace(trace);
         failure = TestFailure(e, stackTrace: chain);
@@ -38,9 +38,11 @@ void main() {
     setUp(() {
       try {
         throw Exception('test message');
-      } catch (e, trace) {
-        failure =
-            TestFirefuelFailure(error: e, stackTrace: Chain.forTrace(trace));
+      } on Exception catch (e, trace) {
+        failure = TestFirefuelFailure(
+          error: e,
+          stackTrace: Chain.forTrace(trace),
+        );
       }
     });
 
@@ -51,15 +53,9 @@ void main() {
 }
 
 class TestFailure extends Failure {
-  TestFailure(
-    Object error, {
-    required Chain stackTrace,
-  }) : super(error, stackTrace: stackTrace);
+  const TestFailure(super.error, {required super.stackTrace});
 }
 
 class TestFirefuelFailure extends FirefuelFailure {
-  TestFirefuelFailure({
-    required Object error,
-    required Chain stackTrace,
-  }) : super(error: error, stackTrace: stackTrace);
+  const TestFirefuelFailure({required super.error, required super.stackTrace});
 }

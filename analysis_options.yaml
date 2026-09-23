@@ -1,1 +1,21 @@
-# No include needed at root level - packages have their own analysis options
+# One lint configuration for every workspace member except the example app,
+# which keeps flutter_lints (see packages/firefuel/example/analysis_options.yaml).
+include: package:very_good_analysis/analysis_options.yaml
+
+analyzer:
+  errors:
+    # Import grouping is owned by import_sorter (derry `sort`), not the analyzer.
+    directives_ordering: ignore
+    # rules.dart documents each capability once; repeating the docs on every
+    # implementation is what dartdoc templates are for.
+    public_member_api_docs: ignore
+    # The capability interfaces in rules.dart are one-method by design.
+    one_member_abstracts: ignore
+
+  exclude:
+    - build/**
+    - '**/build/**'
+    - '**/*.g.dart'
+    - packages/firefuel/bricks/**
+    - packages/firefuel/brick_oven/**
+    - packages/firefuel/brick_oven_dev/**

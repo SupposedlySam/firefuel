@@ -4,12 +4,13 @@ version: 0.1.7
 repository: https://github.com/SupposedlySam/firefuel/tree/main/packages/firefuel_core
 
 environment:
-  sdk: ">=3.3.0 <4.0.0"
+  sdk: ^3.10.0
+
+resolution: workspace
 
 dependencies:
   equatable: ^2.0.8
   stack_trace: ^1.12.1
-  universal_io: ^2.3.1
 
 dev_dependencies:
   test: ^1.31.0

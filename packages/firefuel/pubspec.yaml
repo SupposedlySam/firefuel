@@ -5,10 +5,11 @@ repository: https://github.com/SupposedlySam/firefuel/tree/main/packages/firefue
 homepage: https://github.com/SupposedlySam/firefuel
 documentation: https://firefueldocs.com
 
-# Flutter/Dart versions: https://docs.flutter.dev/development/tools/sdk/releases?tab=macos
 environment:
-  sdk: ">=3.3.0 <4.0.0"
-  flutter: ">=3.3.2"
+  sdk: ^3.10.0
+  flutter: ">=3.38.0"
+
+resolution: workspace
 
 dependencies:
   cloud_firestore: ^6.3.0
@@ -18,14 +19,12 @@ dependencies:
   flutter:
     sdk: flutter
   stack_trace: ^1.12.1
-  universal_io: ^2.3.1
 
 dev_dependencies:
-  fake_cloud_firestore: ^4.1.0+1 #Regression in 1.3.0 breaks ordering
+  fake_cloud_firestore: ^4.3.0
   flutter_test:
     sdk: flutter
   mocktail: ^1.0.5
-  very_good_analysis: ^9.0.0
 
 import_sorter:
   comments: false
