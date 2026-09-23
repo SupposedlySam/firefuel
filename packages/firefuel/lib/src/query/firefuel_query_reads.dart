@@ -1,4 +1,5 @@
 import 'package:firefuel/firefuel.dart';
+import 'package:firefuel/src/utils/snapshot_converters.dart';
 
 /// Every query-shaped read, implemented once over a base query.
 ///
@@ -12,7 +13,8 @@ mixin FirefuelQueryReads<T extends Serializable>
         CollectionAggregate<double?>,
         CollectionCount<int>,
         CollectionPaginate<Chunk<T>, T>,
-        CollectionRead<List<T>, T> {
+        CollectionRead<List<T>, T>,
+        QueryListen<FirefuelQuerySnapshot<T>> {
   /// The documents every read starts from, converted to [T].
   Query<T?> get baseQuery;
 
@@ -29,6 +31,20 @@ mixin FirefuelQueryReads<T extends Serializable>
   @override
   Stream<List<T>> streamQuery(FirefuelQuery query) {
     return query.applyTo(baseQuery).snapshots().toListT();
+  }
+
+  @override
+  Stream<FirefuelQuerySnapshot<T>> snapshots(
+    FirefuelQuery query, {
+    ListenOptions options = const ListenOptions(),
+  }) {
+    return query
+        .applyTo(baseQuery)
+        .snapshots(
+          includeMetadataChanges: options.includeMetadataChanges,
+          source: options.source,
+        )
+        .map(Snapshots.query);
   }
 
   @override

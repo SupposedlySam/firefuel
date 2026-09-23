@@ -8,10 +8,12 @@ abstract class Repository<T extends Serializable>
         CollectionPaginate<Either<Failure, Chunk<T>>, T>,
         DocCreate<Either<Failure, DocumentId>, T>,
         DocCreateIfNotExist<Either<Failure, T>, T>,
+        DocListen<Either<Failure, FirefuelSnapshot<T?>>>,
         DocDelete<Either<Failure, void>>,
         DocRead<Either<Failure, T?>>,
         DocReadMany<Either<Failure, List<T?>>>,
         DocReplace<Either<Failure, void>, T>,
-        DocUpdate<Either<Failure, void>, T> {
+        DocUpdate<Either<Failure, void>, T>,
+        QueryListen<Either<Failure, FirefuelQuerySnapshot<T>>> {
   const Repository(); // coverage:ignore-line
 }

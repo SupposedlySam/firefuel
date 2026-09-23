@@ -8,11 +8,13 @@ abstract class Collection<T extends Serializable>
         CollectionRead<List<T>, T>,
         DocCreate<DocumentId, T>,
         DocCreateIfNotExist<T, T>,
+        DocListen<FirefuelSnapshot<T?>>,
         DocDelete<void>,
         DocRead<T?>,
         DocReadMany<List<T?>>,
         DocReplace<void, T>,
-        DocUpdate<void, T> {
+        DocUpdate<void, T>,
+        QueryListen<FirefuelQuerySnapshot<T>> {
   const Collection(); // coverage:ignore-line
 
   CollectionReference<T?> get ref;

@@ -236,6 +236,29 @@ abstract class CollectionRead<R, T extends Serializable> {
   });
 }
 
+/// Listen to a query's results together with their metadata: ids and
+/// paths, what changed, and whether the data is cached or has unconfirmed
+/// local writes.
+abstract class QueryListen<R> {
+  /// Snapshots of the documents [query] matches.
+  ///
+  /// Pass `ListenOptions(includeMetadataChanges: true)` to also hear when a
+  /// pending write is confirmed or cached data is replaced by the server's.
+  Stream<R> snapshots(
+    FirefuelQuery query, {
+    ListenOptions options = const ListenOptions(),
+  });
+}
+
+/// Listen to one document together with its metadata.
+abstract class DocListen<R> {
+  /// Snapshots of the document at [docId].
+  Stream<R> docSnapshots(
+    DocumentId docId, {
+    ListenOptions options = const ListenOptions(),
+  });
+}
+
 /// Read multiple documents by id while preserving the order of the ids.
 ///
 /// Missing documents are represented as `null` in the returned list.

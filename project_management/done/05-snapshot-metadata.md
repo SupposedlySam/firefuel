@@ -3,7 +3,7 @@
 ## Metadata
 - **Type:** Feature
 - **Appetite:** 2 days
-- **Status:** Pitch
+- **Status:** Done (2026-09-23)
 - **Created:** 2026-09-23
 - **Breaking:** no
 
@@ -34,3 +34,21 @@ flyby audit A (`message_reaction_remote_data_source.dart:39-49`), issue #62.
 because `streamChanges` drops metadata. Wanted shape: `includeMetadataChanges` returning
 `Stream<FirefuelSnapshot<List<T>>>` with `.value`, `.isFromCache` and `.hasPendingWrites`, on
 `streamWhere`, `streamChanges` and `streamAll`. The existing List-returning methods stay as they are.
+
+## Outcome (2026-09-23)
+- Two entry points ([DESIGN.md](../DESIGN.md) D3): `snapshots(FirefuelQuery, {ListenOptions})`
+  returns `FirefuelQuerySnapshot<T>`, and `docSnapshots(DocumentId, {ListenOptions})` returns
+  `FirefuelSnapshot<T?>`. Both are on collections and repositories (via the new `QueryListen`
+  and `DocListen` rules), and collection groups get `snapshots` through the mixin.
+- `FirefuelQuerySnapshot` carries `value`, `docs` (id, path, pending-write state per doc,
+  `ancestorId()`), `changes` (type, doc, indexes), `isFromCache` and `hasPendingWrites`. That
+  covers flyby's syncing pill and the metadata its `streamChanges` usage was losing.
+- `ListenOptions` passes `includeMetadataChanges` and `ListenSource` through. A test on a
+  mocked base query verifies they reach Firestore; the fake ignores both.
+- **Shape changed from flyby's ask:** there's no flag on `streamWhere`/`streamAll`/`streamChanges`,
+  because a flag can't change a stream's element type. `snapshots(FirefuelQuery(clauses: ...))`
+  is the metadata form of each of those.
+- **Not tested for real:** `isFromCache` and `hasPendingWrites` as the platform produces them.
+  fake_cloud_firestore always reports server-confirmed data, so the mapping is tested on mocked
+  snapshots. Verify on a device or the emulator before relying on the exact timing of
+  metadata-only events.

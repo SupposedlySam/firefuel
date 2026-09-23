@@ -2,10 +2,12 @@ export 'package:cloud_firestore/cloud_firestore.dart'
     show
         AggregateSource,
         CollectionReference,
+        DocumentChangeType,
         DocumentSnapshot,
         FieldPath,
         FieldValue,
         GetOptions,
+        ListenSource,
         Query,
         QueryDocumentSnapshot,
         QuerySnapshot,
@@ -31,6 +33,7 @@ export 'package:firefuel/src/firefuel_fetch_mixin.dart';
 export 'package:firefuel/src/firefuel_repository.dart';
 export 'package:firefuel/src/rules.dart';
 export 'package:firefuel/src/snapshot_conversion_mixin.dart';
+export 'package:firefuel/src/snapshots.dart';
 export 'package:firefuel/src/utils/either_extensions.dart';
 export 'package:firefuel/src/utils/exceptions.dart';
 export 'package:firefuel_core/firefuel_core.dart';

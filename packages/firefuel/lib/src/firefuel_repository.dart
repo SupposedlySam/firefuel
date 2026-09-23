@@ -180,6 +180,22 @@ abstract class FirefuelRepository<T extends Serializable>
   }
 
   @override
+  Stream<Either<Failure, FirefuelQuerySnapshot<T>>> snapshots(
+    FirefuelQuery query, {
+    ListenOptions options = const ListenOptions(),
+  }) {
+    return guardStream(() => _collection.snapshots(query, options: options));
+  }
+
+  @override
+  Stream<Either<Failure, FirefuelSnapshot<T?>>> docSnapshots(
+    DocumentId docId, {
+    ListenOptions options = const ListenOptions(),
+  }) {
+    return guardStream(() => _collection.docSnapshots(docId, options: options));
+  }
+
+  @override
   Future<Either<Failure, List<T>>> readAll({GetOptions? getOptions}) {
     return guard(() => _collection.readAll(getOptions: getOptions));
   }

@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firefuel/firefuel.dart';
 import 'package:firefuel/src/utils/field_updates.dart';
+import 'package:firefuel/src/utils/snapshot_converters.dart';
 
 abstract class FirefuelCollection<T extends Serializable>
     with FirefuelQueryReads<T>
@@ -141,6 +142,20 @@ abstract class FirefuelCollection<T extends Serializable>
   @override
   Stream<T?> stream(DocumentId docId) {
     return ref.doc(docId.docId).snapshots().toMaybeT();
+  }
+
+  @override
+  Stream<FirefuelSnapshot<T?>> docSnapshots(
+    DocumentId docId, {
+    ListenOptions options = const ListenOptions(),
+  }) {
+    return ref
+        .doc(docId.docId)
+        .snapshots(
+          includeMetadataChanges: options.includeMetadataChanges,
+          source: options.source,
+        )
+        .map(Snapshots.document);
   }
 
   @override

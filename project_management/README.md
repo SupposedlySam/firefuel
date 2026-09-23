@@ -81,7 +81,7 @@ from 2026-09-23.
 | 6 | 04 | [Server values and multi-field updates](done/04-write-values.md) | Feature | **yes** |
 | 7 | 07 | [Transactions](pitches/07-transactions.md) | Feature | no |
 | 8 | 06 | [Collection groups](pitches/06-collection-groups.md) | Feature | **yes** |
-| 9 | 05 | [Snapshot metadata](pitches/05-snapshot-metadata.md) | Feature | **highest** |
+| 9 | 05 | [Snapshot metadata](done/05-snapshot-metadata.md) | Feature | **highest** |
 | 10 | 08 | [Query power](pitches/08-query-power.md) | Feature | no |
 | 11 | 09 | [Observer, quieter failures](pitches/09-observer-and-failures.md) | Feature | — |
 | 12 | 13 | [Offline writes](pitches/13-offline-writes.md) | Feature | — |
