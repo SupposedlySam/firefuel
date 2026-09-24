@@ -37,7 +37,7 @@ final label = switch (await repository.read(id)) {
 };
 ```
 
-Other dartz methods (`bind`, `toOption`, …) aren't provided.
+Other dartz methods (`forEach`, `bind`, `toOption`, …) aren't provided. For `forEach`, use `fold` with a no-op left side: `result.fold((_) {}, (value) => …)`.
 
 ### `countAll` / `countWhere` take `source:`
 

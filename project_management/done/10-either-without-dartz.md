@@ -27,6 +27,9 @@ imports and uses `fold`, `isLeft`/`isRight`, `Left`/`Right` and the `getRight*` 
 - Is this worth a breaking change *now*, or should it ship as a deprecation-compatible layer
   first? Architecture review decides.
 
+## Verified in flyby (2026-09-24)
+flyby-owner built flyby against the branch at `4367b72` with path overrides: all 236 tests pass. The breakages were the two dartz test imports and one use of `Either.forEach`, which the 2026-09-23 usage inventory missed. flyby changed both on its main branch in a way that also works on 0.4.7. `forEach` is now named in the migration guide.
+
 ## flyby's answer (2026-09-23)
 Fine to replace. flyby uses `Either`, `Left`, `Right`, `fold`, `map`, `isLeft`, `isRight`,
 `getOrElse` (8), `getRight` (17), `getRightOrElseNull` (4), `getLeft` (1) and
