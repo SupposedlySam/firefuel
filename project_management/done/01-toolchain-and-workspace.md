@@ -47,7 +47,4 @@ with no code. `universal_io` is a dependency of both published packages, used on
 
 ## Outcome (2026-09-23)
 All must-haves shipped: `0af13de`, `94cfc07` and `09d1c91`. `CLAUDE.md` came later.
-**CI has never run:** the workflow was added on this branch and nothing has been pushed, so
-the first push of the branch is its first real run. The actions it uses were checked on
-2026-09-23: `kuhnroyal/flutter-fvm-config-action@v3` (tag `v3`, latest `v3.3`) declares the
-`path` input, and `actions/checkout@v5` exists.
+**CI verified (2026-09-24):** its first run, on the push of `chore/upgrade-2026` (GitHub Actions run 36017079955), passed every step: fvm setup, format, analyze, the three test suites and the publish dry run. The Pages deploy did not trigger, as intended.
