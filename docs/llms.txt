@@ -1,0 +1,206 @@
+# firefuel
+
+> A typed, testable data layer for Flutter apps on Cloud Firestore. You describe each collection once (its path, and how a document converts to your model and back), and firefuel gives you every read, query, listen and write as a typed method. `FirefuelRepository` wraps the same methods so each returns `Either<Failure, T>` instead of throwing. Packages: `firefuel` (Flutter, cloud_firestore ^6.10) and `firefuel_core` (pure Dart: `Serializable`, `DocumentId`, `Failure`, `Either`, `FieldUpdate`). Current version: firefuel 0.5.0 / firefuel_core 0.2.0; requires Dart ^3.10, Flutter >=3.38.
+
+This file is for agents. If you're using firefuel in an app, read **Using firefuel**. If you're changing this repository, read **Working on firefuel** first. Everything here matches firefuel 0.5.0. When in doubt, the source in `packages/firefuel/lib/src/rules.dart` is the contract.
+
+## Documentation
+
+- [Getting Started](https://firefueldocs.com/#/gettingstarted): install and initialize
+- [API Guide](https://firefueldocs.com/#/firefuelapi): every feature, by use case, with examples
+- [Migrating to 0.5](https://firefueldocs.com/#/migrating): breaking and behaviour changes from 0.4.x
+- [Core Concepts](https://firefueldocs.com/#/coreconcepts): collections, subcollections, repositories, `Either`
+- [API reference (firefuel)](https://pub.dev/documentation/firefuel/latest/)
+- [API reference (firefuel_core)](https://pub.dev/documentation/firefuel_core/latest/)
+- [Source](https://github.com/SupposedlySam/firefuel)
+
+## Using firefuel
+
+### Setup
+
+```dart
+import 'package:firefuel/firefuel.dart'; // also re-exports FirebaseFirestore, Timestamp, GetOptions, Source, ...
+
+await Firebase.initializeApp();
+Firefuel.initialize(
+  FirebaseFirestore.instance,
+  env: 'dev',                                   // optional: prefixes TOP-LEVEL collection names ("dev-notes")
+  observer: const FirefuelObserver(),           // optional: hears every handled failure (default logs via dart:developer)
+  writeAcknowledgement: WriteAcknowledgement.server, // or .local: writes complete once queued locally (offline-friendly)
+);
+```
+
+`Firefuel.firestore` throws a `StateError` before `initialize`. Collections look up the instance on every call, so calling `initialize` again moves them all over. `Firefuel.reset()` clears everything, which is useful in `tearDown`.
+
+### Define a model and a collection
+
+```dart
+import 'package:equatable/equatable.dart'; // equatable is your dependency, not re-exported
+import 'package:firefuel/firefuel.dart';
+
+class Note extends Serializable with Equatable {
+  const Note({required this.id, required this.title, this.createdAt});
+
+  factory Note.fromJson(Map<String, dynamic> json, String id) => Note(
+    id: id,
+    title: json[fieldTitle] as String,
+    createdAt: (json[fieldCreatedAt] as Timestamp?)?.toDate(),
+  );
+
+  static const fieldTitle = 'title';
+  static const fieldCreatedAt = 'createdAt';
+
+  final String id;
+  final String title;
+  final DateTime? createdAt;
+
+  @override
+  List<Object?> get props => [id, title, createdAt];
+
+  @override
+  Map<String, dynamic> toJson() => {
+    fieldTitle: title,
+    fieldCreatedAt: createdAt ?? const ServerTimestamp(), // server stamps it on create
+  };
+}
+
+class NoteCollection extends FirefuelCollection<Note> {
+  NoteCollection() : super('notes'); // or super('users/$uid/notes') for a subcollection; super('notes', firestore: db) to pin an instance
+
+  @override
+  Note? fromFirestore(DocumentSnapshot<Map<String, dynamic>> snapshot, SnapshotOptions? options) {
+    final data = snapshot.data();
+    return data == null ? null : Note.fromJson(data, snapshot.id);
+  }
+
+  @override
+  Map<String, Object?> toFirestore(Note? note, SetOptions? options) => note?.toJson() ?? {};
+}
+
+class NoteRepository extends FirefuelRepository<Note> {
+  NoteRepository(NoteCollection collection) : super(collection: collection);
+}
+```
+
+Document ids are `DocumentId('value')`, which validates Firestore's id rules and strips `/` (pass `throwsOnForwardSlash: true` to throw instead).
+
+### Method reference
+
+A collection returns the value and throws on failure. A repository returns `Either<Failure, value>` (streams: `Stream<Either<Failure, value>>`).
+
+| Kind | Methods |
+|---|---|
+| Create | `create(value)` → `DocumentId`; `createById(docId:, value:)`; `generateDocId()` |
+| Read one | `read(docId, {getOptions})` → `T?`; `whereById(docId)`; `readOrCreate(docId:, createValue:)` (not atomic) |
+| Read many | `readAll()`, `readMany(docIds)` (keeps order, `null` for missing), `limit(n)` |
+| Query | `where(clauses, {orderBy, limit})`, `orderBy(orderBy, {limit})`, `query(FirefuelQuery)` |
+| Stream | `stream(docId)`, `streamAll()`, `streamMany(docIds)`, `streamWhere(...)`, `streamOrdered(...)`, `streamLimited(n)`, `streamQuery(q)`, `streamChanges({includeRemoved})` |
+| Listen with metadata | `snapshots(FirefuelQuery, {options: ListenOptions(...)})` → `FirefuelQuerySnapshot<T>`; `docSnapshots(docId, {options})` → `FirefuelSnapshot<T?>` |
+| Paginate | `paginate(Chunk)`: pass the returned `Chunk` back until `status == ChunkStatus.last`. `Chunk(orderBy:, clauses:, limit:)` or `Chunk.query(FirefuelQuery)` |
+| Count and aggregate | `countAll()`, `countWhere(clauses)`, `sumAll(field)`, `sumWhere(clauses, field)`, `averageAll`, `averageWhere`, `aggregate(query, count:, sums:, averages:)` → `AggregateResult`; `streamCountAll`, `streamCountWhere` (these read every matching doc) |
+| Update | `update(docId:, value:)`, `updateFields(docId:, fields:)`, `updateOrCreate(docId:, value:)`, `replace(docId:, value:)`, `replaceFields(docId:, value:, fieldPaths:)` |
+| Transforms | `increment(docId:, field:, by:)`, `arrayUnion(...)`, `arrayRemove(...)`, `serverTimestamp(docId:, field:)`, `deleteField(docId:, field:)` |
+| Delete | `delete(docId)` |
+
+### Queries
+
+```dart
+notes.where([Clause(Note.fieldTitle, isEqualTo: 'x')]);   // a list of clauses is an AND
+Clause.or([                                                 // groups nest; at most 30 clauses per group
+  Clause('pinned', isEqualTo: true),
+  Clause.and([Clause('views', isGreaterThan: 100), Clause('archived', isEqualTo: false)]),
+]);
+notes.query(FirefuelQuery(
+  clauses: [Clause('pinned', isEqualTo: true)],
+  orderBy: [OrderBy(field: 'createdAt', direction: OrderDirection.newestToOldest)],
+  limit: 20,                          // or limitToLast: 20 (not both)
+  start: StartCursor.after([someDate]), // .at([...]); values line up with orderBy fields
+  end: EndCursor.before([otherDate]),   // .at([...])
+));
+```
+
+- A `Clause` takes exactly one operator: `isEqualTo`, `isNotEqualTo`, `isLessThan`, `isLessThanOrEqualTo`, `isGreaterThan`, `isGreaterThanOrEqualTo`, `arrayContains`, `arrayContainsAny`, `whereIn`, `whereNotIn` or `isNull`. Giving two throws `TooManyArgumentsException`.
+- `OrderDirection` has `asc`/`desc` plus aliases: `aToZ`, `zToA`, `smallestToLargest`, `largestToSmallest`, `oldestToNewest` (asc), `newestToOldest` (desc), `falseToTrue`, `trueToFalse`. `OrderBy.docId([direction])` orders by document id.
+- With a range filter, Firestore requires the first `orderBy` to be a range field. For plain `where` calls, firefuel moves or inserts it for you.
+- **With cursors or `limitToLast`, firefuel does not rewrite the order.** You must write an order Firestore accepts (range field first, no equality-filtered field), or the `FirefuelQuery` constructor throws `ArgumentError`. `limitToLast` and cursors without any `orderBy` throw `MissingValueException`.
+- `where([])` and `orderBy([])` throw `MissingValueException`.
+
+### Writes: semantics to rely on
+
+- `replace` is a server-checked update of the whole serialized document. It **fails with `not-found` if the document doesn't exist** (a `Left` from a repository). Stored fields your `toFirestore` doesn't write are kept.
+- `update`, `updateFields` and the transforms also fail with `not-found` on a missing document. `updateOrCreate` merges and creates the document if needed.
+- `updateFields` accepts `FieldUpdate` values alongside plain values, in one atomic write:
+  `fields: {'count': const FieldUpdate.increment(1), 'tags': FieldUpdate.arrayUnion(['a']), 'old': const FieldUpdate.delete(), 'at': const FieldUpdate.serverTimestamp(), 'name': 'plain value'}`.
+- A `ServerTimestamp()` returned from `toJson` is resolved on every write path. A local read before the server confirms sees `null`. Read with `GetOptions(serverTimestampBehavior: ServerTimestampBehavior.estimate)` to get an estimate instead.
+- With `WriteAcknowledgement.local`, collection writes return once queued, and a later server rejection goes to `Firefuel.observer`, not the caller. `Firefuel.waitForPendingWrites()` waits for everything queued to reach the server.
+
+### Transactions and batches
+
+```dart
+final renamed = await Firefuel.runTransaction((tx) async {
+  final notes = tx.of(noteCollection);          // TransactionScope<Note>
+  final note = await notes.read(idA);           // all reads before the first write
+  if (note == null) return false;
+  notes.updateFields(docId: idA, fields: {Note.fieldTitle: '${note.title} (edited)'});
+  return true;
+});                                             // {firestore, timeout, maxAttempts} optional
+
+final batch = Firefuel.batch();                 // atomic, may span collections, never auto-commits
+batch.of(noteCollection).createById(docId: id, value: note);
+batch.of(authorCollection).updateFields(docId: authorId, fields: {'notes': const FieldUpdate.increment(1)});
+await batch.commit();
+```
+
+- Reading after writing in a transaction throws `ReadAfterWriteException`. Mixing collections pinned to different instances throws `MixedFirestoreInstancesException`.
+- Transactions need the server; they fail while offline. The handler may run more than once.
+- `tx.of(c).readOrCreate(...)` is the atomic version. `FirefuelCollection.readOrCreate` is not atomic, but works offline.
+- `FirefuelBatch(collection)` is the older single-collection bulk writer. It auto-commits every 500 writes, so it isn't atomic past that.
+
+### Collection groups
+
+```dart
+class ReactionGroup extends FirefuelCollectionGroup<Reaction> {
+  ReactionGroup() : super('reactions');
+  @override
+  Reaction? fromFirestore(DocumentSnapshot<Map<String, dynamic>> s, SnapshotOptions? o) => Reaction.fromJson(s.data()!);
+}
+final snap = await ReactionGroup()
+    .snapshots(FirefuelQuery(clauses: [Clause('conversationId', isEqualTo: conversationId)]))
+    .first;
+snap.docs.first.ancestorId('messages'); // id of the parent document in the 'messages' collection
+```
+
+Groups are read-only: they have every read, count, aggregate, stream and paginate method, and no writes. Use `FirefuelQueryRepository(source: group)` for `Either` results. `Firefuel.env` is **not** applied to groups. Filtered group queries usually need a collection-group index; Firestore's error links to the console page that creates it.
+
+### Either and failures
+
+```dart
+final message = switch (await repository.read(id)) {
+  Left(:final value) => 'failed: ${value.error}',   // value is a Failure (error + Chain stackTrace)
+  Right(:final value) => value?.title ?? 'missing',
+};
+```
+
+`Either` has `fold`, `map`, `leftMap`, `flatMap`, `getOrElse`, `swap`, `isLeft()` and `isRight()`, plus the firefuel extensions `getRight()`, `getLeft()` (both throw `MissingValueException` if absent), `getRightOrElseNull()` and `getLeftOrElseNull()`. It is **not** dartz: there's no `forEach`, `bind` or `toOption`. Wrap custom repository methods in `guard(() => ...)` / `guardStream(() => ...)` (from `FirefuelFetchMixin`) to get the same `Either` and observer behaviour.
+
+### Testing apps that use firefuel
+
+Use `fake_cloud_firestore`: `Firefuel.initialize(FakeFirebaseFirestore())` in `setUp`, and `Firefuel.reset` in `tearDown`. Know its limits:
+
+- It never reports `isFromCache` or `hasPendingWrites` as true, can't go offline, and doesn't roll back a transaction whose handler throws.
+- It applies query operations in call order and notifies listeners per reference type. firefuel already accounts for both.
+
+Mock `Collection<T>` (with mocktail) to unit-test repositories. Stub exact arguments, not `any()`, so a dropped argument fails the test.
+
+## Working on firefuel
+
+Read `CLAUDE.md` at the repository root first. The short version:
+
+- It's a pub workspace. Run `flutter pub get` at the root; Flutter is pinned in `.fvmrc`.
+- CI runs `dart format --set-exit-if-changed` on `packages/firefuel/{lib,test,example/lib,example/test}` and `packages/firefuel_core`, then `dart analyze --fatal-infos`, `dart test` in firefuel_core, and `flutter test` in firefuel and in example.
+- **Pushing to `main` deploys the docs site** (GitHub Pages serves `docs/`). Work on a branch. Never publish to pub from a branch. On release, publish `firefuel_core` before `firefuel`.
+- Reads lower in one place: `FirefuelQuery.applyTo`, via the `FirefuelQueryReads` mixin. Writes serialize in one place: `FirefuelCollection.encode` → `FieldUpdates.lower`. The capability interfaces live in `lib/src/rules.dart`.
+- Adding a collection method means updating the rule in `rules.dart`, `FirefuelCollection` or `FirefuelQueryReads`, `FirefuelRepository` or `FirefuelQueryRepository`, the forwarding test (`test/src/firefuel_repository_forwarding_test.dart`), `docs/firefuelapi.md`, this file (`docs/llms.txt`, symlinked at the repo root), and `project_management/pass-through.md`.
+- Commits follow Conventional Commits (`feat(firefuel):`, `fix(firefuel_core)!:`, `docs:`, `chore:`).
+- Plans live in `project_management/` (Shape Up pitches, `DESIGN.md` decisions, `pass-through.md` coverage of cloud_firestore).
+- The owner agent is reachable in llm_chat room `#firefuel_owner`.

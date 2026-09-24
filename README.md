@@ -28,6 +28,6 @@ The pure-Dart types `firefuel` is built on: `Serializable`, `DocumentId`, `Failu
 
 ### Working on this repo
 
-The packages form a [pub workspace](https://dart.dev/tools/pub/workspaces): run `flutter pub get` once at the root. Flutter is pinned with [fvm](https://fvm.app) in `.fvmrc`. CI runs format, `dart analyze --fatal-infos` and every package's tests; see [`.github/workflows/ci.yaml`](.github/workflows/ci.yaml). Plans and design decisions live in [`project_management/`](project_management/README.md).
+The packages form a [pub workspace](https://dart.dev/tools/pub/workspaces): run `flutter pub get` once at the root. Flutter is pinned with [fvm](https://fvm.app) in `.fvmrc`. CI runs format, `dart analyze --fatal-infos` and every package's tests; see [`.github/workflows/ci.yaml`](.github/workflows/ci.yaml). Plans and design decisions live in [`project_management/`](project_management/README.md). Agents: start with [`llms.txt`](docs/llms.txt).
 
 The documentation site is served by GitHub Pages straight from `docs/` on `main`: **merging to `main` publishes the docs**.
