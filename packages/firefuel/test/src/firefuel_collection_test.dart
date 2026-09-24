@@ -1297,6 +1297,47 @@ void main() {
       });
     });
 
+    group('with real timestamps', () {
+      // The age-based tests above stand in for time. These store actual
+      // Firestore Timestamps, which order chronologically, so "newest" is
+      // the latest instant.
+      setUp(() async {
+        final firestore = Firefuel.firestore;
+        for (final (name, day) in [('jan', 1), ('mar', 3), ('feb', 2)]) {
+          await firestore
+              .collection(TestCollection.testUsersCollectionName)
+              .doc(name)
+              .set({
+                TestUser.fieldName: name,
+                'createdAt': Timestamp.fromDate(DateTime.utc(2026, day)),
+              });
+        }
+      });
+
+      Future<List<String>> namesBy(OrderDirection direction) async {
+        final users = await testCollection.orderBy([
+          OrderBy(field: 'createdAt', direction: direction),
+        ]);
+        return users.map((user) => user.name).toList();
+      }
+
+      test('newestToOldest should list the latest first', () async {
+        expect(await namesBy(OrderDirection.newestToOldest), [
+          'mar',
+          'feb',
+          'jan',
+        ]);
+      });
+
+      test('oldestToNewest should list the earliest first', () async {
+        expect(await namesBy(OrderDirection.oldestToNewest), [
+          'jan',
+          'feb',
+          'mar',
+        ]);
+      });
+    });
+
     group('OrderBy.docId', () {
       test('should honour a descending alias', () async {
         await testCollection.createById(
