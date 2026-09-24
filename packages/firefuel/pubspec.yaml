@@ -23,6 +23,7 @@ dependencies:
   stack_trace: ^1.12.2
 
 dev_dependencies:
+  async: ^2.13.0
   fake_cloud_firestore: ^4.3.0
   flutter_test:
     sdk: flutter

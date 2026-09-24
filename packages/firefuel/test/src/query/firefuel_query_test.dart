@@ -1,15 +1,15 @@
-import 'package:fake_cloud_firestore/fake_cloud_firestore.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:firefuel/firefuel.dart';
 import '../../utils/test_collection.dart';
 import '../../utils/test_user.dart';
+import '../../utils/test_backend.dart';
 
 void main() {
   late TestCollection collection;
 
   setUp(() async {
-    Firefuel.initialize(FakeFirebaseFirestore());
+    Firefuel.initialize(await testFirestore());
     collection = TestCollection();
 
     for (var age = 1; age <= 6; age++) {

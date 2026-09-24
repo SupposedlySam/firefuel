@@ -1,9 +1,9 @@
-import 'package:fake_cloud_firestore/fake_cloud_firestore.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:firefuel/firefuel.dart';
 import '../utils/test_collection.dart';
 import '../utils/test_user.dart';
+import '../utils/test_backend.dart';
 
 class OtherCollection extends TestCollection {
   OtherCollection({super.firestore});
@@ -13,7 +13,7 @@ class OtherCollection extends TestCollection {
 }
 
 void main() {
-  late FakeFirebaseFirestore firestore;
+  late FirebaseFirestore firestore;
   late TestCollection users;
   late OtherCollection others;
   final fryId = DocumentId('fry');
@@ -21,8 +21,8 @@ void main() {
   const fry = TestUser('Fry', age: 25);
   const leela = TestUser('Leela', age: 27);
 
-  setUp(() {
-    firestore = FakeFirebaseFirestore();
+  setUp(() async {
+    firestore = await testFirestore();
     Firefuel.initialize(firestore);
     users = TestCollection();
     others = OtherCollection();
@@ -100,7 +100,7 @@ void main() {
     }
 
     test('should run on an instance it is given', () async {
-      final other = FakeFirebaseFirestore();
+      final other = await otherTestFirestore();
       final elsewhere = TestCollection(firestore: other);
 
       await Firefuel.runTransaction(firestore: other, (transaction) async {
@@ -109,7 +109,7 @@ void main() {
 
       expect(await elsewhere.read(fryId), fry);
       expect(await users.read(fryId), isNull);
-    });
+    }, skip: skipWithoutOtherFirestore);
 
     test('readOrCreate should create only when missing', () async {
       final created = await Firefuel.runTransaction(
@@ -128,7 +128,7 @@ void main() {
     });
 
     test('should refuse a collection on another instance', () async {
-      final elsewhere = TestCollection(firestore: FakeFirebaseFirestore());
+      final elsewhere = TestCollection(firestore: await otherTestFirestore());
 
       await expectLater(
         Firefuel.runTransaction((transaction) async {
@@ -136,7 +136,7 @@ void main() {
         }),
         throwsA(isA<MixedFirestoreInstancesException>()),
       );
-    });
+    }, skip: skipWithoutOtherFirestore);
   });
 
   group('Firefuel.batch', () {
@@ -179,7 +179,7 @@ void main() {
     });
 
     test('should write to an instance it is given', () async {
-      final other = FakeFirebaseFirestore();
+      final other = await otherTestFirestore();
       final elsewhere = TestCollection(firestore: other);
 
       final batch = Firefuel.batch(firestore: other);
@@ -188,7 +188,7 @@ void main() {
 
       expect(await elsewhere.read(fryId), fry);
       expect(await users.read(fryId), isNull);
-    });
+    }, skip: skipWithoutOtherFirestore);
 
     test('should delete', () async {
       await users.createById(value: fry, docId: fryId);
@@ -200,13 +200,13 @@ void main() {
       expect(await users.read(fryId), isNull);
     });
 
-    test('should refuse a collection on another instance', () {
-      final elsewhere = TestCollection(firestore: FakeFirebaseFirestore());
+    test('should refuse a collection on another instance', () async {
+      final elsewhere = TestCollection(firestore: await otherTestFirestore());
 
       expect(
         () => Firefuel.batch().of(elsewhere),
         throwsA(isA<MixedFirestoreInstancesException>()),
       );
-    });
+    }, skip: skipWithoutOtherFirestore);
   });
 }

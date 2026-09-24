@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart'
     show DocumentReference, SnapshotMetadata;
-import 'package:fake_cloud_firestore/fake_cloud_firestore.dart';
+import 'package:async/async.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 
@@ -9,6 +9,7 @@ import 'package:firefuel/src/utils/snapshot_converters.dart';
 import '../utils/test_collection.dart';
 import '../utils/test_repository.dart';
 import '../utils/test_user.dart';
+import '../utils/test_backend.dart';
 
 class _MockQuerySnapshot extends Mock implements QuerySnapshot<TestUser?> {}
 
@@ -44,8 +45,8 @@ void main() {
 
   setUpAll(() => registerFallbackValue(ListenSource.defaultSource));
 
-  setUp(() {
-    Firefuel.initialize(FakeFirebaseFirestore());
+  setUp(() async {
+    Firefuel.initialize(await testFirestore());
     collection = TestCollection();
   });
 
@@ -75,13 +76,34 @@ void main() {
       final docId = DocumentId('fry');
       await collection.createById(value: fry, docId: docId);
 
-      final snapshots = collection.snapshots(FirefuelQuery()).skip(1);
-      final next = snapshots.first;
+      final events = StreamQueue(collection.snapshots(FirefuelQuery()));
+      // Wait until the listener has seen the document before changing it; a
+      // real listener attaches asynchronously and may otherwise start after
+      // the update.
+      await expectLater(
+        events,
+        emitsThrough(
+          isA<FirefuelQuerySnapshot<TestUser>>().having(
+            (s) => s.value,
+            'value',
+            [fry],
+          ),
+        ),
+      );
+
       await collection.update(docId: docId, value: leela);
 
-      final change = (await next).changes.single;
-      expect(change.type, DocumentChangeType.modified);
-      expect(change.doc.value, leela);
+      await expectLater(
+        events,
+        emitsThrough(
+          isA<FirefuelQuerySnapshot<TestUser>>().having(
+            (s) => s.changes.map((c) => (c.type, c.doc.value)).toList(),
+            'changes',
+            [(DocumentChangeType.modified, leela)],
+          ),
+        ),
+      );
+      await events.cancel();
     });
 
     test('the repository should wrap each snapshot in Right', () async {

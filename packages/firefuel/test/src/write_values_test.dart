@@ -1,8 +1,8 @@
-import 'package:fake_cloud_firestore/fake_cloud_firestore.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:firefuel/firefuel.dart';
 import 'package:firefuel/src/utils/field_updates.dart';
+import '../utils/test_backend.dart';
 
 /// A model whose `createdAt` is stamped by the server when it is new,
 /// written the way flyby writes message pods.
@@ -46,12 +46,12 @@ class NoteCollection extends FirefuelCollection<Note> {
 }
 
 void main() {
-  late FakeFirebaseFirestore firestore;
+  late FirebaseFirestore firestore;
   late NoteCollection notes;
   final docId = DocumentId('note');
 
-  setUp(() {
-    firestore = FakeFirebaseFirestore();
+  setUp(() async {
+    firestore = await testFirestore();
     Firefuel.initialize(firestore);
     notes = NoteCollection();
   });

@@ -1,8 +1,8 @@
-import 'package:fake_cloud_firestore/fake_cloud_firestore.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:firefuel/firefuel.dart';
 import '../utils/test_user.dart';
+import '../utils/test_backend.dart';
 
 /// Reactions live under many message pods; the group reads them all.
 class ReactionGroup extends FirefuelCollectionGroup<TestUser> {
@@ -23,7 +23,7 @@ class ReactionGroupRepository extends FirefuelQueryRepository<TestUser> {
 }
 
 void main() {
-  late FakeFirebaseFirestore firestore;
+  late FirebaseFirestore firestore;
   late ReactionGroup group;
 
   Future<void> react(String pod, String user, {required int age}) {
@@ -34,7 +34,7 @@ void main() {
   }
 
   setUp(() async {
-    firestore = FakeFirebaseFirestore();
+    firestore = await testFirestore();
     Firefuel.initialize(firestore);
     group = ReactionGroup();
 
@@ -122,7 +122,7 @@ void main() {
   });
 
   test('should read a pinned instance', () async {
-    final other = FakeFirebaseFirestore();
+    final other = await otherTestFirestore();
     await other
         .collection('a/1/reactions')
         .doc('amy')
@@ -131,10 +131,10 @@ void main() {
     final users = await ReactionGroup(firestore: other).readAll();
 
     expect(users.map((user) => user.name), ['amy']);
-  });
+  }, skip: skipWithoutOtherFirestore);
 
   test('should follow Firefuel.initialize after construction', () async {
-    final second = FakeFirebaseFirestore();
+    final second = await otherTestFirestore();
     await second
         .collection('x/1/reactions')
         .doc('hermes')
@@ -144,7 +144,7 @@ void main() {
     Firefuel.initialize(second);
 
     expect((await group.readAll()).map((user) => user.name), ['hermes']);
-  });
+  }, skip: skipWithoutOtherFirestore);
 
   test(
     'should ignore Firefuel.env, which prefixes top-level names only',

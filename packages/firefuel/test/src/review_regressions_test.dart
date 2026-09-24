@@ -1,16 +1,16 @@
-import 'package:fake_cloud_firestore/fake_cloud_firestore.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:firefuel/firefuel.dart';
 import '../utils/test_collection.dart';
 import '../utils/test_user.dart';
+import '../utils/test_backend.dart';
 
 /// Defects found by the independent correctness review of 0.5 (2026-09-23).
 void main() {
   late TestCollection users;
 
   setUp(() async {
-    Firefuel.initialize(FakeFirebaseFirestore());
+    Firefuel.initialize(await testFirestore());
     users = TestCollection();
   });
 

@@ -1,17 +1,18 @@
 import 'package:cloud_firestore/cloud_firestore.dart' show FirebaseException;
-import 'package:fake_cloud_firestore/fake_cloud_firestore.dart';
+import 'package:async/async.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:firefuel/firefuel.dart';
 import '../utils/test_collection.dart';
 import '../utils/test_user.dart';
+import '../utils/test_backend.dart';
 
 void main() {
   late TestCollection testCollection;
   const defaultUser = TestUser('testName');
 
-  setUp(() {
-    Firefuel.initialize(FakeFirebaseFirestore());
+  setUp(() async {
+    Firefuel.initialize(await testFirestore());
     testCollection = TestCollection();
   });
 
@@ -228,20 +229,28 @@ void main() {
       const newUser2 = TestUser('newUser2');
       const newUser3 = TestUser('newUser3');
 
-      expect(stream, emitsInOrder([defaultUser, newUser1, newUser2, newUser3]));
+      final events = StreamQueue(stream);
+      await expectLater(events, emitsThrough(defaultUser));
 
-      await testCollection.update(docId: docId, value: newUser1);
-      await testCollection.update(docId: docId, value: newUser2);
-      await testCollection.update(docId: docId, value: newUser3);
+      for (final user in [newUser1, newUser2, newUser3]) {
+        await testCollection.update(docId: docId, value: user);
+        await expectLater(events, emitsThrough(user));
+      }
+      await events.cancel();
     });
 
     test('should output null when doc no longer exists', () async {
       const newUser = TestUser('newUser');
 
-      expect(stream, emitsInOrder([defaultUser, newUser, null]));
+      final events = StreamQueue(stream);
+      await expectLater(events, emitsThrough(defaultUser));
 
       await testCollection.update(docId: docId, value: newUser);
+      await expectLater(events, emitsThrough(newUser));
+
       await testCollection.delete(docId);
+      await expectLater(events, emitsThrough(isNull));
+      await events.cancel();
     });
   });
 
@@ -256,15 +265,12 @@ void main() {
 
       final stream = testCollection.streamMany([docId2, missingDocId, docId1]);
 
-      expect(
-        stream,
-        emitsInOrder([
-          [user2, null, user1],
-          [updatedUser2, null, user1],
-        ]),
-      );
+      final events = StreamQueue(stream);
+      await expectLater(events, emitsThrough([user2, null, user1]));
 
       await testCollection.update(docId: docId2, value: updatedUser2);
+      await expectLater(events, emitsThrough([updatedUser2, null, user1]));
+      await events.cancel();
     });
 
     test('should output an empty list when no document ids are given', () {
@@ -285,28 +291,33 @@ void main() {
       stream = testCollection.streamAll();
     });
 
+    // Firestore returns documents in id order, and create() ids are random,
+    // so these compare without order.
     test('should update when an item is added', () async {
-      expect(
-        stream,
-        emitsInOrder([
-          [defaultUser, newUser1],
-          [defaultUser, newUser1, newUser2],
-        ]),
+      final events = StreamQueue(stream);
+      await expectLater(
+        events,
+        emitsThrough(unorderedEquals([defaultUser, newUser1])),
       );
 
       await testCollection.create(newUser2);
+      await expectLater(
+        events,
+        emitsThrough(unorderedEquals([defaultUser, newUser1, newUser2])),
+      );
+      await events.cancel();
     });
 
     test('should update when an item is deleted', () async {
-      expect(
-        stream,
-        emitsInOrder([
-          [defaultUser, newUser1],
-          [newUser1],
-        ]),
+      final events = StreamQueue(stream);
+      await expectLater(
+        events,
+        emitsThrough(unorderedEquals([defaultUser, newUser1])),
       );
 
       await testCollection.delete(docId);
+      await expectLater(events, emitsThrough([newUser1]));
+      await events.cancel();
     });
   });
 
@@ -318,17 +329,15 @@ void main() {
         const newUser = TestUser('newUser');
         final stream = testCollection.streamChanges();
 
-        expect(
-          stream,
-          emitsInOrder([
-            [defaultUser],
-            [newUser],
-            <TestUser>[],
-          ]),
-        );
+        final events = StreamQueue(stream);
+        await expectLater(events, emitsThrough([defaultUser]));
 
         await testCollection.update(docId: docId, value: newUser);
+        await expectLater(events, emitsThrough([newUser]));
+
         await testCollection.delete(docId);
+        await expectLater(events, emitsThrough(isEmpty));
+        await events.cancel();
       },
     );
 
@@ -336,15 +345,13 @@ void main() {
       final docId = await testCollection.create(defaultUser);
       final stream = testCollection.streamChanges(includeRemoved: true);
 
-      expect(
-        stream,
-        emitsInOrder([
-          [defaultUser],
-          [defaultUser],
-        ]),
-      );
+      final events = StreamQueue(stream);
+      await expectLater(events, emitsThrough([defaultUser]));
 
+      // The removal is reported with the document's last data.
       await testCollection.delete(docId);
+      await expectLater(events, emits([defaultUser]));
+      await events.cancel();
     });
   });
 
@@ -359,15 +366,21 @@ void main() {
     });
 
     test('should output new value when new doc is created', () async {
-      expect(stream, emitsInOrder([1, 2]));
+      final events = StreamQueue(stream);
+      await expectLater(events, emitsThrough(1));
 
       await testCollection.create(defaultUser);
+      await expectLater(events, emitsThrough(2));
+      await events.cancel();
     });
 
     test('should output 0 when docs no longer exists', () async {
-      expect(stream, emitsInOrder([1, 0]));
+      final events = StreamQueue(stream);
+      await expectLater(events, emitsThrough(1));
 
       await testCollection.delete(docId);
+      await expectLater(events, emitsThrough(0));
+      await events.cancel();
     });
   });
 
@@ -443,27 +456,21 @@ void main() {
     });
 
     test('should update when an item is added', () async {
-      expect(
-        stream,
-        emitsInOrder([
-          [newUser1, newUser3],
-          [newUser1, newUser2, newUser3],
-        ]),
-      );
+      final events = StreamQueue(stream);
+      await expectLater(events, emitsThrough([newUser1, newUser3]));
 
       await testCollection.create(newUser2);
+      await expectLater(events, emitsThrough([newUser1, newUser2, newUser3]));
+      await events.cancel();
     });
 
     test('should update when an item is deleted', () async {
-      expect(
-        stream,
-        emitsInOrder([
-          [newUser1, newUser3],
-          [newUser3],
-        ]),
-      );
+      final events = StreamQueue(stream);
+      await expectLater(events, emitsThrough([newUser1, newUser3]));
 
       await testCollection.delete(docId);
+      await expectLater(events, emitsThrough([newUser3]));
+      await events.cancel();
     });
   });
 
@@ -535,8 +542,9 @@ void main() {
 
       test('should return a subset based on multiple clauses', () {
         final filteredStream = testCollection.streamWhere([
+          // Firestore allows one != per query; combine it with a range.
           Clause(TestUser.fieldName, isNotEqualTo: unexpectedName1),
-          Clause(TestUser.fieldName, isNotEqualTo: unexpectedName2),
+          Clause(TestUser.fieldName, isLessThan: unexpectedName2),
         ]);
 
         expect(
@@ -568,7 +576,8 @@ void main() {
 
       test('when first $OrderBy matches first $Clause', () {
         final filteredList = testCollection.streamWhere(
-          [Clause(TestUser.fieldName, isNotEqualTo: expectedUser)],
+          // A field value, not a model: the fake accepted a TestUser here.
+          [Clause(TestUser.fieldName, isNotEqualTo: expectedName)],
           orderBy: [OrderBy(field: TestUser.fieldName)],
         );
 
@@ -626,9 +635,9 @@ void main() {
               [Clause(TestUser.fieldAge, isEqualTo: 25)],
               orderBy: [OrderBy(field: TestUser.fieldAge)],
             ),
-            emitsInOrder([
-              [leela, fry],
-            ]),
+            // The orderBy on an equality field is dropped, so Firestore
+            // returns id order, which is random for create()d documents.
+            emits(unorderedEquals([leela, fry])),
           );
         });
 
@@ -652,9 +661,8 @@ void main() {
               ],
               orderBy: [OrderBy(field: TestUser.fieldAge)],
             ),
-            emitsInOrder([
-              [leela, bender, fry],
-            ]),
+            // As above: no usable order, so compare without one.
+            emits(unorderedEquals([leela, bender, fry])),
           );
         });
       });
@@ -1113,8 +1121,9 @@ void main() {
 
       test('should return a subset based on multiple clauses', () async {
         final filteredList = await testCollection.where([
+          // Firestore allows one != per query; combine it with a range.
           Clause(TestUser.fieldName, isNotEqualTo: unexpectedName1),
-          Clause(TestUser.fieldName, isNotEqualTo: unexpectedName2),
+          Clause(TestUser.fieldName, isLessThan: unexpectedName2),
         ]);
 
         expect(filteredList, [expectedUser]);
@@ -1158,7 +1167,8 @@ void main() {
 
       test('when first $OrderBy matches first $Clause', () async {
         final filteredList = await testCollection.where(
-          [Clause(TestUser.fieldName, isNotEqualTo: expectedUser)],
+          // A field value, not a model: the fake accepted a TestUser here.
+          [Clause(TestUser.fieldName, isNotEqualTo: expectedName)],
           orderBy: [OrderBy(field: TestUser.fieldName)],
         );
 
@@ -1339,22 +1349,29 @@ void main() {
     });
 
     group('OrderBy.docId', () {
-      test('should honour a descending alias', () async {
-        await testCollection.createById(
-          value: const TestUser('a'),
-          docId: DocumentId('a'),
-        );
-        await testCollection.createById(
-          value: const TestUser('z'),
-          docId: DocumentId('z'),
-        );
+      test(
+        'should honour a descending alias',
+        () async {
+          await testCollection.createById(
+            value: const TestUser('a'),
+            docId: DocumentId('a'),
+          );
+          await testCollection.createById(
+            value: const TestUser('z'),
+            docId: DocumentId('z'),
+          );
 
-        final users = await testCollection.orderBy([
-          const OrderBy.docId(OrderDirection.zToA),
-        ]);
+          final users = await testCollection.orderBy([
+            const OrderBy.docId(OrderDirection.zToA),
+          ]);
 
-        expect(users.first.name, 'z');
-      });
+          expect(users.first.name, 'z');
+        },
+        skip: emulatorGap(
+          'refuses orderBy(documentId, desc) as the only order ("does not '
+          'support descending key scans")',
+        ),
+      );
     });
 
     group('arrayContainsAny', () {
@@ -1438,7 +1455,7 @@ void main() {
 
   group('firestore instance', () {
     test('should follow Firefuel.initialize after construction', () async {
-      final second = FakeFirebaseFirestore();
+      final second = await otherTestFirestore();
 
       // Built and used against the instance from setUp...
       final collection = TestCollection();
@@ -1456,13 +1473,13 @@ void main() {
           .doc('moved')
           .get();
       expect(stored.exists, isTrue);
-    });
+    }, skip: skipWithoutOtherFirestore);
 
     test('should stay on an instance it was given', () async {
-      final pinned = FakeFirebaseFirestore();
+      final pinned = await otherTestFirestore();
       final collection = TestCollection(firestore: pinned);
 
-      Firefuel.initialize(FakeFirebaseFirestore());
+      Firefuel.initialize(await testFirestore());
       await collection.createById(
         value: defaultUser,
         docId: DocumentId('pinned'),
@@ -1474,6 +1491,6 @@ void main() {
           .get();
       expect(stored.exists, isTrue);
       expect(await testCollection.read(DocumentId('pinned')), isNull);
-    });
+    }, skip: skipWithoutOtherFirestore);
   });
 }

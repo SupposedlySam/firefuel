@@ -1,4 +1,3 @@
-import 'package:fake_cloud_firestore/fake_cloud_firestore.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:stack_trace/stack_trace.dart';
 
@@ -6,6 +5,7 @@ import 'package:firefuel/firefuel.dart';
 import '../utils/test_collection.dart';
 import '../utils/test_repository.dart';
 import '../utils/test_user.dart';
+import '../utils/test_backend.dart';
 
 class RecordingObserver extends FirefuelObserver {
   final failures = <Failure>[];
@@ -25,7 +25,8 @@ void main() {
 
   group('observer', () {
     setUp(
-      () => Firefuel.initialize(FakeFirebaseFirestore(), observer: observer),
+      () async =>
+          Firefuel.initialize(await testFirestore(), observer: observer),
     );
 
     test('should hear every failure a repository returns', () async {
@@ -78,7 +79,7 @@ void main() {
 
   group('writeAcknowledgement', () {
     test('server should surface a rejected write to the caller', () async {
-      Firefuel.initialize(FakeFirebaseFirestore(), observer: observer);
+      Firefuel.initialize(await testFirestore(), observer: observer);
 
       await expectLater(
         TestCollection().replace(docId: missing, value: fry),
@@ -89,21 +90,26 @@ void main() {
 
     test('local should return at once and report a later rejection', () async {
       Firefuel.initialize(
-        FakeFirebaseFirestore(),
+        await testFirestore(),
         observer: observer,
         writeAcknowledgement: WriteAcknowledgement.local,
       );
 
       await TestCollection().replace(docId: missing, value: fry);
-      // Let the queued write settle.
-      await pumpEventQueue();
+
+      // The rejection arrives after a server round trip: instantly on the
+      // fake, a few milliseconds on a real Firestore.
+      final deadline = DateTime.now().add(const Duration(seconds: 10));
+      while (observer.failures.isEmpty && DateTime.now().isBefore(deadline)) {
+        await Future<void>.delayed(const Duration(milliseconds: 20));
+      }
 
       expect(observer.failures, hasLength(1));
     });
 
     test('local should still apply successful writes', () async {
       Firefuel.initialize(
-        FakeFirebaseFirestore(),
+        await testFirestore(),
         observer: observer,
         writeAcknowledgement: WriteAcknowledgement.local,
       );
@@ -118,7 +124,7 @@ void main() {
 
     test('a collection should be able to override the default', () async {
       Firefuel.initialize(
-        FakeFirebaseFirestore(),
+        await testFirestore(),
         observer: observer,
         writeAcknowledgement: WriteAcknowledgement.local,
       );

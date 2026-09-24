@@ -1,7 +1,7 @@
-import 'package:fake_cloud_firestore/fake_cloud_firestore.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:firefuel/firefuel.dart';
+import '../utils/test_backend.dart';
 
 void main() {
   group('#firestore', () {
@@ -13,18 +13,21 @@ void main() {
       expect(() => Firefuel.firestore, throwsStateError);
     });
 
-    test('should return a $FirebaseFirestore instance when initialized', () {
-      Firefuel.initialize(FakeFirebaseFirestore());
+    test(
+      'should return a $FirebaseFirestore instance when initialized',
+      () async {
+        Firefuel.initialize(await testFirestore());
 
-      expect(Firefuel.firestore, isA<FirebaseFirestore>());
-    });
+        expect(Firefuel.firestore, isA<FirebaseFirestore>());
+      },
+    );
   });
 
   group('#env', () {
-    late FakeFirebaseFirestore firestore;
+    late FirebaseFirestore firestore;
 
-    setUp(() {
-      firestore = FakeFirebaseFirestore();
+    setUp(() async {
+      firestore = await testFirestore();
     });
 
     test('should return an empty string when not initialized', () {

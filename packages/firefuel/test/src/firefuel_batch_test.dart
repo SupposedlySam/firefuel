@@ -1,18 +1,18 @@
 import 'package:cloud_firestore/cloud_firestore.dart' show FirebaseException;
-import 'package:fake_cloud_firestore/fake_cloud_firestore.dart';
 import 'package:firefuel/firefuel.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../utils/test_collection.dart';
 import '../utils/test_user.dart';
+import '../utils/test_backend.dart';
 
 void main() {
   late FirefuelBatch<TestUser> testBatch;
   late TestCollection testCollection;
   const batman = TestUser('Bruce Wayne');
 
-  setUp(() {
-    Firefuel.initialize(FakeFirebaseFirestore());
+  setUp(() async {
+    Firefuel.initialize(await testFirestore());
 
     testCollection = TestCollection();
     testBatch = FirefuelBatch(testCollection);
