@@ -20,7 +20,6 @@ with one shape across collections, groups, repositories, batches and transaction
 - `llms.txt` (a symlink to `docs/llms.txt`, served at `firefueldocs.com/llms.txt`) is the agent-facing
   guide. Keep it in step with the API: its snippets were compile-checked against 0.5.0; recheck
   them when signatures change.
-
 - A pub workspace: `flutter pub get` at the root. Flutter is pinned in `.fvmrc` (use `fvm`).
 - Checks that CI runs (`.github/workflows/ci.yaml`):
   `dart format --set-exit-if-changed packages/firefuel/{lib,test,example/lib,example/test} packages/firefuel_core`,
