@@ -13,7 +13,7 @@
 
 The goal of this package is to make it easy to interact with [Cloud Firestore](https://firebase.google.com/docs/firestore/) database. The `firefuel` community aims to always make this package simple, intuitive, and consistent. `firefuel` wraps the [cloud_firestore](https://pub.dev/packages/cloud_firestore) plugin, and provides conventions to help jump-start your development.
 
-Still not convinced? See our documentation on why we think you should [choose firefuel](https://firefueldocs.com/#/whyfirefuel)
+Still not convinced? See our documentation on why we think you should [choose firefuel](http://firefueldocs.com/#/whyfirefuel)
 
 # Scope
 
@@ -23,9 +23,9 @@ Still not convinced? See our documentation on why we think you should [choose fi
 
 Add `firefuel` to your `pubspec.yaml` (it needs Dart 3.10 / Flutter 3.38 or newer). Import `package:firefuel/firefuel.dart` into your entry point (often `main.dart`). Then initialize `firefuel` with `Firefuel.initialize(FirebaseFirestore.instance);` before calling `runApp`.
 
-Upgrading from 0.4? Read the [migration guide](https://firefueldocs.com/#/migrating).
+Upgrading from 0.4? Read the [migration guide](http://firefueldocs.com/#/migrating).
 
-Read the full walkthrough in our [docs](https://firefueldocs.com/#/gettingstarted?id=installation).
+Read the full walkthrough in our [docs](http://firefueldocs.com/#/gettingstarted?id=installation).
 
 # Quick Start
 
@@ -107,7 +107,7 @@ class UserCollection extends FirefuelCollection<User> {
 
 You can write out the above classes manually or generate them using the Mason CLI
 
-See the docs for more information: [firefuel brick](https://firefueldocs.com/#/firefuelbrick)
+See the docs for more information: [firefuel brick](http://firefueldocs.com/#/firefuelbrick)
 
 ## Use It
 
@@ -126,7 +126,7 @@ await users.updateFields(
 );
 ```
 
-Beyond CRUD you get `Clause.or`, cursors and `limitToLast` through `FirefuelQuery`, server-side counts and aggregates, listening with cache and pending-write metadata, collection groups, `FieldUpdate` transforms (including `ServerTimestamp` straight from `toJson`), transactions, atomic batches and offline-friendly writes. See the [API guide](https://firefueldocs.com/#/firefuelapi) and the [full API reference](https://pub.dev/documentation/firefuel/latest/).
+Beyond CRUD you get `Clause.or`, cursors and `limitToLast` through `FirefuelQuery`, server-side counts and aggregates, listening with cache and pending-write metadata, collection groups, `FieldUpdate` transforms (including `ServerTimestamp` straight from `toJson`), transactions, atomic batches and offline-friendly writes. See the [API guide](http://firefueldocs.com/#/firefuelapi) and the [full API reference](https://pub.dev/documentation/firefuel/latest/).
 
 Wrap the collection in a `FirefuelRepository` and each method returns `Either<Failure, T>` instead of throwing.
 
@@ -134,7 +134,7 @@ Wrap the collection in a `FirefuelRepository` and each method returns `Either<Fa
 
 Follow the [official walkthrough](https://supposedlysam.medium.com/firefuel-basics-e4d97f1685c9) on Medium
 
-See the [firefuel documentation](https://firefueldocs.com/#/coreconcepts) to learn the core concepts of using `firefuel`.
+See the [firefuel documentation](http://firefueldocs.com/#/coreconcepts) to learn the core concepts of using `firefuel`.
 
 # Issues and feedback
 

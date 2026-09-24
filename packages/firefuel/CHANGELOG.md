@@ -1,6 +1,6 @@
 ## 0.5.0
 
-Requires Dart 3.10 / Flutter 3.38 and firefuel_core 0.2.0. Read the migration guide: https://firefueldocs.com/#/migrating
+Requires Dart 3.10 / Flutter 3.38 and firefuel_core 0.2.0. Read the migration guide: http://firefueldocs.com/#/migrating
 
 fix!: make queries and writes do what their names say
 

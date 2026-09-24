@@ -35,6 +35,9 @@
 Shipped in `4da3b27`: docsify 5.0.0 with pinned assets; the dead analytics tag, abandoned
 plugins and never-registered `sw.js` removed; a site home page; the migration guide; the API
 guide rewritten. Rendered locally in headless Chrome (home, API guide, migration).
-**Open, needs the maintainer:** `https://firefueldocs.com` serves GitHub's `*.github.io`
-certificate, so HTTPS fails with a name mismatch; HTTP works. Re-provision the certificate in
-the repo's Pages settings. `firefuel.dev` and `firefueldocs.dev` have no DNS records.
+**HTTPS: declined (maintainer, 2026-09-24).** `https://firefueldocs.com` serves GitHub's
+`*.github.io` certificate, so HTTPS fails with a name mismatch. The maintainer's call: a static
+docs site doesn't need HTTPS. Every link now uses `http://firefueldocs.com`, including the
+pubspec `documentation:` field that pub.dev shows. Browsers in HTTPS-first mode may show a
+"not secure" interstitial before loading. `firefuel.dev` and `firefueldocs.dev` have no DNS
+records.

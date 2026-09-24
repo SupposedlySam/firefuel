@@ -3,7 +3,7 @@ description: A Firebase Cloud Firestore library to fuel your application's growt
 version: 0.5.0
 repository: https://github.com/SupposedlySam/firefuel/tree/main/packages/firefuel
 homepage: https://github.com/SupposedlySam/firefuel
-documentation: https://firefueldocs.com
+documentation: http://firefueldocs.com
 
 environment:
   sdk: ^3.10.0

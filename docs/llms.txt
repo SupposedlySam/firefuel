@@ -6,10 +6,10 @@ This file is for agents. If you're using firefuel in an app, read **Using firefu
 
 ## Documentation
 
-- [Getting Started](https://firefueldocs.com/#/gettingstarted): install and initialize
-- [API Guide](https://firefueldocs.com/#/firefuelapi): every feature, by use case, with examples
-- [Migrating to 0.5](https://firefueldocs.com/#/migrating): breaking and behaviour changes from 0.4.x
-- [Core Concepts](https://firefueldocs.com/#/coreconcepts): collections, subcollections, repositories, `Either`
+- [Getting Started](http://firefueldocs.com/#/gettingstarted): install and initialize
+- [API Guide](http://firefueldocs.com/#/firefuelapi): every feature, by use case, with examples
+- [Migrating to 0.5](http://firefueldocs.com/#/migrating): breaking and behaviour changes from 0.4.x
+- [Core Concepts](http://firefueldocs.com/#/coreconcepts): collections, subcollections, repositories, `Either`
 - [API reference (firefuel)](https://pub.dev/documentation/firefuel/latest/)
 - [API reference (firefuel_core)](https://pub.dev/documentation/firefuel_core/latest/)
 - [Source](https://github.com/SupposedlySam/firefuel)
