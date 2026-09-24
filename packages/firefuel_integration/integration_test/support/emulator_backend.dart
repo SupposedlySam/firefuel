@@ -5,6 +5,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firefuel/firefuel.dart';
 
 import '../../../firefuel/test/utils/test_backend.dart';
+import 'default_app.dart';
 
 /// The Firestore emulator started by `firebase emulators:exec` with the
 /// repo-root firebase.emulator.json, whose rules are open (see
@@ -43,11 +44,7 @@ class EmulatorBackend implements TestBackend {
   Future<FirebaseFirestore> _empty(String projectId) async {
     await _wipe(projectId);
 
-    // cloud_firestore's platform layer reads the default app even when every
-    // call names another one.
-    if (Firebase.apps.isEmpty) {
-      await Firebase.initializeApp(options: _options(project));
-    }
+    await ensureDefaultApp(_options(project));
 
     final app = await Firebase.initializeApp(
       name: 'firefuel-test-${_apps++}',

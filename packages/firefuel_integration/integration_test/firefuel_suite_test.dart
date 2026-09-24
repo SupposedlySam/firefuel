@@ -1,4 +1,6 @@
-// Runs firefuel's own test files against a real Firestore.
+// Runs firefuel's own test files against a real Firestore: the emulator
+// (tool/test_real_firestore.sh) or the live firefuel-integration project
+// (tool/test_live_firestore.sh).
 //
 //   firebase emulators:exec --config ../../firebase.emulator.json \
 //     --only firestore --project demo-firefuel \
@@ -29,11 +31,16 @@ import '../../firefuel/test/src/write_scopes_test.dart' as write_scopes;
 import '../../firefuel/test/src/write_values_test.dart' as write_values;
 import '../../firefuel/test/utils/test_backend.dart';
 import 'support/emulator_backend.dart';
+import 'support/live_backend.dart';
 
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
   // Installed before any test is declared: skip reasons read it.
-  installTestBackend(EmulatorBackend());
+  installTestBackend(
+    const String.fromEnvironment('FIREFUEL_BACKEND') == 'live'
+        ? LiveBackend()
+        : EmulatorBackend(),
+  );
 
   group('firefuel_batch_test.dart', firefuel_batch.main);
   group('firefuel_collection_group_test.dart', firefuel_collection_group.main);

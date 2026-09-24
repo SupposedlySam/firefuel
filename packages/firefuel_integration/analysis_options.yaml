@@ -8,3 +8,4 @@ analyzer:
   exclude:
     - build/**
     - macos/**
+    - ios/**
