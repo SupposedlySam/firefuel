@@ -13,23 +13,29 @@ import 'package:equatable/equatable.dart';
 /// An OrderBy clause also filters for existence of the given fields. The
 /// result set will not include documents that do not contain the given fields.
 class OrderBy extends Equatable {
-  OrderBy({
-    required this.field,
-    OrderDirection direction = OrderDirection.asc,
-  })  : direction = direction.toAscDesc,
-        byId = false;
+  OrderBy({required this.field, OrderDirection direction = OrderDirection.asc})
+    : direction = direction.toAscDesc,
+      byId = false;
 
   /// Creates a condition to order your collection by document id
-  const OrderBy.docId([
-    this.direction = OrderDirection.asc,
-  ])  : field = 'unused',
-        byId = true;
+  const OrderBy.docId([this.direction = OrderDirection.asc])
+    : field = 'unused',
+      byId = true;
   final String field;
   final OrderDirection direction;
   final bool byId;
 
+  /// Whether Firestore should sort this field descending.
+  ///
+  /// Read this rather than comparing [direction] to [OrderDirection.desc]:
+  /// the const [OrderBy.docId] constructor cannot normalise its alias, so
+  /// [direction] may still be e.g. [OrderDirection.zToA].
+  bool get isDescending => direction.toAscDesc == OrderDirection.desc;
+
   @override
-  List<Object?> get props => [field, direction];
+  // byId and the normalised direction: `OrderBy.docId(zToA)` sorts exactly
+  // like `OrderBy.docId(desc)`, and neither is a field named 'unused'.
+  List<Object?> get props => [field, byId, isDescending];
 
   /// Handle cases when using [OrderBy] with where clauses containing range
   /// comparisons.
@@ -56,10 +62,10 @@ class OrderBy extends Equatable {
     required List<OrderBy>? orderBy,
     required bool isRangeComparison,
   }) {
-    if (orderBy?.isEmpty ?? true) return null;
+    if (orderBy == null || orderBy.isEmpty) return null;
 
     if (isRangeComparison) {
-      final hasCorrectValueInWrongSpot = orderBy!.any(
+      final hasCorrectValueInWrongSpot = orderBy.any(
         (orderBy) => orderBy.field == fieldToMatch,
       );
       final firstOrder = OrderBy(field: fieldToMatch);
@@ -85,10 +91,10 @@ class OrderBy extends Equatable {
     required List<OrderBy>? orderBy,
     required bool isEqualityOrInComparison,
   }) {
-    if (orderBy?.isEmpty ?? true) return null;
+    if (orderBy == null || orderBy.isEmpty) return null;
 
     if (isEqualityOrInComparison) {
-      return orderBy!
+      return orderBy
           .where((orderBy) => !fieldsToMatch.contains(orderBy.field))
           .toList();
     }
@@ -98,9 +104,9 @@ class OrderBy extends Equatable {
 
   static List<OrderBy> _moveToFirst(
     String fieldToMatch,
-    List<OrderBy>? orderBy,
+    List<OrderBy> orderBy,
   ) {
-    final matchingClause = orderBy!.firstWhere(
+    final matchingClause = orderBy.firstWhere(
       (orderBy) => orderBy.field == fieldToMatch,
     );
 
@@ -126,18 +132,23 @@ enum OrderDirection {
 }
 
 extension on OrderDirection {
+  /// Collapses the descriptive aliases onto Firestore's two directions.
+  ///
+  /// "Newest" means the largest timestamp, so newest-first is descending.
+  /// Until 0.5 the two time aliases were swapped: newestToOldest sorted
+  /// ascending, and a test asserted it.
   OrderDirection get toAscDesc {
     switch (this) {
       case OrderDirection.asc:
       case OrderDirection.aToZ:
       case OrderDirection.smallestToLargest:
-      case OrderDirection.newestToOldest:
+      case OrderDirection.oldestToNewest:
       case OrderDirection.falseToTrue:
         return OrderDirection.asc;
       case OrderDirection.desc:
       case OrderDirection.zToA:
       case OrderDirection.largestToSmallest:
-      case OrderDirection.oldestToNewest:
+      case OrderDirection.newestToOldest:
       case OrderDirection.trueToFalse:
         return OrderDirection.desc;
     }

@@ -17,10 +17,7 @@ class PlaygroundNoteCollection extends FirefuelCollection<PlaygroundNote> {
   }
 
   @override
-  Map<String, Object?> toFirestore(
-    PlaygroundNote? model,
-    SetOptions? options,
-  ) {
+  Map<String, Object?> toFirestore(PlaygroundNote? model, SetOptions? options) {
     return model?.toJson() ?? <String, Object?>{};
   }
 }

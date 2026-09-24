@@ -1,0 +1,11 @@
+rules_version = '2';
+
+// Emulator only: a local, throwaway demo-* project. These runs verify
+// firefuel's Firestore semantics, not security rules, so access is open.
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /{document=**} {
+      allow read, write: if true;
+    }
+  }
+}

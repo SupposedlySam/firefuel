@@ -11,27 +11,13 @@ mixin FirefuelFetchMixin {
   /// errors are triggered by the [callback]
   ///
   /// See also: [guardStream] for [Stream] types
-  Future<Either<Failure, R>> guard<R>(
-    FutureOr<R> Function() callback,
-  ) async {
+  Future<Either<Failure, R>> guard<R>(FutureOr<R> Function() callback) async {
     try {
       final result = await callback();
 
       return Right(result);
     } on Object catch (e, stack) {
-      if (e is FormatException) {
-        // Intentionally using print for debugging format exceptions in
-        // development
-        // ignore: avoid_print
-        print('Format Exception: ${e.message}');
-      }
-
-      return Left(
-        FirestoreFailure(
-          error: e,
-          stackTrace: Chain.forTrace(stack),
-        ),
-      );
+      return Left(report(e, stack));
     }
   }
 
@@ -49,19 +35,23 @@ mixin FirefuelFetchMixin {
         yield Right(result);
       }
     } on Object catch (e, stack) {
-      if (e is FormatException) {
-        // Intentionally using print for debugging format exceptions in
-        // development
-        // ignore: avoid_print
-        print('Format Exception: ${e.message}');
-      }
-
-      yield Left(
-        FirestoreFailure(
-          error: e,
-          stackTrace: Chain.forTrace(stack),
-        ),
-      );
+      yield Left(report(e, stack));
     }
+  }
+
+  /// Wraps [error] in a [FirestoreFailure] and tells `Firefuel.observer`.
+  ///
+  /// Use it from your own catch blocks to report the way firefuel does.
+  ///
+  /// This replaced two things: `FirefuelFailure` printing itself from its
+  /// constructor, and a `print` of every `FormatException` here. Neither
+  /// could be turned off or routed anywhere.
+  static Failure report(Object error, StackTrace stack) {
+    final failure = FirestoreFailure(
+      error: error,
+      stackTrace: Chain.forTrace(stack),
+    );
+    Firefuel.observer.onFailure(failure);
+    return failure;
   }
 }

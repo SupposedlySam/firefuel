@@ -18,8 +18,10 @@ For more information on Collections and Repositories, review the [Core Concepts]
 
 ## Using the Firefuel Brick
 
-To install the `firefuel` brick, run `mason add firefuel`.
+Install the Mason CLI with `dart pub global activate mason_cli`, then run `mason init` in your app and `mason add firefuel`.
 
-Afterwards, run `mason get` and `mason make firefuel` in the directory you'd like your FirefuelCollection and Model generated.
+Afterwards, run `mason make firefuel` in the directory you'd like your FirefuelCollection and Model generated. It asks for the collection name, the document name, and whether to generate a repository.
+
+The generated model stamps a `createdAt` field with the server's clock on create, using `ServerTimestamp`. Delete it if you don't need it.
 
 For more information, see the brick's [README](https://github.com/SupposedlySam/firefuel/blob/main/packages/firefuel/bricks/firefuel/README.md)

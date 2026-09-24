@@ -9,7 +9,7 @@ abstract class CollectionCount<T> {
   /// {@template firefuel.rules.count.footer}
   /// See also: [countWhere]
   /// {@endtemplate}
-  Future<T> countAll({GetOptions? getOptions});
+  Future<T> countAll({AggregateSource? source});
 
   /// {@template firefuel.rules.countwhere.definition}
   /// Gets the amount of documents filtered by the provided clauses.
@@ -18,7 +18,7 @@ abstract class CollectionCount<T> {
   /// {@template firefuel.rules.countwhere.footer}
   /// See also: [countAll]
   /// {@endtemplate}
-  Future<T> countWhere(List<Clause> clauses, {GetOptions? getOptions});
+  Future<T> countWhere(List<Clause> clauses, {AggregateSource? source});
 
   /// {@template firefuel.rules.streamcount.definition}
   /// Gets the amount of all documents from the collection
@@ -49,6 +49,23 @@ abstract class CollectionCount<T> {
 ///
 /// The optional `source` argument is passed to `AggregateQuery.get`. The
 /// FlutterFire plugin currently exposes `AggregateSource.server` only.
+/// Several aggregations over one query in a single round trip.
+abstract class QueryAggregate<R> {
+  /// Computes, over the documents [query] matches, the count (when [count]
+  /// is true), the sum of each of [sums], and the average of each of
+  /// [averages], in one request.
+  ///
+  /// Firestore allows up to 5 aggregations per request. [query]'s order,
+  /// limits and cursors apply too, so `limit` bounds what is aggregated.
+  Future<R> aggregate(
+    FirefuelQuery query, {
+    bool count = false,
+    List<String> sums = const [],
+    List<String> averages = const [],
+    AggregateSource? source,
+  });
+}
+
 abstract class CollectionAggregate<T> {
   /// Sum of [field] over all documents in the collection.
   Future<T> sumAll(String field, {AggregateSource? source});
@@ -79,18 +96,29 @@ abstract class CollectionAggregate<T> {
 /// {@macro firefuel.rules.subclasses}
 /// {@macro firefuel.rules.implementations}
 abstract class CollectionPaginate<R, T extends Serializable> {
-  /// Get a number of Documents from the Collection specified by the [chunk]
+  /// The next page of [query]: the first page when [after] is `null`, then
+  /// the page after each [Chunk] you pass back in as [after].
   ///
-  /// Store the [Chunk] you get back from calling this method and pass it back
-  /// to the [paginate] method to get the next [Chunk]
+  /// Continue until `status` is [ChunkStatus.last]. Passing a last chunk
+  /// back returns it unchanged without reading, as `Chunker` does.
   ///
-  /// You can continue to do this until the `Chunk.status` equals
-  /// [ChunkStatus.last].
+  /// The page size is [query]'s `limit`, else [after]'s, else
+  /// `Chunk.defaultLimit`. [query] walks forward from the start of its
+  /// order, so it may not use `limitToLast` or a start cursor; an end cursor
+  /// stops the pagination early.
   ///
-  /// Passing in a [Chunk] with the status of [ChunkStatus.last] will result in
-  /// a [Chunk] with empty data.
-  Future<R> paginate(Chunk<T> chunk, {GetOptions? getOptions});
+  /// Pass the same [query] for every page: each call applies the query it is
+  /// given, and [after] carries only the position.
+  Future<R> paginate(
+    FirefuelQuery query, {
+    FirefuelPage<T>? after,
+    GetOptions? getOptions,
+  });
 }
+
+/// A page of [T] from firefuel: package:chunk's [Chunk], positioned by the
+/// Firestore snapshot of its last document.
+typedef FirefuelPage<T> = Chunk<T, DocumentSnapshot<T?>>;
 
 /// Read a `List` of [T] from the Collection
 ///
@@ -105,6 +133,20 @@ abstract class CollectionPaginate<R, T extends Serializable> {
 /// subclasses
 /// {@endtemplate}
 abstract class CollectionRead<R, T extends Serializable> {
+  /// Get the documents described by [query], once.
+  ///
+  /// The other reads are shorthands for common queries; reach for this when
+  /// you need cursors, `limitToLast`, or a query you build up in steps.
+  ///
+  /// Does NOT refresh automatically. Related: [streamQuery]
+  Future<R> query(FirefuelQuery query, {GetOptions? getOptions});
+
+  /// Get the documents described by [query].
+  ///
+  /// Refreshes automatically when matching data is added, changed or
+  /// removed.
+  Stream<R> streamQuery(FirefuelQuery query);
+
   /// Get a list of all documents from the collection as a list
   ///
   /// Refreshes automatically when new data is added/removed from the collection
@@ -175,8 +217,9 @@ abstract class CollectionRead<R, T extends Serializable> {
   ///
   /// {@template firefuel.rules.whereExceptions}
   /// throws a [MissingValueException] when no [Clause]s are given
-  /// throws a [MoreThanOneFieldInRangeClauseException] when range filters are
-  /// on different fields
+  ///
+  /// Range filters may target up to 10 different fields; Firestore enforces
+  /// the limit and requires a composite index for the combination.
   /// {@endtemplate}
   Stream<R> streamWhere(
     List<Clause> clauses, {
@@ -221,6 +264,29 @@ abstract class CollectionRead<R, T extends Serializable> {
   });
 }
 
+/// Listen to a query's results together with their metadata: ids and
+/// paths, what changed, and whether the data is cached or has unconfirmed
+/// local writes.
+abstract class QueryListen<R> {
+  /// Snapshots of the documents [query] matches.
+  ///
+  /// Pass `ListenOptions(includeMetadataChanges: true)` to also hear when a
+  /// pending write is confirmed or cached data is replaced by the server's.
+  Stream<R> snapshots(
+    FirefuelQuery query, {
+    ListenOptions options = const ListenOptions(),
+  });
+}
+
+/// Listen to one document together with its metadata.
+abstract class DocListen<R> {
+  /// Snapshots of the document at [docId].
+  Stream<R> docSnapshots(
+    DocumentId docId, {
+    ListenOptions options = const ListenOptions(),
+  });
+}
+
 /// Read multiple documents by id while preserving the order of the ids.
 ///
 /// Missing documents are represented as `null` in the returned list.
@@ -246,10 +312,7 @@ abstract class DocCreate<R, T extends Serializable> {
   Future<R> create(T value);
 
   /// Create a new document with the provided [docId]
-  Future<R> createById({
-    required T value,
-    required DocumentId docId,
-  });
+  Future<R> createById({required T value, required DocumentId docId});
 }
 
 /// {@template firefuel.rules.doc_create_if_not_exists}
@@ -267,6 +330,11 @@ abstract class DocCreateIfNotExist<R, T extends Serializable>
   ///
   /// If the documentId returns a snapshot that does not exist, or `data()`
   /// returns `null`, create a new document with the [docId] provided.
+  ///
+  /// Not atomic: two clients racing on the same missing document can both
+  /// create it, and the later write wins. It works offline, which a
+  /// transaction does not. When the race matters, use
+  /// `TransactionScope.readOrCreate` inside `Firefuel.runTransaction`.
   Future<R> readOrCreate({
     required DocumentId docId,
     required T createValue,
@@ -285,10 +353,7 @@ abstract class DocUpdateOrCreate<R, T extends Serializable> {
   /// If no document exists, a new document will be created
   ///
   /// The value returned is the value passed in, a read is not performed
-  Future<R> updateOrCreate({
-    required DocumentId docId,
-    required T value,
-  });
+  Future<R> updateOrCreate({required DocumentId docId, required T value});
 }
 
 /// Delete an existing Document
@@ -333,21 +398,22 @@ abstract class DocRead<R> {
 abstract class DocReplace<R, T extends Serializable> {
   /// Replaces the document at [docId] with [value].
   ///
-  /// If no document exists yet, the replace will fail silently.
+  /// Fails with a `not-found` error when no document exists yet. Firestore
+  /// checks that on the server as the write lands, so replace is atomic,
+  /// costs no read, works offline, and inside a batch can replace a document
+  /// created earlier in the same batch.
   ///
-  /// *Requires 1 read of doc to perform replace*
-  Future<R> replace({
-    required DocumentId docId,
-    required T value,
-    GetOptions? getOptions,
-  });
+  /// Every field [value] serializes is written. A stored field your model
+  /// does not serialize at all is left in place.
+  Future<R> replace({required DocumentId docId, required T value});
 
   /// Replaces the fields of the document at [docId] with the matching
   /// [fieldPaths] from [value]
   ///
-  /// Converts all [fieldPaths] into [FieldPath] objects to compare against
+  /// [fieldPaths] are matched against the top-level keys [value]
+  /// serializes to; a dotted path such as `address.city` matches nothing.
   ///
-  /// If no document exists yet, the update will fail silently.
+  /// Fails with a `not-found` error when no document exists yet.
   Future<R> replaceFields({
     required DocumentId docId,
     required T value,
@@ -366,13 +432,15 @@ abstract class DocUpdate<R, T extends Serializable> {
   /// Updates data on the document. Data will be merged with any existing
   /// document data.
   ///
-  /// If no document exists yet, the update will fail silently.
-  Future<R> update({
-    required DocumentId docId,
-    required T value,
-  });
+  /// Fails with a `not-found` error when no document exists yet; use
+  /// `updateOrCreate` to create it instead.
+  Future<R> update({required DocumentId docId, required T value});
 
   /// Updates specific fields on the document.
+  ///
+  /// A value may be a [FieldUpdate] (increment, array union or remove,
+  /// delete, server timestamp) to combine transforms and plain sets in one
+  /// atomic write.
   Future<R> updateFields({
     required DocumentId docId,
     required Map<String, Object?> fields,
@@ -394,8 +462,16 @@ abstract class DocUpdate<R, T extends Serializable> {
   });
 
   /// Sets [field] to Firestore's server timestamp.
-  Future<R> serverTimestamp({
+  Future<R> serverTimestamp({required DocumentId docId, required String field});
+
+  /// Adds [by] to the number in [field] on the server, so concurrent
+  /// increments are never lost. A missing field counts as 0.
+  Future<R> increment({
     required DocumentId docId,
     required String field,
+    required num by,
   });
+
+  /// Deletes [field] from the document.
+  Future<R> deleteField({required DocumentId docId, required String field});
 }

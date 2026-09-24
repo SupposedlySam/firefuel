@@ -1,16 +1,19 @@
-import 'package:fake_cloud_firestore/fake_cloud_firestore.dart';
+import 'package:cloud_firestore/cloud_firestore.dart' show FirebaseException;
+import 'package:async/async.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:firefuel/firefuel.dart';
 import '../utils/test_collection.dart';
 import '../utils/test_user.dart';
+import '../utils/test_backend.dart';
+import '../utils/page_through.dart';
 
 void main() {
   late TestCollection testCollection;
   const defaultUser = TestUser('testName');
 
-  setUp(() {
-    Firefuel.initialize(FakeFirebaseFirestore());
+  setUp(() async {
+    Firefuel.initialize(await testFirestore());
     testCollection = TestCollection();
   });
 
@@ -37,20 +40,17 @@ void main() {
       await testCollection.create(defaultUser);
     });
 
-    test(
-      'should return the amount of documents in the collection, filtered by '
-      'the provided clauses',
-      () async {
-        const newUserName = 'newUser';
-        await testCollection.create(const TestUser(newUserName));
+    test('should return the amount of documents in the collection, filtered by '
+        'the provided clauses', () async {
+      const newUserName = 'newUser';
+      await testCollection.create(const TestUser(newUserName));
 
-        final actual = await testCollection.countWhere([
-          Clause(TestUser.fieldName, isEqualTo: newUserName),
-        ]);
+      final actual = await testCollection.countWhere([
+        Clause(TestUser.fieldName, isEqualTo: newUserName),
+      ]);
 
-        expect(actual, 1);
-      },
-    );
+      expect(actual, 1);
+    });
   });
 
   group('#sumAll', () {
@@ -74,20 +74,16 @@ void main() {
       await testCollection.create(const TestUser('c', age: 30));
     });
 
-    test(
-      'should return the sum for documents matching clauses',
-      () async {
-        const target = 'match';
-        await testCollection.create(const TestUser(target, age: 100));
+    test('should return the sum for documents matching clauses', () async {
+      const target = 'match';
+      await testCollection.create(const TestUser(target, age: 100));
 
-        final actual = await testCollection.sumWhere(
-          [Clause(TestUser.fieldName, isEqualTo: target)],
-          TestUser.fieldAge,
-        );
+      final actual = await testCollection.sumWhere([
+        Clause(TestUser.fieldName, isEqualTo: target),
+      ], TestUser.fieldAge);
 
-        expect(actual, 100);
-      },
-    );
+      expect(actual, 100);
+    });
   });
 
   group('#averageAll', () {
@@ -111,20 +107,16 @@ void main() {
       await testCollection.create(const TestUser('c', age: 30));
     });
 
-    test(
-      'should return the average for documents matching clauses',
-      () async {
-        const target = 'match';
-        await testCollection.create(const TestUser(target, age: 90));
+    test('should return the average for documents matching clauses', () async {
+      const target = 'match';
+      await testCollection.create(const TestUser(target, age: 90));
 
-        final actual = await testCollection.averageWhere(
-          [Clause(TestUser.fieldName, isEqualTo: target)],
-          TestUser.fieldAge,
-        );
+      final actual = await testCollection.averageWhere([
+        Clause(TestUser.fieldName, isEqualTo: target),
+      ], TestUser.fieldAge);
 
-        expect(actual, 90);
-      },
-    );
+      expect(actual, 90);
+    });
   });
 
   group('#create', () {
@@ -149,10 +141,7 @@ void main() {
     final originalDocId = DocumentId('originalDocId');
 
     test('should create the document with provided id', () async {
-      await testCollection.createById(
-        value: defaultUser,
-        docId: originalDocId,
-      );
+      await testCollection.createById(value: defaultUser, docId: originalDocId);
 
       final readResult = await testCollection.read(originalDocId);
 
@@ -164,10 +153,7 @@ void main() {
       final createdDocId = await testCollection.create(newUser);
 
       const updatedUser = TestUser('updatedUser');
-      await testCollection.createById(
-        value: updatedUser,
-        docId: createdDocId,
-      );
+      await testCollection.createById(value: updatedUser, docId: createdDocId);
 
       final overwrittenUser = await testCollection.read(createdDocId);
 
@@ -210,10 +196,7 @@ void main() {
     test('when items are less than limit, should return all items', () async {
       final result = await testCollection.limit(4);
 
-      expect(
-        result,
-        [defaultUser, defaultUser, defaultUser],
-      );
+      expect(result, [defaultUser, defaultUser, defaultUser]);
     });
 
     test(
@@ -221,24 +204,15 @@ void main() {
       () async {
         final result = await testCollection.limit(2);
 
-        expect(
-          result,
-          [defaultUser, defaultUser],
-        );
+        expect(result, [defaultUser, defaultUser]);
       },
     );
 
-    test(
-      'when items are equal to limit, should return all items',
-      () async {
-        final result = await testCollection.limit(3);
+    test('when items are equal to limit, should return all items', () async {
+      final result = await testCollection.limit(3);
 
-        expect(
-          result,
-          [defaultUser, defaultUser, defaultUser],
-        );
-      },
-    );
+      expect(result, [defaultUser, defaultUser, defaultUser]);
+    });
   });
 
   group('#stream', () {
@@ -256,20 +230,28 @@ void main() {
       const newUser2 = TestUser('newUser2');
       const newUser3 = TestUser('newUser3');
 
-      expect(stream, emitsInOrder([defaultUser, newUser1, newUser2, newUser3]));
+      final events = StreamQueue(stream);
+      await expectLater(events, emitsThrough(defaultUser));
 
-      await testCollection.update(docId: docId, value: newUser1);
-      await testCollection.update(docId: docId, value: newUser2);
-      await testCollection.update(docId: docId, value: newUser3);
+      for (final user in [newUser1, newUser2, newUser3]) {
+        await testCollection.update(docId: docId, value: user);
+        await expectLater(events, emitsThrough(user));
+      }
+      await events.cancel();
     });
 
     test('should output null when doc no longer exists', () async {
       const newUser = TestUser('newUser');
 
-      expect(stream, emitsInOrder([defaultUser, newUser, null]));
+      final events = StreamQueue(stream);
+      await expectLater(events, emitsThrough(defaultUser));
 
       await testCollection.update(docId: docId, value: newUser);
+      await expectLater(events, emitsThrough(newUser));
+
       await testCollection.delete(docId);
+      await expectLater(events, emitsThrough(isNull));
+      await events.cancel();
     });
   });
 
@@ -284,15 +266,12 @@ void main() {
 
       final stream = testCollection.streamMany([docId2, missingDocId, docId1]);
 
-      expect(
-        stream,
-        emitsInOrder([
-          [user2, null, user1],
-          [updatedUser2, null, user1],
-        ]),
-      );
+      final events = StreamQueue(stream);
+      await expectLater(events, emitsThrough([user2, null, user1]));
 
       await testCollection.update(docId: docId2, value: updatedUser2);
+      await expectLater(events, emitsThrough([updatedUser2, null, user1]));
+      await events.cancel();
     });
 
     test('should output an empty list when no document ids are given', () {
@@ -313,64 +292,67 @@ void main() {
       stream = testCollection.streamAll();
     });
 
+    // Firestore returns documents in id order, and create() ids are random,
+    // so these compare without order.
     test('should update when an item is added', () async {
-      expect(
-        stream,
-        emitsInOrder([
-          [defaultUser, newUser1],
-          [defaultUser, newUser1, newUser2],
-        ]),
+      final events = StreamQueue(stream);
+      await expectLater(
+        events,
+        emitsThrough(unorderedEquals([defaultUser, newUser1])),
       );
 
       await testCollection.create(newUser2);
+      await expectLater(
+        events,
+        emitsThrough(unorderedEquals([defaultUser, newUser1, newUser2])),
+      );
+      await events.cancel();
     });
 
     test('should update when an item is deleted', () async {
-      expect(
-        stream,
-        emitsInOrder([
-          [defaultUser, newUser1],
-          [newUser1],
-        ]),
+      final events = StreamQueue(stream);
+      await expectLater(
+        events,
+        emitsThrough(unorderedEquals([defaultUser, newUser1])),
       );
 
       await testCollection.delete(docId);
+      await expectLater(events, emitsThrough([newUser1]));
+      await events.cancel();
     });
   });
 
   group('#streamChanges', () {
-    test('should output changed docs and skip removed docs by default',
-        () async {
-      final docId = await testCollection.create(defaultUser);
-      const newUser = TestUser('newUser');
-      final stream = testCollection.streamChanges();
+    test(
+      'should output changed docs and skip removed docs by default',
+      () async {
+        final docId = await testCollection.create(defaultUser);
+        const newUser = TestUser('newUser');
+        final stream = testCollection.streamChanges();
 
-      expect(
-        stream,
-        emitsInOrder([
-          [defaultUser],
-          [newUser],
-          <TestUser>[],
-        ]),
-      );
+        final events = StreamQueue(stream);
+        await expectLater(events, emitsThrough([defaultUser]));
 
-      await testCollection.update(docId: docId, value: newUser);
-      await testCollection.delete(docId);
-    });
+        await testCollection.update(docId: docId, value: newUser);
+        await expectLater(events, emitsThrough([newUser]));
+
+        await testCollection.delete(docId);
+        await expectLater(events, emitsThrough(isEmpty));
+        await events.cancel();
+      },
+    );
 
     test('should include removed docs when requested', () async {
       final docId = await testCollection.create(defaultUser);
       final stream = testCollection.streamChanges(includeRemoved: true);
 
-      expect(
-        stream,
-        emitsInOrder([
-          [defaultUser],
-          [defaultUser],
-        ]),
-      );
+      final events = StreamQueue(stream);
+      await expectLater(events, emitsThrough([defaultUser]));
 
+      // The removal is reported with the document's last data.
       await testCollection.delete(docId);
+      await expectLater(events, emits([defaultUser]));
+      await events.cancel();
     });
   });
 
@@ -385,15 +367,21 @@ void main() {
     });
 
     test('should output new value when new doc is created', () async {
-      expect(stream, emitsInOrder([1, 2]));
+      final events = StreamQueue(stream);
+      await expectLater(events, emitsThrough(1));
 
       await testCollection.create(defaultUser);
+      await expectLater(events, emitsThrough(2));
+      await events.cancel();
     });
 
     test('should output 0 when docs no longer exists', () async {
-      expect(stream, emitsInOrder([1, 0]));
+      final events = StreamQueue(stream);
+      await expectLater(events, emitsThrough(1));
 
       await testCollection.delete(docId);
+      await expectLater(events, emitsThrough(0));
+      await events.cancel();
     });
   });
 
@@ -429,19 +417,16 @@ void main() {
       },
     );
 
-    test(
-      'when items are equal to limit, should return all items',
-      () {
-        final stream = testCollection.streamLimited(3);
+    test('when items are equal to limit, should return all items', () {
+      final stream = testCollection.streamLimited(3);
 
-        expect(
-          stream,
-          emitsInOrder([
-            [defaultUser, defaultUser, defaultUser],
-          ]),
-        );
-      },
-    );
+      expect(
+        stream,
+        emitsInOrder([
+          [defaultUser, defaultUser, defaultUser],
+        ]),
+      );
+    });
   });
 
   group('#streamOrdered', () {
@@ -455,8 +440,9 @@ void main() {
       docId = await testCollection.create(newUser1);
       await testCollection.create(newUser3);
 
-      stream =
-          testCollection.streamOrdered([OrderBy(field: TestUser.fieldName)]);
+      stream = testCollection.streamOrdered([
+        OrderBy(field: TestUser.fieldName),
+      ]);
     });
 
     test('should return an ordered list', () async {
@@ -471,27 +457,21 @@ void main() {
     });
 
     test('should update when an item is added', () async {
-      expect(
-        stream,
-        emitsInOrder([
-          [newUser1, newUser3],
-          [newUser1, newUser2, newUser3],
-        ]),
-      );
+      final events = StreamQueue(stream);
+      await expectLater(events, emitsThrough([newUser1, newUser3]));
 
       await testCollection.create(newUser2);
+      await expectLater(events, emitsThrough([newUser1, newUser2, newUser3]));
+      await events.cancel();
     });
 
     test('should update when an item is deleted', () async {
-      expect(
-        stream,
-        emitsInOrder([
-          [newUser1, newUser3],
-          [newUser3],
-        ]),
-      );
+      final events = StreamQueue(stream);
+      await expectLater(events, emitsThrough([newUser1, newUser3]));
 
       await testCollection.delete(docId);
+      await expectLater(events, emitsThrough([newUser3]));
+      await events.cancel();
     });
   });
 
@@ -549,9 +529,9 @@ void main() {
       });
 
       test('should return a subset of the existing list', () {
-        final filteredStream = testCollection.streamWhere(
-          [Clause(TestUser.fieldName, isEqualTo: expectedName)],
-        );
+        final filteredStream = testCollection.streamWhere([
+          Clause(TestUser.fieldName, isEqualTo: expectedName),
+        ]);
 
         expect(
           filteredStream,
@@ -562,12 +542,11 @@ void main() {
       });
 
       test('should return a subset based on multiple clauses', () {
-        final filteredStream = testCollection.streamWhere(
-          [
-            Clause(TestUser.fieldName, isNotEqualTo: unexpectedName1),
-            Clause(TestUser.fieldName, isNotEqualTo: unexpectedName2),
-          ],
-        );
+        final filteredStream = testCollection.streamWhere([
+          // Firestore allows one != per query; combine it with a range.
+          Clause(TestUser.fieldName, isNotEqualTo: unexpectedName1),
+          Clause(TestUser.fieldName, isLessThan: unexpectedName2),
+        ]);
 
         expect(
           filteredStream,
@@ -583,20 +562,6 @@ void main() {
           throwsA(isA<MissingValueException>()),
         );
       });
-
-      test(
-        'should throw $MoreThanOneFieldInRangeClauseException when more than '
-        'one field is used in multiple range clauses',
-        () {
-          expect(
-            () => testCollection.streamWhere([
-              Clause('firstField', isGreaterThan: 44),
-              Clause('secondField', isLessThan: 22),
-            ]),
-            throwsA(isA<MoreThanOneFieldInRangeClauseException>()),
-          );
-        },
-      );
     });
 
     group('with orderBy should return a subset of the existing list', () {
@@ -612,7 +577,8 @@ void main() {
 
       test('when first $OrderBy matches first $Clause', () {
         final filteredList = testCollection.streamWhere(
-          [Clause(TestUser.fieldName, isNotEqualTo: expectedUser)],
+          // A field value, not a model: the fake accepted a TestUser here.
+          [Clause(TestUser.fieldName, isNotEqualTo: expectedName)],
           orderBy: [OrderBy(field: TestUser.fieldName)],
         );
 
@@ -624,47 +590,44 @@ void main() {
         );
       });
 
-      group(
-        'when using a range comparison',
-        () {
-          const oldFry = TestUser('Fry', age: 1025, occupation: 'Delivery Boy');
+      group('when using a range comparison', () {
+        const oldFry = TestUser('Fry', age: 1025, occupation: 'Delivery Boy');
 
-          setUp(() async {
-            await testCollection.create(oldFry);
-          });
+        setUp(() async {
+          await testCollection.create(oldFry);
+        });
 
-          test('and $OrderBy does not exist for first $Clause', () {
-            expect(
-              testCollection.streamWhere(
-                [Clause(TestUser.fieldAge, isGreaterThan: 4)],
-                orderBy: [OrderBy(field: TestUser.fieldName)],
-                limit: 1,
-              ),
-              emitsInOrder([
-                [fry],
-              ]),
-            );
-          });
+        test('and $OrderBy does not exist for first $Clause', () {
+          expect(
+            testCollection.streamWhere(
+              [Clause(TestUser.fieldAge, isGreaterThan: 4)],
+              orderBy: [OrderBy(field: TestUser.fieldName)],
+              limit: 1,
+            ),
+            emitsInOrder([
+              [fry],
+            ]),
+          );
+        });
 
-          test('and matching $OrderBy is not first in orderBy list', () {
-            // Range on `age` requires that field first in Firestore; firefuel
-            // reorders to orderBy(age).orderBy(name). Same-age docs sort by
-            // name.
-            expect(
-              testCollection.streamWhere(
-                [Clause(TestUser.fieldAge, isGreaterThan: 4)],
-                orderBy: [
-                  OrderBy(field: TestUser.fieldName),
-                  OrderBy(field: TestUser.fieldAge),
-                ],
-              ),
-              emitsInOrder([
-                [fry, leela, oldFry],
-              ]),
-            );
-          });
-        },
-      );
+        test('and matching $OrderBy is not first in orderBy list', () {
+          // Range on `age` requires that field first in Firestore; firefuel
+          // reorders to orderBy(age).orderBy(name). Same-age docs sort by
+          // name.
+          expect(
+            testCollection.streamWhere(
+              [Clause(TestUser.fieldAge, isGreaterThan: 4)],
+              orderBy: [
+                OrderBy(field: TestUser.fieldName),
+                OrderBy(field: TestUser.fieldAge),
+              ],
+            ),
+            emitsInOrder([
+              [fry, leela, oldFry],
+            ]),
+          );
+        });
+      });
 
       group('when using a equality comparison', () {
         test('and has matching $OrderBy field', () {
@@ -673,9 +636,9 @@ void main() {
               [Clause(TestUser.fieldAge, isEqualTo: 25)],
               orderBy: [OrderBy(field: TestUser.fieldAge)],
             ),
-            emitsInOrder([
-              [leela, fry],
-            ]),
+            // The orderBy on an equality field is dropped, so Firestore
+            // returns id order, which is random for create()d documents.
+            emits(unorderedEquals([leela, fry])),
           );
         });
 
@@ -685,9 +648,7 @@ void main() {
               [Clause(TestUser.fieldAge, isNull: true)],
               orderBy: [OrderBy(field: TestUser.fieldAge)],
             ),
-            emitsInOrder([
-              <String>[],
-            ]),
+            emitsInOrder([<String>[]]),
           );
         });
       });
@@ -701,9 +662,8 @@ void main() {
               ],
               orderBy: [OrderBy(field: TestUser.fieldAge)],
             ),
-            emitsInOrder([
-              [leela, bender, fry],
-            ]),
+            // As above: no usable order, so compare without one.
+            emits(unorderedEquals([leela, bender, fry])),
           );
         });
       });
@@ -714,10 +674,9 @@ void main() {
         await testCollection.create(expectedUser);
         await testCollection.create(expectedUser);
 
-        final limitedStream = testCollection.streamWhere(
-          [Clause(TestUser.fieldName, isEqualTo: expectedName)],
-          limit: 1,
-        );
+        final limitedStream = testCollection.streamWhere([
+          Clause(TestUser.fieldName, isEqualTo: expectedName),
+        ], limit: 1);
 
         expect(
           limitedStream,
@@ -745,108 +704,87 @@ void main() {
 
     test('should throw when no orderBys are given', () async {
       expect(
-        () async => testCollection.orderBy([]),
+        () => testCollection.orderBy([]),
         throwsA(isA<MissingValueException>()),
       );
     });
 
     test('should return results in ascending order', () async {
-      final usersResult = await testCollection.orderBy(
-        [OrderBy(field: TestUser.fieldName, direction: OrderDirection.aToZ)],
-      );
+      final usersResult = await testCollection.orderBy([
+        OrderBy(field: TestUser.fieldName, direction: OrderDirection.aToZ),
+      ]);
 
       expect(usersResult, [testUser1, testUser2, testUser3]);
     });
 
     test('should return results in descending order', () async {
-      final usersResult = await testCollection.orderBy(
-        [OrderBy(field: TestUser.fieldName, direction: OrderDirection.zToA)],
-      );
+      final usersResult = await testCollection.orderBy([
+        OrderBy(field: TestUser.fieldName, direction: OrderDirection.zToA),
+      ]);
 
       expect(usersResult, [testUser3, testUser2, testUser1]);
     });
   });
 
   group('#paginate', () {
-    setUp(() async {
-      final scenarioCount = ChunkStatus.values.length;
-      final seedCount = Chunk.defaultLimit * scenarioCount - 1;
+    const pageSize = 25;
+    final byName = FirefuelQuery(
+      orderBy: [OrderBy(field: TestUser.fieldName)],
+      limit: pageSize,
+    );
 
+    setUp(() async {
+      // One short of two full pages.
       await Future.wait(
         List.generate(
-          seedCount,
+          pageSize * 2 - 1,
           (i) => testCollection.create(TestUser('User$i')),
         ),
       );
     });
 
-    test('should use the Chunk.defaultLimit', () async {
-      final startingChunk = await testCollection.paginate(
-        Chunk(orderBy: [OrderBy(field: TestUser.fieldName)]),
-      );
+    test("should use the query's limit as the page size", () async {
+      final first = await testCollection.paginate(byName);
 
-      expect(startingChunk.data.length, Chunk.defaultLimit);
+      expect(first.data, hasLength(pageSize));
+      expect(first.limit, pageSize);
+    });
+
+    test('should report nextAvailable on a full page', () async {
+      final first = await testCollection.paginate(byName);
+
+      expect(first.status, ChunkStatus.nextAvailable);
+    });
+
+    test('should report last on a short page', () async {
+      final first = await testCollection.paginate(byName);
+      final second = await testCollection.paginate(byName, after: first);
+
+      expect(second.status, ChunkStatus.last);
+      expect(second.data, hasLength(pageSize - 1));
+    });
+
+    test('should return a last chunk unchanged when passed back in', () async {
+      final first = await testCollection.paginate(byName);
+      final last = await testCollection.paginate(byName, after: first);
+
+      expect(await testCollection.paginate(byName, after: last), same(last));
     });
 
     test(
-      'should have status of $ChunkStatus.nextAvailable when receiving the '
-      'middle chunk',
+      'should end with an empty last page after exactly full pages',
       () async {
-        final middleChunk = await testCollection.paginate(
-          Chunk(orderBy: [OrderBy(field: TestUser.fieldName)]),
-        );
-
-        expect(middleChunk.status, ChunkStatus.nextAvailable);
-      },
-    );
-
-    test(
-      'should have status of $ChunkStatus.last when receiving the last chunk',
-      () async {
-        final middleChunk = await testCollection.paginate(
-          Chunk(orderBy: [OrderBy(field: TestUser.fieldName)]),
-        );
-        final lastChunk = await testCollection.paginate(middleChunk);
-
-        expect(lastChunk.status, ChunkStatus.last);
-      },
-    );
-
-    test(
-      'should return empty data when the last chunk is passed back in',
-      () async {
-        final middleChunk = await testCollection.paginate(
-          Chunk(orderBy: [OrderBy(field: TestUser.fieldName)]),
-        );
-        final lastChunk = await testCollection.paginate(middleChunk);
-
-        assert(lastChunk.status == ChunkStatus.last, 'should be last');
-
-        final emptyLastChunk2 = await testCollection.paginate(lastChunk);
-
-        expect(emptyLastChunk2.status, ChunkStatus.last);
-        expect(emptyLastChunk2.data.isEmpty, isTrue);
-        expect(emptyLastChunk2.cursor, isNull);
-      },
-    );
-
-    test(
-      'should return empty data when last chunk contains nothing',
-      () async {
-        // We're starting with minus document to make a full chunk so adding one
-        // more user will allow two full chunks
         await testCollection.create(const TestUser('LastUser'));
 
-        final middleChunk = await testCollection.paginate(
-          Chunk(orderBy: [OrderBy(field: TestUser.fieldName)]),
-        );
-        final lastFullChunk = await testCollection.paginate(middleChunk);
+        final first = await testCollection.paginate(byName);
+        final fullSecond = await testCollection.paginate(byName, after: first);
+        final empty = await testCollection.paginate(byName, after: fullSecond);
 
-        final emptyLastChunk = await testCollection.paginate(lastFullChunk);
-
-        expect(emptyLastChunk.status, ChunkStatus.last);
-        expect(emptyLastChunk.data.isEmpty, isTrue);
-        expect(emptyLastChunk.cursor, isNull);
+        expect(fullSecond.status, ChunkStatus.nextAvailable);
+        expect(empty.status, ChunkStatus.last);
+        expect(empty.data, isEmpty);
+        // It keeps the previous cursor, so it cannot restart at page one.
+        expect(empty.cursor, fullSecond.cursor);
       },
     );
   });
@@ -944,26 +882,42 @@ void main() {
   group('#replace', () {
     final originalDocId = DocumentId('originalDocId');
 
-    test('should fail silently when document does not exist', () async {
+    test('should throw not-found when document does not exist', () async {
       final nonExistentDoc = DocumentId('dodoBird');
-      const newValue = TestUser('Clark Kent');
 
-      final nonExistentDocReadBeforeReplace = await testCollection.read(
-        nonExistentDoc,
+      await expectLater(
+        testCollection.replace(
+          docId: nonExistentDoc,
+          value: const TestUser('Clark Kent'),
+        ),
+        throwsA(
+          isA<FirebaseException>().having((e) => e.code, 'code', 'not-found'),
+        ),
       );
 
-      expect(nonExistentDocReadBeforeReplace, isNull);
+      expect(await testCollection.read(nonExistentDoc), isNull);
+    });
+
+    test('should overwrite what the model writes and keep the rest', () async {
+      await testCollection.createById(
+        value: const TestUser('old', age: 3, tags: ['x']),
+        docId: originalDocId,
+      );
 
       await testCollection.replace(
-        docId: nonExistentDoc,
-        value: newValue,
+        docId: originalDocId,
+        value: const TestUser('new'),
       );
 
-      final nonExistentDocReadAfterReplace = await testCollection.read(
-        nonExistentDoc,
+      expect(
+        await testCollection.read(originalDocId),
+        isA<TestUser>()
+            .having((user) => user.name, 'name', 'new')
+            // toJson always writes age, so null overwrites the stored 3...
+            .having((user) => user.age, 'age', isNull)
+            // ...but omits tags when null, and a field it does not write stays.
+            .having((user) => user.tags, 'tags', ['x']),
       );
-
-      expect(nonExistentDocReadAfterReplace, isNull);
     });
 
     test('should overwrite all values in document', () async {
@@ -972,10 +926,7 @@ void main() {
 
       await testCollection.createById(value: newUser, docId: originalDocId);
 
-      await testCollection.replace(
-        value: updatedUser,
-        docId: originalDocId,
-      );
+      await testCollection.replace(value: updatedUser, docId: originalDocId);
 
       final readUser = await testCollection.read(originalDocId);
 
@@ -1001,7 +952,10 @@ void main() {
 
       final updatedUser = await testCollection.read(docId);
 
-      expect(updatedUser!.name, replacementName);
+      expect(
+        updatedUser,
+        isA<TestUser>().having((user) => user.name, 'name', replacementName),
+      );
     });
 
     test('should not replace fields missing from the list', () async {
@@ -1016,7 +970,14 @@ void main() {
 
       final unchangedUser = await testCollection.read(docId);
 
-      expect(unchangedUser!.name, isNot(replacementName));
+      expect(
+        unchangedUser,
+        isA<TestUser>().having(
+          (user) => user.name,
+          'name',
+          isNot(replacementName),
+        ),
+      );
     });
   });
 
@@ -1025,10 +986,7 @@ void main() {
       const updatedDoc = TestUser('updateValue');
       final docId = await testCollection.create(defaultUser);
 
-      await testCollection.update(
-        docId: docId,
-        value: updatedDoc,
-      );
+      await testCollection.update(docId: docId, value: updatedDoc);
 
       final readResult = await testCollection.read(docId);
 
@@ -1118,10 +1076,7 @@ void main() {
       final originalDocId = DocumentId('originalDocId');
       const newUser = TestUser('newUser');
 
-      await testCollection.updateOrCreate(
-        docId: originalDocId,
-        value: newUser,
-      );
+      await testCollection.updateOrCreate(docId: originalDocId, value: newUser);
 
       final updatedDoc = await testCollection.read(originalDocId);
 
@@ -1132,10 +1087,7 @@ void main() {
       const updatedDoc = TestUser('updateValue');
       final docId = await testCollection.create(defaultUser);
 
-      await testCollection.updateOrCreate(
-        docId: docId,
-        value: updatedDoc,
-      );
+      await testCollection.updateOrCreate(docId: docId, value: updatedDoc);
 
       final readResult = await testCollection.read(docId);
 
@@ -1157,20 +1109,19 @@ void main() {
       });
 
       test('should return a subset of the existing list', () async {
-        final filteredList = await testCollection.where(
-          [Clause(TestUser.fieldName, isEqualTo: expectedName)],
-        );
+        final filteredList = await testCollection.where([
+          Clause(TestUser.fieldName, isEqualTo: expectedName),
+        ]);
 
         expect(filteredList, [expectedUser]);
       });
 
       test('should return a subset based on multiple clauses', () async {
-        final filteredList = await testCollection.where(
-          [
-            Clause(TestUser.fieldName, isNotEqualTo: unexpectedName1),
-            Clause(TestUser.fieldName, isNotEqualTo: unexpectedName2),
-          ],
-        );
+        final filteredList = await testCollection.where([
+          // Firestore allows one != per query; combine it with a range.
+          Clause(TestUser.fieldName, isNotEqualTo: unexpectedName1),
+          Clause(TestUser.fieldName, isLessThan: unexpectedName2),
+        ]);
 
         expect(filteredList, [expectedUser]);
       });
@@ -1180,15 +1131,13 @@ void main() {
         'is chosen',
         () {
           expect(
-            () async => testCollection.where(
-              [
-                Clause(
-                  TestUser.fieldName,
-                  isNotEqualTo: unexpectedName1,
-                  isEqualTo: expectedUser,
-                ),
-              ],
-            ),
+            () => testCollection.where([
+              Clause(
+                TestUser.fieldName,
+                isNotEqualTo: unexpectedName1,
+                isEqualTo: expectedUser,
+              ),
+            ]),
             throwsA(isA<TooManyArgumentsException>()),
           );
         },
@@ -1196,24 +1145,10 @@ void main() {
 
       test('should throw when no clauses are given', () async {
         expect(
-          () async => testCollection.where([]),
+          () => testCollection.where([]),
           throwsA(isA<MissingValueException>()),
         );
       });
-
-      test(
-        'should throw $MoreThanOneFieldInRangeClauseException when more than '
-        'one field is used in multiple range clauses',
-        () {
-          expect(
-            () => testCollection.streamWhere([
-              Clause('firstField', isGreaterThan: 44),
-              Clause('secondField', isLessThan: 22),
-            ]),
-            throwsA(isA<MoreThanOneFieldInRangeClauseException>()),
-          );
-        },
-      );
     });
 
     group('with orderBy should return a subset of the existing list', () {
@@ -1229,7 +1164,8 @@ void main() {
 
       test('when first $OrderBy matches first $Clause', () async {
         final filteredList = await testCollection.where(
-          [Clause(TestUser.fieldName, isNotEqualTo: expectedUser)],
+          // A field value, not a model: the fake accepted a TestUser here.
+          [Clause(TestUser.fieldName, isNotEqualTo: expectedName)],
           orderBy: [OrderBy(field: TestUser.fieldName)],
         );
 
@@ -1309,10 +1245,9 @@ void main() {
         await testCollection.create(expectedUser);
         await testCollection.create(expectedUser);
 
-        final filteredList = await testCollection.where(
-          [Clause(TestUser.fieldName, isEqualTo: expectedName)],
-          limit: 1,
-        );
+        final filteredList = await testCollection.where([
+          Clause(TestUser.fieldName, isEqualTo: expectedName),
+        ], limit: 1);
 
         expect(filteredList, [expectedUser]);
       });
@@ -1333,5 +1268,219 @@ void main() {
 
       expect(readResult, isNull);
     });
+  });
+
+  group('regressions', () {
+    group('$OrderDirection', () {
+      setUp(() async {
+        // `age` stands in for a timestamp: a larger value is newer.
+        await testCollection.create(const TestUser('oldest', age: 1));
+        await testCollection.create(const TestUser('middle', age: 2));
+        await testCollection.create(const TestUser('newest', age: 3));
+      });
+
+      Future<List<String>> namesOrderedBy(OrderDirection direction) async {
+        final users = await testCollection.orderBy([
+          OrderBy(field: TestUser.fieldAge, direction: direction),
+        ]);
+
+        return users.map((user) => user.name).toList();
+      }
+
+      test('newestToOldest should put the largest value first', () async {
+        expect(await namesOrderedBy(OrderDirection.newestToOldest), [
+          'newest',
+          'middle',
+          'oldest',
+        ]);
+      });
+
+      test('oldestToNewest should put the smallest value first', () async {
+        expect(await namesOrderedBy(OrderDirection.oldestToNewest), [
+          'oldest',
+          'middle',
+          'newest',
+        ]);
+      });
+    });
+
+    group('with real timestamps', () {
+      // The age-based tests above stand in for time. These store actual
+      // Firestore Timestamps, which order chronologically, so "newest" is
+      // the latest instant.
+      setUp(() async {
+        final firestore = Firefuel.firestore;
+        for (final (name, day) in [('jan', 1), ('mar', 3), ('feb', 2)]) {
+          await firestore
+              .collection(TestCollection.testUsersCollectionName)
+              .doc(name)
+              .set({
+                TestUser.fieldName: name,
+                'createdAt': Timestamp.fromDate(DateTime.utc(2026, day)),
+              });
+        }
+      });
+
+      Future<List<String>> namesBy(OrderDirection direction) async {
+        final users = await testCollection.orderBy([
+          OrderBy(field: 'createdAt', direction: direction),
+        ]);
+        return users.map((user) => user.name).toList();
+      }
+
+      test('newestToOldest should list the latest first', () async {
+        expect(await namesBy(OrderDirection.newestToOldest), [
+          'mar',
+          'feb',
+          'jan',
+        ]);
+      });
+
+      test('oldestToNewest should list the earliest first', () async {
+        expect(await namesBy(OrderDirection.oldestToNewest), [
+          'jan',
+          'feb',
+          'mar',
+        ]);
+      });
+    });
+
+    group('OrderBy.docId', () {
+      test(
+        'should honour a descending alias',
+        () async {
+          await testCollection.createById(
+            value: const TestUser('a'),
+            docId: DocumentId('a'),
+          );
+          await testCollection.createById(
+            value: const TestUser('z'),
+            docId: DocumentId('z'),
+          );
+
+          final users = await testCollection.orderBy([
+            const OrderBy.docId(OrderDirection.zToA),
+          ]);
+
+          expect(users.first.name, 'z');
+        },
+        skip: emulatorGap(
+          'refuses orderBy(documentId, desc) as the only order ("does not '
+          'support descending key scans")',
+        ),
+      );
+    });
+
+    group('arrayContainsAny', () {
+      test('should filter on the clause instead of dropping it', () async {
+        await testCollection.create(
+          const TestUser('flutter fan', tags: ['flutter']),
+        );
+        await testCollection.create(const TestUser('dart fan', tags: ['dart']));
+        await testCollection.create(const TestUser('no tags'));
+
+        final users = await testCollection.where([
+          Clause(TestUser.fieldTags, arrayContainsAny: const ['flutter', 'go']),
+        ]);
+
+        // Positive control and population: 3 documents exist, exactly one
+        // matches.
+        expect(await testCollection.countAll(), 3);
+        expect(users.map((user) => user.name), ['flutter fan']);
+      });
+    });
+
+    group('#paginate', () {
+      setUp(() async {
+        // 6 matching and 6 non-matching documents, interleaved by name.
+        for (var i = 0; i < 12; i++) {
+          await testCollection.create(
+            TestUser(
+              'user${i.toString().padLeft(2, '0')}',
+              occupation: i.isEven ? 'pilot' : 'chef',
+            ),
+          );
+        }
+      });
+
+      test('should keep clauses and limit on every page', () async {
+        final pages = await pageThrough(
+          testCollection,
+          FirefuelQuery(
+            orderBy: [OrderBy(field: TestUser.fieldName)],
+            clauses: [Clause(TestUser.fieldOccupation, isEqualTo: 'pilot')],
+            limit: 2,
+          ),
+        );
+
+        final users = pages.expand((page) => page.data).toList();
+
+        expect(users, hasLength(6));
+        expect(users.every((user) => user.occupation == 'pilot'), isTrue);
+        expect(pages.every((page) => page.limit == 2), isTrue);
+      });
+    });
+
+    group('range filters on more than one field', () {
+      test('should be sent to Firestore rather than refused', () async {
+        await testCollection.create(
+          const TestUser('match', age: 30, occupation: 'b'),
+        );
+        await testCollection.create(
+          const TestUser('too young', age: 10, occupation: 'b'),
+        );
+        await testCollection.create(
+          const TestUser('wrong occupation', age: 30, occupation: 'z'),
+        );
+
+        final users = await testCollection.where([
+          Clause(TestUser.fieldAge, isGreaterThan: 20),
+          Clause(TestUser.fieldOccupation, isLessThan: 'm'),
+        ]);
+
+        expect(users.map((user) => user.name), ['match']);
+      });
+    });
+  });
+
+  group('firestore instance', () {
+    test('should follow Firefuel.initialize after construction', () async {
+      final second = await otherTestFirestore();
+
+      // Built and used against the instance from setUp...
+      final collection = TestCollection();
+      await collection.readAll();
+      Firefuel.initialize(second);
+
+      // ...but writes land in the instance current at call time.
+      await collection.createById(
+        value: defaultUser,
+        docId: DocumentId('moved'),
+      );
+
+      final stored = await second
+          .collection(TestCollection.testUsersCollectionName)
+          .doc('moved')
+          .get();
+      expect(stored.exists, isTrue);
+    }, skip: skipWithoutOtherFirestore);
+
+    test('should stay on an instance it was given', () async {
+      final pinned = await otherTestFirestore();
+      final collection = TestCollection(firestore: pinned);
+
+      Firefuel.initialize(await testFirestore());
+      await collection.createById(
+        value: defaultUser,
+        docId: DocumentId('pinned'),
+      );
+
+      final stored = await pinned
+          .collection(TestCollection.testUsersCollectionName)
+          .doc('pinned')
+          .get();
+      expect(stored.exists, isTrue);
+      expect(await testCollection.read(DocumentId('pinned')), isNull);
+    }, skip: skipWithoutOtherFirestore);
   });
 }

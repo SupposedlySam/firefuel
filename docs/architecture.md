@@ -23,7 +23,7 @@ This layer is the lowest level of the application and interacts with databases, 
 
 > The collection's responsibility is to provide raw data. The collection should be generic and versatile.
 
-FirefuelRepositories come pre-built with [CRUD](https://en.wikipedia.org/wiki/Create,_read,_update_and_delete) operations.
+FirefuelCollections come pre-built with [CRUD](https://en.wikipedia.org/wiki/Create,_read,_update_and_delete) operations.
 By extending the FirefuelCollection you get `create`, `read`, `update`, `delete`, and many other methods.
 
 [collection.dart](_snippets/architecture/collection.dart.md ":include")
@@ -36,4 +36,6 @@ By extending the FirefuelCollection you get `create`, `read`, `update`, `delete`
 
 As you can see, our repository layer can interact with multiple collections (or other repositories) and perform transformations on the data before handing the result to the business logic layer of your choosing.
 
-So far, even though we've had some code snippets, all of this has been fairly high level. In the tutorial section we're going to put all this together as we build several different example apps.
+A repository method that spans collections atomically can wrap a [transaction](firefuelapi.md#transactions) in `guard`, so it returns `Either` like every inherited method.
+
+For a runnable version of all of this, see the [example app](https://github.com/SupposedlySam/firefuel/tree/main/packages/firefuel/example), a playground that exercises every Firefuel API against an in-memory Firestore.

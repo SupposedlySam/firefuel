@@ -8,50 +8,41 @@ void main() {
     test('should return Right when Right exists', () {
       const Either<Failure, String> result = Right('testValue');
 
-      final right = result.getRight();
+      expect(result.getRight(), 'testValue');
+    });
 
-      expect(right, isA<String>());
+    test('should throw $MissingValueException for a Right holding null', () {
+      const Either<Failure, String?> result = Right(null);
+
+      expect(result.getRight, throwsA(isA<MissingValueException>()));
     });
 
     test('should throw $MissingValueException when Right does not exist', () {
       final Either<Failure, String> result = Left(ExpectedFailure());
 
-      expect(
-        result.getRight,
-        throwsA(isA<MissingValueException>()),
-      );
+      expect(result.getRight, throwsA(isA<MissingValueException>()));
     });
   });
 
   group('#getLeft', () {
     test('should return Left when $Failure exists', () {
-      final Either<Failure, String> result = Left(ExpectedFailure());
+      final failure = ExpectedFailure();
+      final Either<Failure, String> result = Left(failure);
 
-      final left = result.getLeft();
-
-      expect(left, isA<Failure>());
+      expect(result.getLeft(), same(failure));
     });
 
-    test('should throw $MissingValueException when $Failure does not exist',
-        () {
-      const Either<Failure, String> result = Right('testValue');
+    test(
+      'should throw $MissingValueException when $Failure does not exist',
+      () {
+        const Either<Failure, String> result = Right('testValue');
 
-      expect(
-        result.getLeft,
-        throwsA(isA<MissingValueException>()),
-      );
-    });
+        expect(result.getLeft, throwsA(isA<MissingValueException>()));
+      },
+    );
   });
 
   group('#getRightOrElseNull', () {
-    test('should return a nullable Right', () {
-      const Either<Failure, String> right = Right('testValue');
-
-      final result = right.getRightOrElseNull();
-
-      expect(result, isA<String?>());
-    });
-
     test('should return Right value when Right exists', () {
       const success = 'testValue';
       const Either<Failure, String> right = Right(success);
@@ -71,14 +62,6 @@ void main() {
   });
 
   group('#getLeftOrElseNull', () {
-    test('should return a nullable $Failure', () {
-      final Either<Failure, String> result = Left(ExpectedFailure());
-
-      final left = result.getLeftOrElseNull();
-
-      expect(left, isA<Failure?>());
-    });
-
     test('should return Left when $Failure exists', () {
       final failure = ExpectedFailure();
       final Either<Failure, String> result = Left(failure);

@@ -36,32 +36,6 @@ void main() {
     });
   });
 
-  group('.hasMoreThanOneFieldInRangeComparisons', () {
-    test(
-      'should return true when given more than one field in range comparison',
-      () {
-        final result = Clause.hasMoreThanOneFieldInRangeComparisons([
-          Clause('age', isLessThan: 20),
-          Clause('birthYear', isLessThan: 2000),
-        ]);
-
-        expect(result, isTrue);
-      },
-    );
-
-    test(
-      'should return false when given one field in range comparison',
-      () {
-        final result = Clause.hasMoreThanOneFieldInRangeComparisons([
-          Clause('age', isLessThan: 20),
-          Clause('age', isGreaterThan: 10),
-        ]);
-
-        expect(result, isFalse);
-      },
-    );
-  });
-
   group('.getEqualityOrInComparisonFields', () {
     test('should filter out all non-equality or in comparison fields', () {
       const equalToAge = 'age1';
@@ -104,11 +78,36 @@ void main() {
 
     test('should fall back to first clause when there is no range', () {
       expect(
-        Clause.fieldMatchingRangeOrderingRule([
-          Clause('name', isEqualTo: 'a'),
-        ]),
+        Clause.fieldMatchingRangeOrderingRule([Clause('name', isEqualTo: 'a')]),
         'name',
       );
+    });
+
+    group('with range filters on several fields', () {
+      final clauses = [
+        Clause('age', isGreaterThan: 4),
+        Clause('height', isLessThan: 200),
+      ];
+
+      test('should keep a leading orderBy that is a range field', () {
+        expect(
+          Clause.fieldMatchingRangeOrderingRule(
+            clauses,
+            orderBy: [OrderBy(field: 'height')],
+          ),
+          'height',
+        );
+      });
+
+      test('should use the first range field otherwise', () {
+        expect(
+          Clause.fieldMatchingRangeOrderingRule(
+            clauses,
+            orderBy: [OrderBy(field: 'name')],
+          ),
+          'age',
+        );
+      });
     });
   });
 }

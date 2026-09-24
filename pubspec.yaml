@@ -1,0 +1,15 @@
+name: firefuel_workspace
+description: Workspace root for the firefuel packages. Not published.
+publish_to: none
+
+environment:
+  sdk: ^3.10.0
+
+workspace:
+  - packages/firefuel
+  - packages/firefuel/example
+  - packages/firefuel_core
+  - packages/firefuel_integration
+
+dev_dependencies:
+  very_good_analysis: ^11.0.0

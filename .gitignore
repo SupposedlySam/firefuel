@@ -103,3 +103,14 @@ app.*.map.json
 !**/ios/**/default.mode2v3
 !**/ios/**/default.pbxuser
 !**/ios/**/default.perspectivev3
+
+# llm_chat identity for this project
+.llm_chat/
+pubspec.lock
+.fvm/
+
+# Firebase emulator logs
+*-debug.log
+
+# lamp is a local tool manager; its lockfile describes this machine, not the package
+lamp.lock

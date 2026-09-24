@@ -4,10 +4,12 @@ version: 1.0.0+1
 publish_to: none
 
 environment:
-  sdk: '>=3.3.0 <4.0.0'
+  sdk: ^3.10.0
+
+resolution: workspace
 
 dependencies:
-  fake_cloud_firestore: ^4.1.0+1
+  fake_cloud_firestore: ^4.3.0
   firefuel:
     path: ..
   flutter:

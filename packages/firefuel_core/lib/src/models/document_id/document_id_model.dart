@@ -12,19 +12,20 @@ import 'package:firefuel_core/src/models/document_id/document_id_serializer.dart
 /// `throwsOnForwardSlash` if you would prefer for it to throw a
 /// [CannotContainForwardSlash] [FormatException] instead.
 ///
-/// Potential to throw [FormatException] of type [CannotBeNoLongerThan1500Bytes],
+/// Potential to throw [FormatException] of type
+/// [CannotBeNoLongerThan1500Bytes],
 /// [CannotSolelyConsistOfASingleOrDoublePeriod],
 /// [CannotStartAndEndWithDoubleUnderscore], or [CannotContainForwardSlash].
-class DocumentId extends Serializable with EquatableMixin {
+class DocumentId extends Serializable with Equatable {
+  DocumentId(String unsafeValue, {bool throwsOnForwardSlash = false})
+    : docId = _validateAndReplace(unsafeValue, throwsOnForwardSlash),
+      assert(unsafeValue.isNotEmpty, 'A document id cannot be empty');
+
+  factory DocumentId.fromJson(Map<String, dynamic> json) =
+      DocumentIdSerializer.fromJson;
   static const fieldDocId = 'docId';
 
   final String docId;
-
-  DocumentId(
-    String unsafeValue, {
-    throwsOnForwardSlash = false,
-  })  : docId = _validateAndReplace(unsafeValue, throwsOnForwardSlash),
-        assert(unsafeValue.isNotEmpty);
 
   static String _validateAndReplace(
     String unsafeValue,
@@ -32,7 +33,7 @@ class DocumentId extends Serializable with EquatableMixin {
   ) {
     _validate(unsafeValue, throwsOnForwardSlash);
 
-    return unsafeValue.replaceAll(RegExp(r'/'), '');
+    return unsafeValue.replaceAll(RegExp('/'), '');
   }
 
   /// Verifies the string is a valid Firestore document ID
@@ -46,9 +47,9 @@ class DocumentId extends Serializable with EquatableMixin {
   ///
   ///  Source: https://firebase.google.com/docs/firestore/quotas#limits
   static void _validate(String unsafeValue, bool throwsOnForwardSlash) {
-    final RegExp singleOrDoublePeriod = RegExp(r'^(\.*\.+)$'),
-        underscores = RegExp(r'__.*__'),
-        forwardSlash = RegExp(r'/');
+    final singleOrDoublePeriod = RegExp(r'^(\.*\.+)$');
+    final underscores = RegExp('__.*__');
+    final forwardSlash = RegExp('/');
 
     final bytes = utf8.encode(unsafeValue);
     if (bytes.length > 1500) {
@@ -68,9 +69,7 @@ class DocumentId extends Serializable with EquatableMixin {
     }
   }
 
-  factory DocumentId.fromJson(Map<String, dynamic> json) =
-      DocumentIdSerializer.fromJson;
-
+  @override
   Map<String, dynamic> toJson() => DocumentIdSerializer.toMap(this);
 
   @override

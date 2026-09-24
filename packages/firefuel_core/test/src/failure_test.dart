@@ -11,7 +11,7 @@ void main() {
     setUp(() {
       try {
         throw Exception('test message');
-      } catch (e, trace) {
+      } on Exception catch (e, trace) {
         error = e;
         chain = Chain.forTrace(trace);
         failure = TestFailure(e, stackTrace: chain);
@@ -23,8 +23,16 @@ void main() {
       expect(failure.stackTrace, chain);
     });
 
-    test('should have an error and chain as props', () {
-      expect(failure.props, [error, chain]);
+    test('should have its type, error and chain as props', () {
+      expect(failure.props, [TestFailure, error, chain]);
+    });
+
+    test('should not equal another kind of failure with the same error', () {
+      // equatable 3 stopped comparing runtimeType, so props carry it.
+      final other = TestFirefuelFailure(error: error, stackTrace: chain);
+
+      expect(failure, isNot(other));
+      expect(failure, TestFailure(error, stackTrace: chain));
     });
 
     test('#toString should contain the error', () {
@@ -38,9 +46,11 @@ void main() {
     setUp(() {
       try {
         throw Exception('test message');
-      } catch (e, trace) {
-        failure =
-            TestFirefuelFailure(error: e, stackTrace: Chain.forTrace(trace));
+      } on Exception catch (e, trace) {
+        failure = TestFirefuelFailure(
+          error: e,
+          stackTrace: Chain.forTrace(trace),
+        );
       }
     });
 
@@ -51,15 +61,9 @@ void main() {
 }
 
 class TestFailure extends Failure {
-  TestFailure(
-    Object error, {
-    required Chain stackTrace,
-  }) : super(error, stackTrace: stackTrace);
+  const TestFailure(super.error, {required super.stackTrace});
 }
 
 class TestFirefuelFailure extends FirefuelFailure {
-  TestFirefuelFailure({
-    required Object error,
-    required Chain stackTrace,
-  }) : super(error: error, stackTrace: stackTrace);
+  const TestFirefuelFailure({required super.error, required super.stackTrace});
 }

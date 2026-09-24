@@ -1,10 +1,9 @@
-
 ```dart
-void main() async {
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(); // first initialize Firebase
+  await Firebase.initializeApp(); // initialize Firebase first
   Firefuel.initialize(FirebaseFirestore.instance);
 
-  runApp(...);
+  runApp(const MyApp());
 }
 ```

@@ -12,7 +12,7 @@ Creates a Collection, Model Stub and optional Repository for the [firefuel libra
 
 ### Prerequisites
 
-- Ensure the `mason_cli` is installed globally by running `flutter pub global activate mason_cli` in your Terminal.
+- Ensure the `mason_cli` is installed globally by running `dart pub global activate mason_cli` in your Terminal.
 - Run `mason init` inside of your Flutter app root directory.
 - Run `mason add firefuel`
 
@@ -38,7 +38,7 @@ Whether to create a Repository class to contain your data layer business logic.
 
 i.e. persist data both locally and remote, create a readable name for multiple collection access, etc.
 
-For more information, see [the docs](https://firefuel.dev/#/firefuelbrick)
+For more information, see [the docs](http://firefueldocs.com/#/firefuelbrick)
 
 ---
 

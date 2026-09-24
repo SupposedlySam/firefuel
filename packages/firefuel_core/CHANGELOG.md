@@ -1,3 +1,19 @@
+## 0.2.0
+
+feat: `Either`
+
+- A sealed `Either<L, R>` with `Left` / `Right`, `fold`, `map`, `leftMap`, `flatMap`, `getOrElse`, `swap`, `isLeft`, `isRight`, and `left()` / `right()`. It replaces firefuel's re-export of `package:dartz`
+
+feat: `FieldUpdate`
+
+- Server-computed values usable from models with no Flutter or Firestore dependency: `increment`, `arrayUnion`, `arrayRemove`, `delete`, `serverTimestamp` / `ServerTimestamp`
+
+fix!: `FirefuelFailure` no longer prints itself when constructed; `Failure.props` leads with the failure's type, so two kinds of failure wrapping one error are not equal under equatable 3
+
+fix: `DocumentId(throwsOnForwardSlash:)` is typed `bool` (it was an untyped dynamic parameter)
+
+chore: Dart ^3.10.0; `equatable` >=2.1.0 <4.0.0; removed `universal_io`; `Failure` constructors are `const`
+
 ## 0.1.7
 
 chore: bump deps

@@ -6,15 +6,18 @@ import 'package:firefuel_core/src/models/document_id/document_id_model.dart';
 import 'package:firefuel_core/src/models/document_id/document_id_serializer.dart';
 
 void main() {
-  const docIdValue = 'someTestValue',
-      rawJson = """
+  const docIdValue = 'someTestValue';
+  const rawJson =
+      '''
     {
       "${DocumentId.fieldDocId}" : "$docIdValue"
     }
-    """;
+    ''';
 
   test('#fromJson should convert correctly', () {
-    final docId = DocumentIdSerializer.fromJson(json.decode(rawJson));
+    final docId = DocumentIdSerializer.fromJson(
+      json.decode(rawJson) as Map<String, dynamic>,
+    );
 
     expect(docId, isA<DocumentId>());
   });

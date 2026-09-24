@@ -13,7 +13,7 @@
 
 The goal of this package is to make it easy to interact with [Cloud Firestore](https://firebase.google.com/docs/firestore/) database. The `firefuel` community aims to always make this package simple, intuitive, and consistent. `firefuel` wraps the [cloud_firestore](https://pub.dev/packages/cloud_firestore) plugin, and provides conventions to help jump-start your development.
 
-Still not convinced? See our documentation on why we thing you should [choose firefuel](https://firefuel.dev/#/whyfirefuel)
+Still not convinced? See our documentation on why we think you should [choose firefuel](http://firefueldocs.com/#/whyfirefuel)
 
 # Scope
 
@@ -21,9 +21,11 @@ Still not convinced? See our documentation on why we thing you should [choose fi
 
 # Getting Started
 
-Simply add the latest version of `firefuel` as a dependency in your `pubspec.yaml` file. Import `package:firefuel/firefuel.dart` into your entry point (often `main.dart`). Then, initialize `firefuel` using the `Firefuel.initialize(FirebaseFirestore.instance);` before calling `runApp`.
+Add `firefuel` to your `pubspec.yaml` (it needs Dart 3.10 / Flutter 3.38 or newer). Import `package:firefuel/firefuel.dart` into your entry point (often `main.dart`). Then initialize `firefuel` with `Firefuel.initialize(FirebaseFirestore.instance);` before calling `runApp`.
 
-Read the full walkthrough in our [docs](https://firefuel.dev/#/gettingstarted?id=installation).
+Upgrading from 0.4? Read the [migration guide](http://firefueldocs.com/#/migrating).
+
+Read the full walkthrough in our [docs](http://firefueldocs.com/#/gettingstarted?id=installation).
 
 # Quick Start
 
@@ -31,12 +33,12 @@ Choose a collection from your Firestore db and create a class to model your docu
 
 Each model needs to extend `Serializable` so `firefuel` is able to automatically convert the model to JSON. We'll also want to add a `fromJson` method that we'll use to convert it from json into an instance of the model.
 
-Most of the time, when comparing two models of the same type, you want to know whether the two instances have identical values. However, by default, Dart will compare whether the instances reference the same object in memory. I suggest using the `equatable` package with your models to compare by value rather than by reference.
+Most of the time, when comparing two models of the same type, you want to know whether the two instances have identical values. However, by default, Dart will compare whether the instances reference the same object in memory. We suggest using the `equatable` package with your models to compare by value rather than by reference.
 
 ## Create a Model
 
 ```dart
-class User extends Serializable with EquatableMixin {
+class User extends Serializable with Equatable {
   const User({
     required this.docId,
     required this.favoriteColor,
@@ -86,11 +88,10 @@ class UserCollection extends FirefuelCollection<User> {
     DocumentSnapshot<Map<String, dynamic>> snapshot,
     SnapshotOptions? options,
   ) {
-    final data = snapshot.data();
-
-    return data == null
-        ? null
-        : User.fromJson(snapshot.data()!, snapshot.id);
+    return switch (snapshot.data()) {
+      final data? => User.fromJson(data, snapshot.id),
+      null => null,
+    };
   }
 
   @override
@@ -106,17 +107,34 @@ class UserCollection extends FirefuelCollection<User> {
 
 You can write out the above classes manually or generate them using the Mason CLI
 
-See the docs for more information: [firefuel brick](https://firefuel.dev/#/firefuelbrick)
+See the docs for more information: [firefuel brick](http://firefueldocs.com/#/firefuelbrick)
 
-## Profit
+## Use It
 
-That's it! Now you can access your data through the `UserCollection` with any of [the following methods](https://pub.dev/documentation/firefuel/latest/firefuel/FirefuelCollection-class.html).
+That's it. Every read, query, stream and write is now a typed method:
+
+```dart
+final users = UserCollection();
+
+final blueFans = await users.where([
+  Clause(User.fieldFavoriteColor, isEqualTo: 'blue'),
+]);
+final live = users.streamAll();
+await users.updateFields(
+  docId: DocumentId('ada'),
+  fields: {User.fieldFavoriteColor: 'green'},
+);
+```
+
+Beyond CRUD you get `Clause.or`, cursors and `limitToLast` through `FirefuelQuery`, server-side counts and aggregates, listening with cache and pending-write metadata, collection groups, `FieldUpdate` transforms (including `ServerTimestamp` straight from `toJson`), transactions, atomic batches and offline-friendly writes. See the [API guide](http://firefueldocs.com/#/firefuelapi) and the [full API reference](https://pub.dev/documentation/firefuel/latest/).
+
+Wrap the collection in a `FirefuelRepository` and each method returns `Either<Failure, T>` instead of throwing.
 
 # Related Links
 
 Follow the [official walkthrough](https://supposedlysam.medium.com/firefuel-basics-e4d97f1685c9) on Medium
 
-See the [firefuel documentation](https://firefuel.dev/#/coreconcepts) to learn the core concepts of using `firefuel`.
+See the [firefuel documentation](http://firefueldocs.com/#/coreconcepts) to learn the core concepts of using `firefuel`.
 
 # Issues and feedback
 

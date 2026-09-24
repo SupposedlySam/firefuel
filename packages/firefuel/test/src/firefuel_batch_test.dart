@@ -1,17 +1,18 @@
-import 'package:fake_cloud_firestore/fake_cloud_firestore.dart';
+import 'package:cloud_firestore/cloud_firestore.dart' show FirebaseException;
 import 'package:firefuel/firefuel.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../utils/test_collection.dart';
 import '../utils/test_user.dart';
+import '../utils/test_backend.dart';
 
 void main() {
   late FirefuelBatch<TestUser> testBatch;
   late TestCollection testCollection;
   const batman = TestUser('Bruce Wayne');
 
-  setUp(() {
-    Firefuel.initialize(FakeFirebaseFirestore());
+  setUp(() async {
+    Firefuel.initialize(await testFirestore());
 
     testCollection = TestCollection();
     testBatch = FirefuelBatch(testCollection);
@@ -60,6 +61,24 @@ void main() {
       await testBatch.commit();
 
       expect(testBatch.totalTransactionsCommitted, 1);
+    });
+
+    test('should hold a full batch until one more op arrives', () async {
+      for (var i = 0; i < testBatch.transactionLimit; i++) {
+        await testBatch.create(batman);
+      }
+
+      // A full batch has not been committed yet...
+      expect(testBatch.totalTransactionsCommitted, 0);
+      expect(testBatch.transactionSize, testBatch.transactionLimit);
+      expect(await testCollection.countAll(), 0);
+
+      await testBatch.create(batman);
+
+      // ...the op that does not fit commits it and starts the next batch.
+      expect(testBatch.totalTransactionsCommitted, testBatch.transactionLimit);
+      expect(testBatch.transactionSize, 1);
+      expect(await testCollection.countAll(), testBatch.transactionLimit);
     });
 
     group('should persist transaction count across batches', () {
@@ -152,10 +171,7 @@ void main() {
     final originalDocId = DocumentId('originalDocId');
 
     test('should create the document with provided id', () async {
-      await testBatch.createById(
-        value: batman,
-        docId: originalDocId,
-      );
+      await testBatch.createById(value: batman, docId: originalDocId);
 
       await testBatch.commit();
 
@@ -186,7 +202,7 @@ void main() {
   group('#replace', () {
     final originalDocId = DocumentId('originalDocId');
 
-    test('should fail silently when document does not exist', () async {
+    test('should fail the commit when document does not exist', () async {
       final dodoId = DocumentId('dodoId');
 
       await testBatch.replace(
@@ -194,31 +210,41 @@ void main() {
         value: const TestUser('Clark Kent'),
       );
 
-      await testBatch.commit();
-
-      final readResult = await testCollection.read(dodoId);
-
-      expect(readResult, isNull);
+      await expectLater(
+        testBatch.commit(),
+        throwsA(
+          isA<FirebaseException>().having((e) => e.code, 'code', 'not-found'),
+        ),
+      );
+      expect(await testCollection.read(dodoId), isNull);
     });
 
     test('should overwrite all values in document', () async {
       const newUser = TestUser('newUser');
       const updatedUser = TestUser('updatedUser');
 
-      await testBatch.createById(value: newUser, docId: originalDocId);
+      await testCollection.createById(value: newUser, docId: originalDocId);
+
+      await testBatch.replace(value: updatedUser, docId: originalDocId);
       await testBatch.commit();
 
-      await testBatch.replace(
-        value: updatedUser,
-        docId: originalDocId,
-      );
-
-      await testBatch.commit();
-
-      final readUser = await testCollection.read(originalDocId);
-
-      expect(updatedUser, readUser);
+      expect(await testCollection.read(originalDocId), updatedUser);
     });
+
+    // https://github.com/SupposedlySam/firefuel/issues/43
+    test(
+      'should replace a document created earlier in the same batch',
+      () async {
+        const newUser = TestUser('newUser');
+        const updatedUser = TestUser('updatedUser');
+
+        await testBatch.createById(value: newUser, docId: originalDocId);
+        await testBatch.replace(value: updatedUser, docId: originalDocId);
+        await testBatch.commit();
+
+        expect(await testCollection.read(originalDocId), updatedUser);
+      },
+    );
   });
 
   group('#replaceFields', () {
@@ -241,7 +267,10 @@ void main() {
 
       final updatedUser = await testCollection.read(docId);
 
-      expect(updatedUser!.name, replacementName);
+      expect(
+        updatedUser,
+        isA<TestUser>().having((user) => user.name, 'name', replacementName),
+      );
     });
 
     test('should not replace fields missing from the list', () async {
@@ -258,7 +287,14 @@ void main() {
 
       final unchangedUser = await testCollection.read(docId);
 
-      expect(unchangedUser!.name, isNot(replacementName));
+      expect(
+        unchangedUser,
+        isA<TestUser>().having(
+          (user) => user.name,
+          'name',
+          isNot(replacementName),
+        ),
+      );
     });
   });
 
@@ -290,10 +326,7 @@ void main() {
       const updatedDoc = TestUser('updateValue');
       final docId = await testCollection.create(batman);
 
-      await testBatch.update(
-        docId: docId,
-        value: updatedDoc,
-      );
+      await testBatch.update(docId: docId, value: updatedDoc);
 
       await testBatch.commit();
 
@@ -387,10 +420,7 @@ void main() {
       final originalDocId = DocumentId('originalDocId');
       const newUser = TestUser('newUser');
 
-      await testBatch.updateOrCreate(
-        docId: originalDocId,
-        value: newUser,
-      );
+      await testBatch.updateOrCreate(docId: originalDocId, value: newUser);
 
       await testBatch.commit();
 
@@ -403,10 +433,7 @@ void main() {
       const updatedDoc = TestUser('updateValue');
       final docId = await testCollection.create(batman);
 
-      await testBatch.updateOrCreate(
-        docId: docId,
-        value: updatedDoc,
-      );
+      await testBatch.updateOrCreate(docId: docId, value: updatedDoc);
 
       await testBatch.commit();
 

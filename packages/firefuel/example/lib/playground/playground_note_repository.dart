@@ -5,8 +5,8 @@ import 'playground_note_collection.dart';
 
 class PlaygroundNoteRepository extends FirefuelRepository<PlaygroundNote> {
   PlaygroundNoteRepository({required PlaygroundNoteCollection collection})
-      : _collection = collection,
-        super(collection: collection);
+    : _collection = collection,
+      super(collection: collection);
 
   final PlaygroundNoteCollection _collection;
 

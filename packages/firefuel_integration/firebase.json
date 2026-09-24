@@ -1,0 +1,1 @@
+{"flutter":{"platforms":{"ios":{"default":{"projectId":"firefuel-integration","appId":"1:675780430681:ios:d1baa43d0443108d249a48","uploadDebugSymbols":false,"fileOutput":"ios/Runner/GoogleService-Info.plist"}},"dart":{"lib/firebase_options.dart":{"projectId":"firefuel-integration","configurations":{"ios":"1:675780430681:ios:d1baa43d0443108d249a48"}}}}}}

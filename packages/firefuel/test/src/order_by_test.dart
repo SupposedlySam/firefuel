@@ -13,22 +13,22 @@ void main() {
       });
     });
 
-    test('should set direction to asc when newestToOldest is chosen', () {
+    test('should set direction to desc when newestToOldest is chosen', () {
       final instance = OrderBy(
         field: testField,
         direction: OrderDirection.newestToOldest,
       );
 
-      expect(instance.direction, OrderDirection.asc);
+      expect(instance.direction, OrderDirection.desc);
     });
 
-    test('should set direction to desc when oldestToNewest is chosen', () {
+    test('should set direction to asc when oldestToNewest is chosen', () {
       final instance = OrderBy(
         field: testField,
         direction: OrderDirection.oldestToNewest,
       );
 
-      expect(instance.direction, OrderDirection.desc);
+      expect(instance.direction, OrderDirection.asc);
     });
 
     test('should set direction to asc when falseToTrue is chosen', () {
@@ -40,17 +40,14 @@ void main() {
       expect(instance.direction, OrderDirection.asc);
     });
 
-    test(
-      'should set direction to desc when trueToFalse is chosen',
-      () {
-        final instance = OrderBy(
-          field: testField,
-          direction: OrderDirection.trueToFalse,
-        );
+    test('should set direction to desc when trueToFalse is chosen', () {
+      final instance = OrderBy(
+        field: testField,
+        direction: OrderDirection.trueToFalse,
+      );
 
-        expect(instance.direction, OrderDirection.desc);
-      },
-    );
+      expect(instance.direction, OrderDirection.desc);
+    });
 
     test('should set direction to asc when smallestToLargest is chosen', () {
       final instance = OrderBy(
@@ -61,17 +58,14 @@ void main() {
       expect(instance.direction, OrderDirection.asc);
     });
 
-    test(
-      'should set direction to desc when largestToSmallest is chosen',
-      () {
-        final instance = OrderBy(
-          field: testField,
-          direction: OrderDirection.largestToSmallest,
-        );
+    test('should set direction to desc when largestToSmallest is chosen', () {
+      final instance = OrderBy(
+        field: testField,
+        direction: OrderDirection.largestToSmallest,
+      );
 
-        expect(instance.direction, OrderDirection.desc);
-      },
-    );
+      expect(instance.direction, OrderDirection.desc);
+    });
 
     test('should set direction to asc when aToZ is chosen', () {
       final instance = OrderBy(

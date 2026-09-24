@@ -1,8 +1,7 @@
 import 'dart:async';
 
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firefuel/firefuel.dart';
-import 'package:firefuel/src/utils/serializable_extensions.dart';
+import 'package:firefuel/src/utils/field_updates.dart';
 import 'package:flutter/foundation.dart';
 
 class FirefuelBatch<T extends Serializable> extends Batch<T> with _BatchMixin {
@@ -39,17 +38,12 @@ class FirefuelBatch<T extends Serializable> extends Batch<T> with _BatchMixin {
   }
 
   @override
-  Future<void> replace({
-    required DocumentId docId,
-    required T value,
-    GetOptions? getOptions,
-  }) async {
-    await _addToBatch((batch) async {
-      final existingDoc = await collection.read(docId, getOptions: getOptions);
-
-      if (existingDoc == null) return;
-
-      batch.set(collection.ref.doc(docId.docId), value);
+  Future<void> replace({required DocumentId docId, required T value}) async {
+    // Reading here would run before the batch commits, so a createById
+    // earlier in the same batch was invisible and the replace was silently
+    // dropped (#43). update() checks existence at commit instead.
+    await _addToBatch((batch) {
+      batch.update(collection.ref.doc(docId.docId), collection.encode(value));
     });
   }
 
@@ -60,9 +54,10 @@ class FirefuelBatch<T extends Serializable> extends Batch<T> with _BatchMixin {
     required List<String> fieldPaths,
   }) async {
     await _addToBatch((batch) {
-      final replacement = value.toIsolatedJson(fieldPaths);
-
-      batch.update(collection.ref.doc(docId.docId), replacement);
+      batch.update(
+        collection.ref.doc(docId.docId),
+        collection.encodeFields(value, fieldPaths),
+      );
     });
   }
 
@@ -72,7 +67,7 @@ class FirefuelBatch<T extends Serializable> extends Batch<T> with _BatchMixin {
   @override
   Future<void> update({required DocumentId docId, required T value}) async {
     await _addToBatch((batch) {
-      batch.update(collection.ref.doc(docId.docId), value.toJson());
+      batch.update(collection.ref.doc(docId.docId), collection.encode(value));
     });
   }
 
@@ -82,7 +77,7 @@ class FirefuelBatch<T extends Serializable> extends Batch<T> with _BatchMixin {
     required Map<String, Object?> fields,
   }) async {
     await _addToBatch((batch) {
-      batch.update(collection.untypedRef.doc(docId.docId), fields);
+      batch.update(collection.ref.doc(docId.docId), FieldUpdates.lower(fields));
     });
   }
 
@@ -94,7 +89,7 @@ class FirefuelBatch<T extends Serializable> extends Batch<T> with _BatchMixin {
   }) {
     return updateFields(
       docId: docId,
-      fields: {field: FieldValue.arrayUnion(values)},
+      fields: {field: FieldUpdate.arrayUnion(values)},
     );
   }
 
@@ -106,7 +101,7 @@ class FirefuelBatch<T extends Serializable> extends Batch<T> with _BatchMixin {
   }) {
     return updateFields(
       docId: docId,
-      fields: {field: FieldValue.arrayRemove(values)},
+      fields: {field: FieldUpdate.arrayRemove(values)},
     );
   }
 
@@ -117,7 +112,27 @@ class FirefuelBatch<T extends Serializable> extends Batch<T> with _BatchMixin {
   }) {
     return updateFields(
       docId: docId,
-      fields: {field: FieldValue.serverTimestamp()},
+      fields: {field: const FieldUpdate.serverTimestamp()},
+    );
+  }
+
+  @override
+  Future<void> increment({
+    required DocumentId docId,
+    required String field,
+    required num by,
+  }) {
+    return updateFields(
+      docId: docId,
+      fields: {field: FieldUpdate.increment(by)},
+    );
+  }
+
+  @override
+  Future<void> deleteField({required DocumentId docId, required String field}) {
+    return updateFields(
+      docId: docId,
+      fields: {field: const FieldUpdate.delete()},
     );
   }
 
@@ -174,27 +189,20 @@ mixin _BatchMixin<T extends Serializable> on Batch<T> {
   /// Automatically commits the current batch and creates a new one when the
   /// [transactionLimit] is reached
   Future<void> _addToBatch(FutureOr<void> Function(WriteBatch) action) async {
-    // increment the size of the batch
-    _transactionSize++;
-
-    // if the batch is full, commit it
+    // Roll over before adding, so the op that does not fit starts the next
+    // batch and is counted there. Counting first (as before 0.5) committed
+    // 499 ops, then left the rolled-over op uncounted in the new batch.
     if (_transactionSize >= transactionLimit) {
       await _commitBatch();
 
       _createNewBatch();
     }
 
-    // execute the action
     await action(batch);
+
+    _transactionSize++;
   }
 
-  /// Commits all transactions in the batch.
-  ///
-  /// Calling this method prevents any future operations from being added.
-  ///
-  /// Should be called after all transactions have been added to the batch.
-  ///
-  /// {@macro firefuel.batch.size}
   Future<void> _commitBatch() async {
     await batch.commit();
 

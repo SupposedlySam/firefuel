@@ -22,7 +22,7 @@ extension MockCollectionX<T extends Serializable> on MockCollection<T> {
     Stream<List<T>> Function()? onStreamOrdered,
     Stream<List<T>> Function()? onStreamWhere,
     List<T> Function()? onOrderBy,
-    Chunk<T> Function()? onPaginate,
+    FirefuelPage<T> Function()? onPaginate,
     T? Function()? onRead,
     List<T?> Function()? onReadMany,
     List<T>? Function()? onReadAll,
@@ -45,7 +45,7 @@ extension MockCollectionX<T extends Serializable> on MockCollection<T> {
     registerFallbackValue(<String, Object?>{});
     registerFallbackValue(const TestUser('fallbackValue'));
     registerFallbackValue(
-      Chunk<TestUser>(orderBy: [OrderBy(field: TestUser.fieldName)]),
+      FirefuelQuery(orderBy: [OrderBy(field: TestUser.fieldName)]),
     );
 
     if (onCreate != null) {
@@ -102,22 +102,19 @@ extension MockCollectionX<T extends Serializable> on MockCollection<T> {
           orderBy: any(named: 'orderBy'),
           limit: any(named: 'limit'),
         );
-      }).thenAnswer(
-        (_) => onStreamWhere(),
-      );
+      }).thenAnswer((_) => onStreamWhere());
     }
 
     if (onOrderBy != null) {
       when(
-        () => orderBy(
-          any(),
-          limit: any(named: 'limit'),
-        ),
+        () => orderBy(any(), limit: any(named: 'limit')),
       ).thenAnswer((_) => Future.value(onOrderBy()));
     }
 
     if (onPaginate != null) {
-      when(() => paginate(any())).thenAnswer((_) => Future.value(onPaginate()));
+      when(
+        () => paginate(any(), after: any(named: 'after')),
+      ).thenAnswer((_) => Future.value(onPaginate()));
     }
 
     if (onRead != null) {
@@ -161,8 +158,12 @@ extension MockCollectionX<T extends Serializable> on MockCollection<T> {
     }
 
     if (onUpdate != null) {
-      when(() => update(docId: any(named: 'docId'), value: any(named: 'value')))
-          .thenAnswer((_) => Future.value(onUpdate()));
+      when(
+        () => update(
+          docId: any(named: 'docId'),
+          value: any(named: 'value'),
+        ),
+      ).thenAnswer((_) => Future.value(onUpdate()));
     }
 
     if (onArrayRemove != null) {
@@ -223,8 +224,9 @@ extension MockCollectionX<T extends Serializable> on MockCollection<T> {
     }
 
     if (onWhereById != null) {
-      when(() => whereById(any()))
-          .thenAnswer((_) => Future.value(onWhereById()));
+      when(
+        () => whereById(any()),
+      ).thenAnswer((_) => Future.value(onWhereById()));
     }
   }
 }

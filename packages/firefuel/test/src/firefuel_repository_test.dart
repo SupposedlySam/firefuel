@@ -165,15 +165,13 @@ void main() {
     mockCollection: MockCollection(),
     initHappyPath: (mockCollection) async {
       mockCollection.initialize(
-        onStreamWhere: () => Stream.fromIterable(
+        onStreamWhere: () => Stream.fromIterable([
           [
-            [
-              const TestUser('unexpectedUser1'),
-              const TestUser('expectedUser'),
-              const TestUser('unexpectedUser2'),
-            ]
+            const TestUser('unexpectedUser1'),
+            const TestUser('expectedUser'),
+            const TestUser('unexpectedUser2'),
           ],
-        ),
+        ]),
       );
     },
     initSadPath: (mockCollection) async {
@@ -191,26 +189,23 @@ void main() {
     mockCollection: MockCollection(),
     initHappyPath: (mockCollection) async {
       mockCollection.initialize(
-        onStreamWhere: () => Stream.fromIterable(
+        onStreamWhere: () => Stream.fromIterable([
           [
-            [
-              const TestUser('unexpectedUser1'),
-              const TestUser('expectedUser'),
-              const TestUser('expectedUser'),
-              const TestUser('unexpectedUser2'),
-            ]
+            const TestUser('unexpectedUser1'),
+            const TestUser('expectedUser'),
+            const TestUser('expectedUser'),
+            const TestUser('unexpectedUser2'),
           ],
-        ),
+        ]),
       );
     },
     initSadPath: (mockCollection) async {
       mockCollection.initialize(onStreamWhere: () => throw ExpectedFailure());
     },
     streamCallback: (testRepository) {
-      return testRepository.streamWhere(
-        [Clause(TestUser.fieldName, isEqualTo: 'expectedUser')],
-        limit: 1,
-      );
+      return testRepository.streamWhere([
+        Clause(TestUser.fieldName, isEqualTo: 'expectedUser'),
+      ], limit: 1);
     },
   );
 
@@ -219,16 +214,14 @@ void main() {
     mockCollection: MockCollection(),
     initHappyPath: (mockCollection) async {
       mockCollection.initialize(
-        onStreamWhere: () => Stream.fromIterable(
+        onStreamWhere: () => Stream.fromIterable([
           [
-            [
-              const TestUser('unexpectedUser1'),
-              const TestUser('expectedUser'),
-              const TestUser('expectedUser'),
-              const TestUser('unexpectedUser2'),
-            ]
+            const TestUser('unexpectedUser1'),
+            const TestUser('expectedUser'),
+            const TestUser('expectedUser'),
+            const TestUser('unexpectedUser2'),
           ],
-        ),
+        ]),
       );
     },
     initSadPath: (mockCollection) async {
@@ -282,19 +275,13 @@ void main() {
         testRepository.orderBy([OrderBy(field: TestUser.fieldName)], limit: 1),
   );
 
-  RepositoryTestUtil.runTests<Chunk<TestUser>, TestUser>(
+  RepositoryTestUtil.runTests<FirefuelPage<TestUser>, TestUser>(
     methodName: 'paginate',
     mockCollection: MockCollection(),
     initHappyPath: (mockCollection) async {
       mockCollection.initialize(
         onPaginate: () {
-          return Chunk<TestUser>(
-            orderBy: [
-              OrderBy(
-                field: TestUser.fieldName,
-              ),
-            ],
-          );
+          return const Chunk<TestUser, DocumentSnapshot<TestUser?>>();
         },
       );
     },
@@ -303,13 +290,7 @@ void main() {
     },
     methodCallback: (testRepository) {
       return testRepository.paginate(
-        Chunk<TestUser>(
-          orderBy: [
-            OrderBy(
-              field: TestUser.fieldName,
-            ),
-          ],
-        ),
+        FirefuelQuery(orderBy: [OrderBy(field: TestUser.fieldName)]),
       );
     },
   );
@@ -480,10 +461,7 @@ void main() {
       );
     },
     methodCallback: (testRepository) {
-      return testRepository.serverTimestamp(
-        docId: docId,
-        field: 'updatedAt',
-      );
+      return testRepository.serverTimestamp(docId: docId, field: 'updatedAt');
     },
   );
 
@@ -545,10 +523,9 @@ void main() {
       mockCollection.initialize(onWhere: () => throw ExpectedFailure());
     },
     methodCallback: (testRepository) {
-      return testRepository.where(
-        [Clause(TestUser.fieldName, isEqualTo: 'expectedUser')],
-        limit: 1,
-      );
+      return testRepository.where([
+        Clause(TestUser.fieldName, isEqualTo: 'expectedUser'),
+      ], limit: 1);
     },
   );
 

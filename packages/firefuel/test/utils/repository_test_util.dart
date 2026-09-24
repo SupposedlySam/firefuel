@@ -4,10 +4,10 @@ import 'package:firefuel/firefuel.dart';
 import '../mocks/mock_collection.dart';
 import 'test_repository.dart';
 
-typedef FutureCallback<R, T extends Serializable> = Future<Either<Failure, R>>
-    Function(TestRepository<T>);
-typedef StreamCallback<R, T extends Serializable> = Stream<Either<Failure, R>>
-    Function(TestRepository<T>);
+typedef FutureCallback<R, T extends Serializable> =
+    Future<Either<Failure, R>> Function(TestRepository<T>);
+typedef StreamCallback<R, T extends Serializable> =
+    Stream<Either<Failure, R>> Function(TestRepository<T>);
 typedef Initializer<T extends Serializable> = void Function(MockCollection<T>);
 
 class RepositoryTestUtil {
