@@ -111,3 +111,6 @@ pubspec.lock
 
 # Firebase emulator logs
 *-debug.log
+
+# lamp is a local tool manager; its lockfile describes this machine, not the package
+lamp.lock
