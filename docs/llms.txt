@@ -191,6 +191,8 @@ Use `fake_cloud_firestore`: `Firefuel.initialize(FakeFirebaseFirestore())` in `s
 - It never reports `isFromCache` or `hasPendingWrites` as true, can't go offline, and doesn't roll back a transaction whose handler throws.
 - It applies query operations in call order and notifies listeners per reference type. firefuel already accounts for both.
 
+The fake also accepts queries Firestore rejects (two `!=` filters, a model object as a filter value), returns documents in insertion order where Firestore returns id order, emits one stream event per write where a real listener can merge writes, and never asks for a composite index. Run important queries against the Firestore emulator, and against a real project before release; the emulator doesn't enforce indexes either.
+
 Mock `Collection<T>` (with mocktail) to unit-test repositories. Stub exact arguments, not `any()`, so a dropped argument fails the test.
 
 ## Working on firefuel
@@ -198,6 +200,8 @@ Mock `Collection<T>` (with mocktail) to unit-test repositories. Stub exact argum
 Read `CLAUDE.md` at the repository root first. The short version:
 
 - It's a pub workspace. Run `flutter pub get` at the root; Flutter is pinned in `.fvmrc`.
+- The same test files run against the fake (`flutter test`), the Firestore emulator (`tool/test_real_firestore.sh`, macOS) and the live `firefuel-integration` project (`tool/test_live_firestore.sh`, iOS simulator; it deletes every document there). See "Testing against real Firestore" in `CLAUDE.md`.
+- Library code has no `!` (null assertion); CI enforces it with `tool/check_null_assertions.sh`.
 - CI runs `dart format --set-exit-if-changed` on `packages/firefuel/{lib,test,example/lib,example/test}` and `packages/firefuel_core`, then `dart analyze --fatal-infos`, `dart test` in firefuel_core, and `flutter test` in firefuel and in example.
 - **Pushing to `main` deploys the docs site** (GitHub Pages serves `docs/`). Work on a branch. Never publish to pub from a branch. On release, publish `firefuel_core` before `firefuel`.
 - Reads lower in one place: `FirefuelQuery.applyTo`, via the `FirefuelQueryReads` mixin. Writes serialize in one place: `FirefuelCollection.encode` → `FieldUpdates.lower`. The capability interfaces live in `lib/src/rules.dart`.

@@ -155,6 +155,19 @@ With cursors or `limitToLast`, write the order Firestore needs: any range-filter
 
 A query is immutable; use `copyWith` to derive variations.
 
+### Indexes
+
+Production Firestore needs a composite index for many query shapes. Without one, the query fails with `failed-precondition` and an error message whose link creates the index in the console. **The Firestore emulator doesn't enforce indexes**, so these only fail against a real project. From firefuel's own live test run, shapes that need an index include:
+
+- a filter on one field with an `orderBy` on another (`where([...], orderBy: [...])`, and a `FirefuelQuery` or `Chunk` with both)
+- `sumWhere`, `averageWhere` and `aggregate` with clauses, when the clause and the aggregated field differ
+- range filters on two or more fields
+- `Clause.or` combined with a top-level clause
+- `OrderBy.docId(OrderDirection.desc)`, a descending document-id sort, even on its own (the emulator refuses this one outright)
+- filtered collection-group queries (a collection-group single-field index)
+
+Keep indexes in `firestore.indexes.json` and deploy them with `firebase deploy --only firestore:indexes`, so they're reviewed like code.
+
 ## Pagination
 
 `paginate` reads one page at a time. Pass back the `Chunk` it returns until its `status` is `ChunkStatus.last`.

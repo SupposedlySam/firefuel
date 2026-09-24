@@ -50,6 +50,28 @@ mixin. Every write serializes through `FirefuelCollection.encode`, which lowers 
 in `FieldUpdates.lower`. Repositories wrap each call in `guard`, which reports failures to
 `Firefuel.observer`.
 
+## Testing against real Firestore
+
+The firefuel test files run on three backends. They get Firestore from `testFirestore()`
+(`packages/firefuel/test/utils/test_backend.dart`), which is the fake unless a backend is installed.
+
+| Command | Backend | Where |
+|---|---|---|
+| `flutter test` in packages/firefuel | fake_cloud_firestore | anywhere, CI `verify` |
+| `tool/test_real_firestore.sh` | Firestore emulator (demo project, open rules) | macOS, CI `real-firestore` |
+| `tool/test_live_firestore.sh` | live `firefuel-integration` project (Spark, free) | iOS simulator, on demand |
+
+- Every test gets an empty database and a new Firebase app. A shared instance leaks between
+  tests (check with `tool/test_real_firestore.sh --shared-instance`).
+- A test that needs a second isolated Firestore uses `otherTestFirestore()` with
+  `skip: skipWithoutOtherFirestore`. Emulator-only gaps use `skip: emulatorGap('...')`.
+- Live runs delete **every document** in `firefuel-integration` before each test. Its rules
+  admit one uid, `firefuel-integration-suite`, which the script signs in with a per-run custom
+  token (needs the Service Account Token Creator role on the Admin SDK service account).
+- New query shapes may need indexes in production: add them to
+  `packages/firefuel_integration/firestore.indexes.json` and
+  `firebase deploy --only firestore:indexes --project firefuel-integration`.
+
 ## Testing traps (all hit while building 0.5)
 
 - fake_cloud_firestore applies query operations **in call order**. Cursors must be applied

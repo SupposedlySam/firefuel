@@ -3,7 +3,7 @@
 ## Metadata
 - **Type:** Infrastructure
 - **Appetite:** 2 days
-- **Status:** Bet (started 2026-09-24)
+- **Status:** Done (2026-09-24)
 - **Created:** 2026-09-24
 - **Breaking:** no
 
@@ -34,3 +34,21 @@ the code agrees with the fake, not with Firestore.
 ## How it fails
 - The emulator doesn't enforce composite indexes. Only the live run shows a missing index.
 - Live runs are slow (network per test) and count against the free quota.
+
+## Outcome (2026-09-24)
+- **Emulator** (macOS and iOS simulator, CI `real-firestore` job): 225 passed, 1 skipped (a named
+  emulator gap, `orderBy(documentId, desc)`).
+- **Live** `firefuel-integration` (iOS simulator): 218 passed, 8 skipped. The skips are the tests
+  that need a second isolated Firestore.
+- **What the fake hid.** 19 tests passed on the fake and failed on the emulator. None was a
+  firefuel bug. They were queries Firestore rejects (two `!=`, a model as a filter value),
+  one-event-per-write stream assumptions, insertion-order assumptions, and zero-latency
+  assumptions. All were rewritten to hold on both backends.
+- **What the emulator hid.** Composite indexes, which production needs for 7 query shapes and 2
+  collection-group fields (`firestore.indexes.json`). They're now documented in the API guide.
+- **Mutation-checked.** Restoring the 0.4.7 `OrderDirection` mapping fails the four direction tests
+  on the emulator.
+- **Things learned.** Firebase Auth on macOS needs a provisioned keychain entitlement, so live runs
+  use the iOS simulator. Password sign-in per test hit Auth's quota, so runs use a per-run custom
+  token instead. A shared Firestore instance leaks between tests.
+- **Not done.** Live runs aren't in CI (by decision; no credential in CI).
