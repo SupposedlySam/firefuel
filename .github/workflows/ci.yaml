@@ -32,6 +32,8 @@ jobs:
           packages/firefuel/lib packages/firefuel/test
           packages/firefuel/example/lib packages/firefuel/example/test
           packages/firefuel_core
+          packages/firefuel_integration/integration_test
+          packages/firefuel_integration/test
 
       - name: Analyze
         run: dart analyze --fatal-infos
@@ -48,7 +50,38 @@ jobs:
         working-directory: packages/firefuel/example
         run: flutter test
 
+      - name: Check the real-Firestore suite covers every test file
+        working-directory: packages/firefuel_integration
+        run: flutter test test
+
       - name: Publish dry run
         run: |
           (cd packages/firefuel_core && dart pub publish --dry-run)
           (cd packages/firefuel && flutter pub publish --dry-run)
+
+  # The same firefuel test files, against the Firestore emulator instead of
+  # fake_cloud_firestore. cloud_firestore has no Linux desktop support, so this
+  # runs on macOS.
+  real-firestore:
+    runs-on: macos-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: kuhnroyal/flutter-fvm-config-action/setup@v3
+        with:
+          path: .fvmrc
+
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      - name: Install the Firebase CLI
+        run: npm install -g firebase-tools
+
+      - name: Resolve the workspace
+        run: flutter pub get
+
+      - name: Run firefuel's tests against the Firestore emulator
+        run: tool/test_real_firestore.sh

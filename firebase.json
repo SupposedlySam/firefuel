@@ -1,0 +1,6 @@
+{
+  "firestore": {
+    "rules": "packages/firefuel_integration/firestore.rules",
+    "indexes": "packages/firefuel_integration/firestore.indexes.json"
+  }
+}

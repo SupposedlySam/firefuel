@@ -108,3 +108,6 @@ app.*.map.json
 .llm_chat/
 pubspec.lock
 .fvm/
+
+# Firebase emulator logs
+*-debug.log

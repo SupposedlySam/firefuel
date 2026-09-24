@@ -1,0 +1,24 @@
+name: firefuel_integration
+description: Runs firefuel's test suite against real Firestore (the emulator, or a live project).
+publish_to: none
+
+environment:
+  sdk: ^3.10.0
+
+resolution: workspace
+
+dependencies:
+  cloud_firestore: ^6.10.0
+  firebase_core: ^4.15.0
+  firefuel: ^0.5.0
+  flutter:
+    sdk: flutter
+
+dev_dependencies:
+  fake_cloud_firestore: ^4.3.0
+  flutter_test:
+    sdk: flutter
+  integration_test:
+    sdk: flutter
+  mocktail: ^1.0.5
+  stack_trace: ^1.12.2

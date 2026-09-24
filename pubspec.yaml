@@ -9,6 +9,7 @@ workspace:
   - packages/firefuel
   - packages/firefuel/example
   - packages/firefuel_core
+  - packages/firefuel_integration
 
 dev_dependencies:
   very_good_analysis: ^11.0.0
