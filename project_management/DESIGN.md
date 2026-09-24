@@ -70,6 +70,14 @@ directly (flyby-owner, 2026-09-23).
 return a group. The orderBy rewrite applies to top-level AND field clauses only.
 *Rejected:* a type named `Filter`, which collides with cloud_firestore's.
 
+### D8. The server-timestamp sentinel lives in `firefuel_core`
+flyby's shared model package depends on `firefuel_core` only, with no Flutter and no
+cloud_firestore. That's why flyby invented a `ServerValue` enum. A const `ServerTimestamp()`
+that `toJson` can return, lowered by firefuel on every write path, removes flyby's
+`create`/`createById` overrides.
+
+## 2026-09-24
+
 ### D9. Primary constructors: not yet (2026-09-24)
 They became stable in Dart 3.13 (July 2026) and would remove boilerplate from about 20
 firefuel classes. Adopting them means raising the minimum from Dart 3.10 to 3.13
@@ -83,9 +91,3 @@ The maintainer's `chunk` package (`Chunk<T, Cursor>`, `Chunker`) is what `pagina
 builds on. firefuel had its own `Chunk`, and flyby imports both, hiding firefuel's. Decision:
 update `chunk` to 2.0 (Dart 3, no `Failure` name clash with firefuel_core), then have
 firefuel build on it. Release order becomes chunk 2.0 → firefuel_core → firefuel.
-
-### D8. The server-timestamp sentinel lives in `firefuel_core`
-flyby's shared model package depends on `firefuel_core` only, with no Flutter and no
-cloud_firestore. That's why flyby invented a `ServerValue` enum. A const `ServerTimestamp()`
-that `toJson` can return, lowered by firefuel on every write path, removes flyby's
-`create`/`createById` overrides.
