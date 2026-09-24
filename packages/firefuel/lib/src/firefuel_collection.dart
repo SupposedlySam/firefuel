@@ -115,9 +115,10 @@ abstract class FirefuelCollection<T extends Serializable>
 
     await createById(value: createValue, docId: docId);
 
-    final data = await read(docId, getOptions: getOptions);
-
-    return data!;
+    // Read back for server-computed fields (e.g. a ServerTimestamp). If the
+    // converter cannot turn the stored document into a T, fall back to what
+    // was written rather than throw on a null.
+    return await read(docId, getOptions: getOptions) ?? createValue;
   }
 
   @override

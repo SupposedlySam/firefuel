@@ -38,6 +38,9 @@ jobs:
       - name: Analyze
         run: dart analyze --fatal-infos
 
+      - name: No null assertions in library code
+        run: tool/check_null_assertions.sh
+
       - name: Test firefuel_core
         working-directory: packages/firefuel_core
         run: dart test

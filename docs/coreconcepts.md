@@ -114,7 +114,7 @@ class FriendCollection extends FirefuelCollection<Friend> {
     FriendCollection(this.docId) :
         super('${UserCollection.name}/${docId.docId}/$name');
 
-    static const String name = 'friends'
+    static const String name = 'friends';
     final DocumentId docId;
 
     ...
@@ -128,10 +128,9 @@ Now, let's tie it all together. We'll create an extension method on `User` calle
 
 ```dart
 extension UserSubcollectionX on User {
-  FriendCollection get friends {
-    // The docId below is a property on the User
-    return FriendCollection(docId!);
-  }
+  // docId is a property on the User. It's non-nullable here: a User read from
+  // Firestore always has one, so the subcollection path can't be built from null.
+  FriendCollection get friends => FriendCollection(DocumentId(docId));
 }
 ```
 
@@ -201,11 +200,10 @@ class ProfileNotFound extends Failure {
 }
 
 Either<Failure, Profile> parseProfile(Map<String, dynamic>? json) {
-  try {
-    return Right(Profile.fromJson(json!));
-  } on Object catch (e, stackTrace) {
-    return Left(ProfileNotFound(e, stackTrace: Chain.forTrace(stackTrace)));
+  if (json == null) {
+    return Left(ProfileNotFound('no profile document', stackTrace: Chain.current()));
   }
+  return Right(Profile.fromJson(json));
 }
 ```
 
@@ -266,10 +264,21 @@ readResult.fold(left, (success) => print(success.toString()));
 
 #### Map
 
-Since the `read` method returns a nullable type, you may want to take the value returned and cast it as a non-nullable type instead. To do this, you can use the `map` method on your `Either` type.
+The `map` method transforms the success value and leaves a failure untouched. For example, `read` returns a nullable value; turn "missing" into something your UI can show without asserting it away with `!`:
 
 ```dart
-return readResult.map((nullableSuccess) => nullableSuccess!);
+final titleResult = readResult.map((maybeNote) => maybeNote?.title ?? 'Untitled');
+```
+
+Or, when a missing document is itself a failure, use `flatMap`:
+
+```dart
+final noteResult = readResult.flatMap(
+  (maybeNote) => switch (maybeNote) {
+    final note? => Right(note),
+    null => Left(NoteNotFound('welcome', stackTrace: Chain.current())),
+  },
+);
 ```
 
 The `map` method is considered "right bias", which means the value being passed into your callback will be the value on the "right" side. aka. the success value.

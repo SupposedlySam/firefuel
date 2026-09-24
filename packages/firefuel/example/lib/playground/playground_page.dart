@@ -312,9 +312,11 @@ class _PlaygroundPageState extends State<PlaygroundPage> {
 
   Future<String> _pinFirstNote() async {
     final note = await _firstNote();
-    if (note?.docId == null) return 'Create a note first.';
-
-    final docId = DocumentId(note!.docId!);
+    final docId = switch (note?.docId) {
+      final id? => DocumentId(id),
+      null => null,
+    };
+    if (note == null || docId == null) return 'Create a note first.';
     await _collection.update(
       docId: docId,
       value: note.copyWith(views: note.views + 1),
@@ -333,9 +335,11 @@ class _PlaygroundPageState extends State<PlaygroundPage> {
 
   Future<String> _toggleTag() async {
     final note = await _firstNote();
-    if (note?.docId == null) return 'Create a note first.';
-
-    final docId = DocumentId(note!.docId!);
+    final docId = switch (note?.docId) {
+      final id? => DocumentId(id),
+      null => null,
+    };
+    if (note == null || docId == null) return 'Create a note first.';
     if (note.tags.contains('playground')) {
       await _collection.arrayRemove(
         docId: docId,
@@ -402,10 +406,11 @@ class _PlaygroundPageState extends State<PlaygroundPage> {
 
   Future<String> _applyFieldUpdates() async {
     final note = await _firstNote();
-    if (note?.docId == null) return 'Create a note first.';
+    final id = note?.docId;
+    if (note == null || id == null) return 'Create a note first.';
 
     await _collection.updateFields(
-      docId: DocumentId(note!.docId!),
+      docId: DocumentId(id),
       fields: {
         PlaygroundNote.fieldViews: const FieldUpdate.increment(10),
         PlaygroundNote.fieldTags: const FieldUpdate.arrayUnion(['updated']),
@@ -420,11 +425,16 @@ class _PlaygroundPageState extends State<PlaygroundPage> {
     final notes = await _collection.orderBy([
       OrderBy(field: PlaygroundNote.fieldTitle),
     ], limit: 2);
-    if (notes.length < 2) return 'Seed at least two notes first.';
+    if (notes case [
+      PlaygroundNote(docId: final fromDocId?),
+      PlaygroundNote(docId: final toDocId?),
+    ]) {
+      return _moveAViewBetween(DocumentId(fromDocId), DocumentId(toDocId));
+    }
+    return 'Seed at least two notes first.';
+  }
 
-    final fromId = DocumentId(notes[0].docId!);
-    final toId = DocumentId(notes[1].docId!);
-
+  Future<String> _moveAViewBetween(DocumentId fromId, DocumentId toId) {
     return Firefuel.runTransaction((transaction) async {
       final scope = transaction.of(_collection);
       final from = await scope.read(fromId);
@@ -499,14 +509,13 @@ class _PlaygroundPageState extends State<PlaygroundPage> {
     ]);
     final demoNote = notes
         .where((note) => note.title.startsWith('Created note'))
-        .where((note) => note.docId != null)
         .firstOrNull();
 
-    if (demoNote == null) return 'Create a demo note before deleting one.';
-
-    await _collection.delete(DocumentId(demoNote.docId!));
-
-    return 'Deleted "${demoNote.title}".';
+    if (demoNote case PlaygroundNote(:final title, docId: final id?)) {
+      await _collection.delete(DocumentId(id));
+      return 'Deleted "$title".';
+    }
+    return 'Create a demo note before deleting one.';
   }
 
   Future<PlaygroundNote?> _firstNote() async {

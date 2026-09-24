@@ -31,7 +31,10 @@ class Chunk<T> {
   /// Paging walks forward from the start of the order, so a query using
   /// `limitToLast` or a start cursor cannot be paginated.
   Chunk.query(FirefuelQuery query)
-    : query = _withPageSize(query),
+    : this._first(query, query.limit ?? defaultLimit);
+
+  Chunk._first(FirefuelQuery query, this.limit)
+    : query = _forPaging(query, limit),
       data = const [],
       cursor = null,
       status = ChunkStatus.nextAvailable;
@@ -41,7 +44,7 @@ class Chunk<T> {
     required this.cursor,
     List<OrderBy>? orderBy,
     List<Clause>? clauses,
-    int limit = defaultLimit,
+    this.limit = defaultLimit,
   }) : query = FirefuelQuery(
          orderBy: orderBy ?? const [],
          clauses: clauses ?? const [],
@@ -54,7 +57,7 @@ class Chunk<T> {
     required this.cursor,
     List<OrderBy>? orderBy,
     List<Clause>? clauses,
-    int limit = defaultLimit,
+    this.limit = defaultLimit,
   }) : query = FirefuelQuery(
          orderBy: orderBy ?? const [],
          clauses: clauses ?? const [],
@@ -64,6 +67,7 @@ class Chunk<T> {
 
   Chunk._page({
     required this.query,
+    required this.limit,
     required this.data,
     required this.cursor,
     required this.status,
@@ -82,8 +86,9 @@ class Chunk<T> {
 
   final ChunkStatus status;
 
-  /// Page size.
-  int get limit => query.limit!;
+  /// Page size. Always set: every constructor fills it, and [query] carries
+  /// the same value.
+  final int limit;
 
   List<OrderBy> get orderBy => query.orderBy;
 
@@ -99,13 +104,14 @@ class Chunk<T> {
   }) {
     return Chunk._page(
       query: query,
+      limit: limit,
       data: data,
       cursor: cursor,
       status: isLast ? ChunkStatus.last : ChunkStatus.nextAvailable,
     );
   }
 
-  static FirefuelQuery _withPageSize(FirefuelQuery query) {
+  static FirefuelQuery _forPaging(FirefuelQuery query, int limit) {
     if (query.limitToLast != null || query.start != null) {
       throw ArgumentError(
         'paginate walks forward from the start of the order; '
@@ -113,6 +119,6 @@ class Chunk<T> {
       );
     }
 
-    return query.limit == null ? query.copyWith(limit: defaultLimit) : query;
+    return query.copyWith(limit: limit);
   }
 }

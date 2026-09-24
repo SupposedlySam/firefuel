@@ -925,12 +925,15 @@ void main() {
         value: const TestUser('new'),
       );
 
-      final replaced = await testCollection.read(originalDocId);
-      // toJson always writes age, so a null age overwrites the stored 3...
-      expect(replaced!.name, 'new');
-      expect(replaced.age, isNull);
-      // ...but it omits tags when null, and a field it does not write stays.
-      expect(replaced.tags, ['x']);
+      expect(
+        await testCollection.read(originalDocId),
+        isA<TestUser>()
+            .having((user) => user.name, 'name', 'new')
+            // toJson always writes age, so null overwrites the stored 3...
+            .having((user) => user.age, 'age', isNull)
+            // ...but omits tags when null, and a field it does not write stays.
+            .having((user) => user.tags, 'tags', ['x']),
+      );
     });
 
     test('should overwrite all values in document', () async {
@@ -965,7 +968,10 @@ void main() {
 
       final updatedUser = await testCollection.read(docId);
 
-      expect(updatedUser!.name, replacementName);
+      expect(
+        updatedUser,
+        isA<TestUser>().having((user) => user.name, 'name', replacementName),
+      );
     });
 
     test('should not replace fields missing from the list', () async {
@@ -980,7 +986,14 @@ void main() {
 
       final unchangedUser = await testCollection.read(docId);
 
-      expect(unchangedUser!.name, isNot(replacementName));
+      expect(
+        unchangedUser,
+        isA<TestUser>().having(
+          (user) => user.name,
+          'name',
+          isNot(replacementName),
+        ),
+      );
     });
   });
 

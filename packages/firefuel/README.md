@@ -88,11 +88,10 @@ class UserCollection extends FirefuelCollection<User> {
     DocumentSnapshot<Map<String, dynamic>> snapshot,
     SnapshotOptions? options,
   ) {
-    final data = snapshot.data();
-
-    return data == null
-        ? null
-        : User.fromJson(snapshot.data()!, snapshot.id);
+    return switch (snapshot.data()) {
+      final data? => User.fromJson(data, snapshot.id),
+      null => null,
+    };
   }
 
   @override

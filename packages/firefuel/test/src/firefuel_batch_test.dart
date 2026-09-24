@@ -267,7 +267,10 @@ void main() {
 
       final updatedUser = await testCollection.read(docId);
 
-      expect(updatedUser!.name, replacementName);
+      expect(
+        updatedUser,
+        isA<TestUser>().having((user) => user.name, 'name', replacementName),
+      );
     });
 
     test('should not replace fields missing from the list', () async {
@@ -284,7 +287,14 @@ void main() {
 
       final unchangedUser = await testCollection.read(docId);
 
-      expect(unchangedUser!.name, isNot(replacementName));
+      expect(
+        unchangedUser,
+        isA<TestUser>().having(
+          (user) => user.name,
+          'name',
+          isNot(replacementName),
+        ),
+      );
     });
   });
 

@@ -239,7 +239,10 @@ class ReactionGroup extends FirefuelCollectionGroup<Reaction> {
 
   @override
   Reaction? fromFirestore(DocumentSnapshot<Map<String, dynamic>> snapshot, _) =>
-      Reaction.fromJson(snapshot.data()!);
+      switch (snapshot.data()) {
+        final data? => Reaction.fromJson(data),
+        null => null,
+      };
 }
 
 final reactions = await ReactionGroup().snapshots(
@@ -342,10 +345,11 @@ await Firefuel.runTransaction((transaction) async {
   final accounts = transaction.of(accountCollection);
   final from = await accounts.read(fromId);
   final to = await accounts.read(toId);
+  if (from == null || to == null) throw StateError('unknown account');
 
   accounts
-    ..update(docId: fromId, value: from!.withdraw(amount))
-    ..update(docId: toId, value: to!.deposit(amount));
+    ..update(docId: fromId, value: from.withdraw(amount))
+    ..update(docId: toId, value: to.deposit(amount));
 });
 ```
 

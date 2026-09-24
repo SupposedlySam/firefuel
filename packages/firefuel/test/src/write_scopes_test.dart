@@ -37,16 +37,21 @@ void main() {
       final result = await Firefuel.runTransaction((transaction) async {
         final scope = transaction.of(users);
         final read = await scope.read(fryId);
-
-        scope.update(
-          docId: fryId,
-          value: TestUser(read!.name, age: read.age! + 1),
-        );
-        return read.age;
+        if (read case TestUser(:final name, age: final age?)) {
+          scope.update(
+            docId: fryId,
+            value: TestUser(name, age: age + 1),
+          );
+          return age;
+        }
+        fail('fry should be readable with an age, got $read');
       });
 
       expect(result, 25);
-      expect((await users.read(fryId))!.age, 26);
+      expect(
+        await users.read(fryId),
+        isA<TestUser>().having((user) => user.age, 'age', 26),
+      );
     });
 
     test('should write to several collections atomically', () async {
@@ -165,7 +170,10 @@ void main() {
           );
       await batch.commit();
 
-      expect((await users.read(fryId))!.age, 35);
+      expect(
+        await users.read(fryId),
+        isA<TestUser>().having((user) => user.age, 'age', 35),
+      );
     });
 
     test('replace should see a create queued earlier in the batch', () async {

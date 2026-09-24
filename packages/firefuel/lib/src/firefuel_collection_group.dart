@@ -13,8 +13,10 @@ import 'package:firefuel/firefuel.dart';
 ///   ReactionGroup() : super('reactions');
 ///
 ///   @override
-///   Reaction? fromFirestore(snapshot, options) =>
-///       Reaction.fromJson(snapshot.data()!);
+///   Reaction? fromFirestore(snapshot, options) => switch (snapshot.data()) {
+///     final data? => Reaction.fromJson(data),
+///     null => null,
+///   };
 /// }
 ///
 /// final reactions = ReactionGroup().snapshots(

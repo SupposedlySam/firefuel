@@ -162,7 +162,8 @@ await batch.commit();
 class ReactionGroup extends FirefuelCollectionGroup<Reaction> {
   ReactionGroup() : super('reactions');
   @override
-  Reaction? fromFirestore(DocumentSnapshot<Map<String, dynamic>> s, SnapshotOptions? o) => Reaction.fromJson(s.data()!);
+  Reaction? fromFirestore(DocumentSnapshot<Map<String, dynamic>> s, SnapshotOptions? o) =>
+      switch (s.data()) { final data? => Reaction.fromJson(data), null => null };
 }
 final snap = await ReactionGroup()
     .snapshots(FirefuelQuery(clauses: [Clause('conversationId', isEqualTo: conversationId)]))

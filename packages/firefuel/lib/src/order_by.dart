@@ -62,10 +62,10 @@ class OrderBy extends Equatable {
     required List<OrderBy>? orderBy,
     required bool isRangeComparison,
   }) {
-    if (orderBy?.isEmpty ?? true) return null;
+    if (orderBy == null || orderBy.isEmpty) return null;
 
     if (isRangeComparison) {
-      final hasCorrectValueInWrongSpot = orderBy!.any(
+      final hasCorrectValueInWrongSpot = orderBy.any(
         (orderBy) => orderBy.field == fieldToMatch,
       );
       final firstOrder = OrderBy(field: fieldToMatch);
@@ -91,10 +91,10 @@ class OrderBy extends Equatable {
     required List<OrderBy>? orderBy,
     required bool isEqualityOrInComparison,
   }) {
-    if (orderBy?.isEmpty ?? true) return null;
+    if (orderBy == null || orderBy.isEmpty) return null;
 
     if (isEqualityOrInComparison) {
-      return orderBy!
+      return orderBy
           .where((orderBy) => !fieldsToMatch.contains(orderBy.field))
           .toList();
     }
@@ -104,9 +104,9 @@ class OrderBy extends Equatable {
 
   static List<OrderBy> _moveToFirst(
     String fieldToMatch,
-    List<OrderBy>? orderBy,
+    List<OrderBy> orderBy,
   ) {
-    final matchingClause = orderBy!.firstWhere(
+    final matchingClause = orderBy.firstWhere(
       (orderBy) => orderBy.field == fieldToMatch,
     );
 

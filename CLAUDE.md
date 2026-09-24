@@ -29,6 +29,17 @@ with one shape across collections, groups, repositories, batches and transaction
 - Conventional commits, scoped by package where it helps: `feat(firefuel):`,
   `fix(firefuel_core):`, `docs:`, `chore:`. Use `!` and a `BREAKING CHANGE:` footer for breaks.
 
+## Null safety
+
+No `!` (null assertion) in `packages/*/lib`; CI enforces it (`tool/check_null_assertions.sh`).
+A `!` crashes for whichever caller the author didn't picture. Instead, use a pattern
+(`if (x case final y?)`, a `switch` arm `final y?`), a null check that promotes, or a
+non-nullable type that makes the case impossible (e.g. `Chunk.limit` is a stored `int`,
+not `query.limit!`). The same goes for examples in docs and `llms.txt`, since people
+copy them. In tests, prefer `isA<T>().having(...)` over `value!.field`, which fails more
+clearly. This follows flyby's `docs/code_style/01_dart_foundation.md` ("Control flow and
+expressions"), which is the style reference for this repo too.
+
 ## Architecture in one breath
 
 `rules.dart` holds one-method capability interfaces, generic over the return type. `Collection`,

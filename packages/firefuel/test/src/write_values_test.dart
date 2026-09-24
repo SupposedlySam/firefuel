@@ -58,10 +58,11 @@ void main() {
 
   tearDown(Firefuel.reset);
 
-  Future<Map<String, dynamic>?> stored() async {
+  /// The stored `notes/note` document; fails the test if it doesn't exist.
+  Future<Map<String, dynamic>> stored() async {
     final snapshot = await firestore.collection('notes').doc('note').get();
 
-    return snapshot.data();
+    return snapshot.data() ?? fail('notes/note does not exist');
   }
 
   group('$FieldUpdates.lower', () {
@@ -77,7 +78,7 @@ void main() {
 
       // FieldValue has no value equality; its toString names the operation
       // and its arguments.
-      String describe(Object? value) => (value! as FieldValue).toString();
+      String describe(Object? value) => '${value as FieldValue?}';
 
       expect(describe(lowered['inc']), '${FieldValue.increment(2)}');
       expect(describe(lowered['union']), '${FieldValue.arrayUnion(['a'])}');
@@ -95,8 +96,12 @@ void main() {
       });
 
       expect(
-        (lowered['nested']! as Map<String, Object?>)['stamp'],
-        isA<FieldValue>(),
+        lowered['nested'],
+        isA<Map<String, Object?>>().having(
+          (nested) => nested['stamp'],
+          'stamp',
+          isA<FieldValue>(),
+        ),
       );
       expect(lowered['list'], same(list));
     });
@@ -106,14 +111,20 @@ void main() {
     test('should be stamped by the server on createById', () async {
       await notes.createById(value: const Note('hi'), docId: docId);
 
-      expect((await stored())![Note.fieldCreatedAt], isA<Timestamp>());
-      expect((await notes.read(docId))!.createdAt, isNotNull);
+      expect((await stored())[Note.fieldCreatedAt], isA<Timestamp>());
+      expect(
+        await notes.read(docId),
+        isA<Note>().having((note) => note.createdAt, 'createdAt', isNotNull),
+      );
     });
 
     test('should be stamped by the server on create', () async {
       final id = await notes.create(const Note('hi'));
 
-      expect((await notes.read(id))!.createdAt, isNotNull);
+      expect(
+        await notes.read(id),
+        isA<Note>().having((note) => note.createdAt, 'createdAt', isNotNull),
+      );
     });
 
     test('should be stamped on updateOrCreate and update', () async {
@@ -121,7 +132,7 @@ void main() {
       await notes.update(docId: docId, value: const Note('second'));
 
       final data = await stored();
-      expect(data![Note.fieldText], 'second');
+      expect(data[Note.fieldText], 'second');
       expect(data[Note.fieldCreatedAt], isA<Timestamp>());
     });
 
@@ -131,7 +142,7 @@ void main() {
       await batch.createById(value: const Note('batched'), docId: docId);
       await batch.commit();
 
-      expect((await stored())![Note.fieldCreatedAt], isA<Timestamp>());
+      expect((await stored())[Note.fieldCreatedAt], isA<Timestamp>());
     });
   });
 
@@ -157,7 +168,7 @@ void main() {
       );
 
       final data = await stored();
-      expect(data!['count'], 3);
+      expect(data['count'], 3);
       expect(data['tags'], ['a', 'b']);
       expect(data.containsKey('obsolete'), isFalse);
       expect(data[Note.fieldText], 'plain');
@@ -171,20 +182,20 @@ void main() {
       );
       await batch.commit();
 
-      expect((await stored())!['count'], 6);
+      expect((await stored())['count'], 6);
     });
 
     test('increment should add to the stored number', () async {
       await notes.increment(docId: docId, field: 'count', by: 4);
 
-      expect((await stored())!['count'], 5);
+      expect((await stored())['count'], 5);
     });
 
     test('deleteField should remove the field', () async {
       await notes.deleteField(docId: docId, field: 'obsolete');
 
       final data = await stored();
-      expect(data!.containsKey('obsolete'), isFalse);
+      expect(data.containsKey('obsolete'), isFalse);
       expect(data['count'], 1);
     });
 
@@ -204,7 +215,7 @@ void main() {
       expect(incremented.isRight(), isTrue);
       expect(deleted.isRight(), isTrue);
       final data = await stored();
-      expect(data!['count'], 2);
+      expect(data['count'], 2);
       expect(data.containsKey('obsolete'), isFalse);
     });
   });

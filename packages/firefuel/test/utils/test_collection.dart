@@ -12,10 +12,10 @@ class TestCollection extends FirefuelCollection<TestUser> {
     DocumentSnapshot<Map<String, dynamic>> snapshot,
     SnapshotOptions? options,
   ) {
-    final data = snapshot.data();
-    return data == null
-        ? null
-        : TestUser.fromJson(snapshot.data()!, snapshot.id);
+    return switch (snapshot.data()) {
+      final data? => TestUser.fromJson(data, snapshot.id),
+      null => null,
+    };
   }
 
   @override
