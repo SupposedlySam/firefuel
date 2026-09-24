@@ -29,7 +29,11 @@ void main() {
   const fieldPaths = [TestUser.fieldName];
   const values = <Object?>['v'];
   const fields = <String, Object?>{TestUser.fieldName: 'y'};
-  final chunk = Chunk<TestUser>(orderBy: orderBy, limit: 3);
+  final pageQuery = FirefuelQuery(orderBy: orderBy, limit: 3);
+  const chunk = Chunk<TestUser, DocumentSnapshot<TestUser?>>.last(
+    data: [user],
+    cursor: null,
+  );
 
   setUp(() {
     collection = MockCollection<TestUser>();
@@ -124,9 +128,11 @@ void main() {
 
   test('paginate', () async {
     await expectForwarded(
-      () => collection.paginate(chunk, getOptions: getOptions),
+      () =>
+          collection.paginate(pageQuery, after: chunk, getOptions: getOptions),
       chunk,
-      () => repository.paginate(chunk, getOptions: getOptions),
+      () =>
+          repository.paginate(pageQuery, after: chunk, getOptions: getOptions),
     );
   });
 

@@ -87,5 +87,6 @@ from 2026-09-23.
 | 12 | 13 | [Offline writes](done/13-offline-writes.md) | Feature | — |
 | 13 | 11 | [Docs and site](done/11-docs-site-refresh.md) | Chore | — |
 | 14 | 14 | [Verify against real Firestore](done/14-real-firestore-verification.md) | Infrastructure | — |
+| 15 | 15 | [Build pagination on package:chunk](done/15-build-on-chunk.md) | Improvement | removes `hide Chunk` |
 
 Capability coverage: [pass-through.md](pass-through.md).

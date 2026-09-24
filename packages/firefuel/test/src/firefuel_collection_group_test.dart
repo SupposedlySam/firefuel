@@ -3,6 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:firefuel/firefuel.dart';
 import '../utils/test_user.dart';
 import '../utils/test_backend.dart';
+import '../utils/page_through.dart';
 
 /// Reactions live under many message pods; the group reads them all.
 class ReactionGroup extends FirefuelCollectionGroup<TestUser> {
@@ -99,18 +100,17 @@ void main() {
   });
 
   test('paginate should page across parents', () async {
-    final seen = <String>[];
-    var chunk = Chunk<TestUser>(
-      orderBy: [OrderBy(field: TestUser.fieldAge)],
-      limit: 3,
+    final pages = await pageThrough(
+      group,
+      FirefuelQuery(orderBy: [OrderBy(field: TestUser.fieldAge)], limit: 3),
     );
 
-    do {
-      chunk = await group.paginate(chunk);
-      seen.addAll(chunk.data.map((user) => user.name));
-    } while (chunk.status == ChunkStatus.nextAvailable);
-
-    expect(seen, ['bender', 'fry', 'leela', 'zoidberg']);
+    expect(pages.expand((page) => page.data).map((user) => user.name), [
+      'bender',
+      'fry',
+      'leela',
+      'zoidberg',
+    ]);
   });
 
   test('a repository should wrap group reads in Either', () async {

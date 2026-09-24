@@ -4,6 +4,7 @@ import 'package:firefuel/firefuel.dart';
 import '../../utils/test_collection.dart';
 import '../../utils/test_user.dart';
 import '../../utils/test_backend.dart';
+import '../../utils/page_through.dart';
 
 void main() {
   late TestCollection collection;
@@ -198,10 +199,10 @@ void main() {
     });
   });
 
-  group('$Chunk.query', () {
+  group('paginate', () {
     test('should page through a query that has clauses and order', () async {
-      final seen = <int?>[];
-      var chunk = Chunk<TestUser>.query(
+      final pages = await pageThrough(
+        collection,
         FirefuelQuery(
           clauses: [Clause(TestUser.fieldOccupation, isEqualTo: 'odd')],
           orderBy: byAge,
@@ -209,37 +210,52 @@ void main() {
         ),
       );
 
-      do {
-        chunk = await collection.paginate(chunk);
-        seen.addAll(chunk.data.map((user) => user.age));
-      } while (chunk.status == ChunkStatus.nextAvailable);
-
-      expect(seen, [1, 3, 5]);
+      expect(pages.expand((page) => page.data).map((user) => user.age), [
+        1,
+        3,
+        5,
+      ]);
+      expect(pages.map((page) => page.limit), everyElement(2));
     });
 
-    test('should default the page size', () {
-      final chunk = Chunk<TestUser>.query(FirefuelQuery(orderBy: byAge));
+    test("should default the page size to chunk's", () async {
+      final page = await collection.paginate(FirefuelQuery(orderBy: byAge));
 
-      expect(chunk.limit, Chunk.defaultLimit);
+      expect(page.limit, Chunk.defaultLimit);
+      expect(page.status, ChunkStatus.last);
     });
 
     test('should page up to an end cursor', () async {
-      final seen = <int?>[];
-      var chunk = Chunk<TestUser>.query(
+      final pages = await pageThrough(
+        collection,
         FirefuelQuery(orderBy: byAge, end: const EndCursor.at([4]), limit: 2),
       );
 
-      do {
-        chunk = await collection.paginate(chunk);
-        seen.addAll(chunk.data.map((user) => user.age));
-      } while (chunk.status == ChunkStatus.nextAvailable);
+      expect(pages.expand((page) => page.data).map((user) => user.age), [
+        1,
+        2,
+        3,
+        4,
+      ]);
+    });
 
-      expect(seen, [1, 2, 3, 4]);
+    test('should return a last chunk unchanged without reading', () async {
+      const last = Chunk<TestUser, DocumentSnapshot<TestUser?>>.last(
+        data: [TestUser('only')],
+        cursor: null,
+      );
+
+      final again = await collection.paginate(
+        FirefuelQuery(orderBy: byAge),
+        after: last,
+      );
+
+      expect(again, same(last));
     });
 
     test('should refuse a start cursor', () {
       expect(
-        () => Chunk<TestUser>.query(
+        () => collection.paginate(
           FirefuelQuery(orderBy: byAge, start: const StartCursor.at([1])),
         ),
         throwsArgumentError,
@@ -248,7 +264,50 @@ void main() {
 
     test('should refuse queries that do not walk forward', () {
       expect(
-        () => Chunk<TestUser>.query(
+        () =>
+            collection.paginate(FirefuelQuery(orderBy: byAge, limitToLast: 2)),
+        throwsArgumentError,
+      );
+    });
+  });
+
+  group('dataChunker', () {
+    test("should drive package:chunk's Chunker through every page", () async {
+      final chunker = Chunker<TestUser, DocumentId>(
+        dataChunker: collection.dataChunker(
+          FirefuelQuery(
+            clauses: [Clause(TestUser.fieldOccupation, isEqualTo: 'even')],
+            orderBy: byAge,
+          ),
+        ),
+        cursorSelector: (user) => DocumentId(user.docId ?? ''),
+      );
+
+      final seen = <int?>[];
+      var chunk = const Chunk<TestUser, DocumentId>(limit: 2);
+      // Bounded: a chunker that ignored its cursor would page forever.
+      for (var page = 0; page < 10; page++) {
+        chunk = await chunker.getNext(chunk);
+        seen.addAll(chunk.data.map((user) => user.age));
+        if (chunk.status == ChunkStatus.last) break;
+      }
+
+      expect(chunk.status, ChunkStatus.last);
+      expect(seen, [2, 4, 6]);
+    });
+
+    test('should fail clearly when the cursor document was deleted', () async {
+      final pageAfter = collection.dataChunker(FirefuelQuery(orderBy: byAge));
+
+      await expectLater(
+        pageAfter(DocumentId('deleted-meanwhile'), 2),
+        throwsStateError,
+      );
+    });
+
+    test('should refuse queries that do not walk forward', () {
+      expect(
+        () => collection.dataChunker(
           FirefuelQuery(orderBy: byAge, limitToLast: 2),
         ),
         throwsArgumentError,

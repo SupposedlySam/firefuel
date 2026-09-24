@@ -47,6 +47,26 @@ They accepted `getOptions:` and ignored it. They now take `AggregateSource? sour
 
 See [replace](#replace-fails-for-a-missing-document) below.
 
+### `paginate` takes a query and returns package:chunk's `Chunk`
+
+firefuel's own `Chunk` is gone. Pages are now [package:chunk](https://pub.dev/packages/chunk)'s `Chunk<T, DocumentSnapshot<T?>>` (alias `FirefuelPage<T>`), which firefuel re-exports with `ChunkStatus`, `Chunker` and `DataChunker`. It's the same type paginated_builder uses, so an app that imports both no longer needs `hide Chunk`.
+
+```dart
+// Before
+var page = Chunk<Note>(orderBy: [...], clauses: [...], limit: 20);
+page = await notes.paginate(page);
+page = await notes.paginate(page);
+
+// After
+final query = FirefuelQuery(orderBy: [...], clauses: [...], limit: 20);
+var page = await notes.paginate(query);
+page = await notes.paginate(query, after: page);
+```
+
+- The default page size is `Chunk.defaultLimit`, which is **50** (firefuel's was 25). Set `limit` on the query to keep 25.
+- Passing a chunk whose status is `last` returns it unchanged, without a read. firefuel used to query again and return an empty page.
+- `chunk.orderBy`, `chunk.clauses` and `Chunk.query` no longer exist; the query is passed on each call.
+
 ### `Clause` is sealed
 
 `Clause(field, isEqualTo: …)` works as before. If you read a clause's properties (`clause.field`, `clause.isEqualTo`) through a variable typed `Clause`, match on `FieldClause` first. A clause can now also be a `Clause.or` / `Clause.and` group.
@@ -61,7 +81,7 @@ See [replace](#replace-fails-for-a-missing-document) below.
 
 ### `paginate` kept only the first page's filters
 
-Pages after the first ignored the `Chunk`'s `clauses` and fell back to 25 documents. Every page now uses the same query. If you added filtering on the client to make up for it, you can remove it.
+Pages after the first ignored the `Chunk`'s `clauses` and fell back to 25 documents. Pages now come from the query you pass on each call (see above). If you added filtering on the client to make up for it, you can remove it.
 
 ### `Clause(arrayContainsAny: …)` now filters
 
@@ -122,6 +142,7 @@ Auto-commit happened one op early, and `totalTransactionsCommitted` over-counted
 - The `dartz` and `universal_io` dependencies.
 - `firefuel_env`, an unpublished empty package.
 - Public exports of the internal query helpers (`QueryX`: `filterIfNotNull`, `sortIfNotNull`, …). Use [`FirefuelQuery`](firefuelapi.md#queries-as-values).
+- firefuel's `Chunk` and its `ChunkStatus` (replaced by package:chunk's; see above).
 
 ## New in 0.5
 

@@ -22,7 +22,7 @@ extension MockCollectionX<T extends Serializable> on MockCollection<T> {
     Stream<List<T>> Function()? onStreamOrdered,
     Stream<List<T>> Function()? onStreamWhere,
     List<T> Function()? onOrderBy,
-    Chunk<T> Function()? onPaginate,
+    FirefuelPage<T> Function()? onPaginate,
     T? Function()? onRead,
     List<T?> Function()? onReadMany,
     List<T>? Function()? onReadAll,
@@ -45,7 +45,7 @@ extension MockCollectionX<T extends Serializable> on MockCollection<T> {
     registerFallbackValue(<String, Object?>{});
     registerFallbackValue(const TestUser('fallbackValue'));
     registerFallbackValue(
-      Chunk<TestUser>(orderBy: [OrderBy(field: TestUser.fieldName)]),
+      FirefuelQuery(orderBy: [OrderBy(field: TestUser.fieldName)]),
     );
 
     if (onCreate != null) {
@@ -112,7 +112,9 @@ extension MockCollectionX<T extends Serializable> on MockCollection<T> {
     }
 
     if (onPaginate != null) {
-      when(() => paginate(any())).thenAnswer((_) => Future.value(onPaginate()));
+      when(
+        () => paginate(any(), after: any(named: 'after')),
+      ).thenAnswer((_) => Future.value(onPaginate()));
     }
 
     if (onRead != null) {

@@ -84,6 +84,52 @@ abstract class FirefuelCollection<T extends Serializable>
     SnapshotOptions? options,
   );
 
+  /// Pages of [query] for package:chunk's [Chunker], or for
+  /// paginated_builder, which builds on it.
+  ///
+  /// The cursor is the id of the previous page's last document, so a
+  /// `cursorSelector` can take it from your model:
+  ///
+  /// ```dart
+  /// Chunker<Note, DocumentId>(
+  ///   dataChunker: notes.dataChunker(
+  ///     FirefuelQuery(orderBy: [OrderBy(field: Note.fieldCreatedAt)]),
+  ///   ),
+  ///   cursorSelector: (note) => DocumentId(note.id),
+  /// );
+  /// ```
+  ///
+  /// Every page after the first costs one extra document read, to position
+  /// on that id. If the cursor's document was deleted in the meantime,
+  /// Firestore cannot position on it, so the page fails with a [StateError].
+  /// Use [paginate] to page without the extra read.
+  DataChunker<T, DocumentId> dataChunker(FirefuelQuery query) {
+    if (query.limitToLast != null || query.start != null) {
+      throw ArgumentError(
+        'dataChunker walks forward from the start of the order; '
+        'limitToLast and start cursors cannot be paginated',
+      );
+    }
+
+    return (after, limit) async {
+      final cursor = switch (after) {
+        null => null,
+        final id => await ref.doc(id.docId).get(),
+      };
+      if (cursor != null && !cursor.exists) {
+        throw StateError(
+          'Cannot page after ${cursor.id}: the document no longer exists',
+        );
+      }
+
+      final snapshot = await query
+          .copyWith(limit: limit)
+          .applyTo(baseQuery, startAfterDocument: cursor)
+          .get();
+      return snapshot.docs.toListT();
+    };
+  }
+
   /// Auto-generate a [DocumentId]
   ///
   /// The unique key generated is prefixed with a client-generated timestamp

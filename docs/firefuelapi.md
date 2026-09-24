@@ -170,20 +170,36 @@ Keep indexes in `firestore.indexes.json` and deploy them with `firebase deploy -
 
 ## Pagination
 
-`paginate` reads one page at a time. Pass back the `Chunk` it returns until its `status` is `ChunkStatus.last`.
+Pages use [package:chunk](https://pub.dev/packages/chunk)'s `Chunk`, which firefuel re-exports. The same type drives [paginated_builder](https://pub.dev/packages/paginated_builder) and any other chunked data source.
+
+`paginate` reads one page of a query at a time. Pass each returned `Chunk` back as `after` until its `status` is `ChunkStatus.last`:
 
 ```dart
-var page = Chunk<Note>(
-  orderBy: [OrderBy(field: Note.fieldCreatedAt, direction: OrderDirection.newestToOldest)],
+final unarchived = FirefuelQuery(
   clauses: [Clause(Note.fieldArchived, isEqualTo: false)],
-  limit: 20,
+  orderBy: [OrderBy(field: Note.fieldCreatedAt, direction: OrderDirection.newestToOldest)],
+  limit: 20, // page size; defaults to Chunk.defaultLimit (50)
 );
 
-page = await notes.paginate(page); // first page
-page = await notes.paginate(page); // next page, same filters and size
+var page = await notes.paginate(unarchived); // first page
+page = await notes.paginate(unarchived, after: page); // the next one
 ```
 
-To paginate a `FirefuelQuery`, use `Chunk.query(FirefuelQuery(...))`.
+Pass the same query each time. The chunk carries only the position (its last document's snapshot). A chunk whose status is `last` comes back unchanged, without a read. A query with `limitToLast` or a start cursor can't be paginated, but an end cursor stops the pages early.
+
+### With paginated_builder or Chunker
+
+`dataChunker(query)` gives package:chunk's `Chunker` (and so paginated_builder) a collection as its data source. The cursor is the last document's id, which you select from your model:
+
+```dart
+PaginatedBuilder<Note, DocumentId>(
+  dataChunker: notes.dataChunker(unarchived),
+  cursorSelector: (note) => DocumentId(note.id),
+  // ...
+);
+```
+
+Each page after the first costs one extra document read, to position on that id. If that document is deleted before the next page loads, the page fails with a `StateError`.
 
 ## Counting and aggregates
 
@@ -450,7 +466,7 @@ Transactions and batches aren't affected: a batch commits in one request, and a 
 - Stream: `stream`, `streamAll`, `streamMany`, `streamChanges`, `streamQuery`
 - Metadata: `snapshots`, `docSnapshots`, `ListenOptions`
 - Query: `where`, `streamWhere`, `orderBy`, `streamOrdered`, `limit`, `streamLimited`, `query`, `FirefuelQuery`, `Clause.or`, `Clause.and`, `StartCursor`, `EndCursor`
-- Pagination: `paginate`, `Chunk`, `Chunk.query`, `ChunkStatus`
+- Pagination: `paginate`, `dataChunker`, `Chunk`, `ChunkStatus`, `Chunker` (package:chunk)
 - Count and aggregate: `countAll`, `countWhere`, `sumAll`, `sumWhere`, `averageAll`, `averageWhere`, `aggregate`, `streamCountAll`, `streamCountWhere`
 - Update: `update`, `updateFields`, `updateOrCreate`, `replace`, `replaceFields`
 - Field updates: `FieldUpdate`, `ServerTimestamp`, `increment`, `arrayUnion`, `arrayRemove`, `serverTimestamp`, `deleteField`

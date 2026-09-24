@@ -9,7 +9,7 @@ abstract class ReadableQuery<T extends Serializable>
     implements
         CollectionAggregate<double?>,
         CollectionCount<int>,
-        CollectionPaginate<Chunk<T>, T>,
+        CollectionPaginate<FirefuelPage<T>, T>,
         CollectionRead<List<T>, T>,
         QueryAggregate<AggregateResult>,
         QueryListen<FirefuelQuerySnapshot<T>> {}

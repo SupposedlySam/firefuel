@@ -112,18 +112,33 @@ mixin FirefuelQueryReads<T extends Serializable> implements ReadableQuery<T> {
   }
 
   @override
-  Future<Chunk<T>> paginate(Chunk<T> chunk, {GetOptions? getOptions}) async {
-    final snapshot = await chunk.query
-        .applyTo(baseQuery, startAfterDocument: chunk.cursor)
+  Future<FirefuelPage<T>> paginate(
+    FirefuelQuery query, {
+    FirefuelPage<T>? after,
+    GetOptions? getOptions,
+  }) async {
+    if (after != null && after.status == ChunkStatus.last) return after;
+    if (query.limitToLast != null || query.start != null) {
+      throw ArgumentError(
+        'paginate walks forward from the start of the order; '
+        'limitToLast and start cursors cannot be paginated',
+      );
+    }
+
+    final limit = query.limit ?? after?.limit ?? Chunk.defaultLimit;
+    final snapshot = await query
+        .copyWith(limit: limit)
+        .applyTo(baseQuery, startAfterDocument: after?.cursor)
         .get(getOptions);
 
-    return chunk.followedBy(
-      data: snapshot.docs.toListT(),
-      // An empty page keeps the previous cursor, so paginating past the
-      // end stays at the end instead of restarting at page one.
-      cursor: snapshot.docs.lastOrNull ?? chunk.cursor,
-      isLast: snapshot.docs.length < chunk.limit,
-    );
+    final data = snapshot.docs.toListT();
+    // An empty page keeps the previous cursor, so paginating past the end
+    // stays at the end instead of restarting at page one.
+    final cursor = snapshot.docs.lastOrNull ?? after?.cursor;
+
+    return snapshot.docs.length < limit
+        ? Chunk.last(data: data, cursor: cursor, limit: limit)
+        : Chunk.next(data: data, cursor: cursor, limit: limit);
   }
 
   /// {@macro firefuel.rules.count.definition}

@@ -96,18 +96,29 @@ abstract class CollectionAggregate<T> {
 /// {@macro firefuel.rules.subclasses}
 /// {@macro firefuel.rules.implementations}
 abstract class CollectionPaginate<R, T extends Serializable> {
-  /// Get a number of Documents from the Collection specified by the [chunk]
+  /// The next page of [query]: the first page when [after] is `null`, then
+  /// the page after each [Chunk] you pass back in as [after].
   ///
-  /// Store the [Chunk] you get back from calling this method and pass it back
-  /// to the [paginate] method to get the next [Chunk]
+  /// Continue until `status` is [ChunkStatus.last]. Passing a last chunk
+  /// back returns it unchanged without reading, as `Chunker` does.
   ///
-  /// You can continue to do this until the `Chunk.status` equals
-  /// [ChunkStatus.last].
+  /// The page size is [query]'s `limit`, else [after]'s, else
+  /// `Chunk.defaultLimit`. [query] walks forward from the start of its
+  /// order, so it may not use `limitToLast` or a start cursor; an end cursor
+  /// stops the pagination early.
   ///
-  /// Passing in a [Chunk] with the status of [ChunkStatus.last] will result in
-  /// a [Chunk] with empty data.
-  Future<R> paginate(Chunk<T> chunk, {GetOptions? getOptions});
+  /// Pass the same [query] for every page: each call applies the query it is
+  /// given, and [after] carries only the position.
+  Future<R> paginate(
+    FirefuelQuery query, {
+    FirefuelPage<T>? after,
+    GetOptions? getOptions,
+  });
 }
+
+/// A page of [T] from firefuel: package:chunk's [Chunk], positioned by the
+/// Firestore snapshot of its last document.
+typedef FirefuelPage<T> = Chunk<T, DocumentSnapshot<T?>>;
 
 /// Read a `List` of [T] from the Collection
 ///

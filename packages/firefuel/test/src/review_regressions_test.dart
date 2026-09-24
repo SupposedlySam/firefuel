@@ -105,20 +105,21 @@ void main() {
     for (var i = 0; i < 4; i++) {
       await users.create(TestUser('user$i', age: i));
     }
-    var chunk = Chunk<TestUser>(
+    final query = FirefuelQuery(
       orderBy: [OrderBy(field: TestUser.fieldAge)],
       limit: 2,
     );
 
-    chunk = await users.paginate(chunk); // 0, 1
-    chunk = await users.paginate(chunk); // 2, 3 (a full page)
-    chunk = await users.paginate(chunk); // empty, last
+    var chunk = await users.paginate(query); // 0, 1
+    chunk = await users.paginate(query, after: chunk); // 2, 3 (a full page)
+    chunk = await users.paginate(query, after: chunk); // empty, last
 
     expect(chunk.status, ChunkStatus.last);
     expect(chunk.data, isEmpty);
+    expect(chunk.cursor, isNotNull);
 
     // Paginating again must not restart at page one.
-    final again = await users.paginate(chunk);
+    final again = await users.paginate(query, after: chunk);
     expect(again.data, isEmpty);
   });
 

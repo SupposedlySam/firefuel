@@ -22,8 +22,11 @@ export 'package:cloud_firestore/cloud_firestore.dart'
         WriteBatch,
         average,
         sum;
+// The maintainer's pagination primitives, shared with paginated_builder, so
+// one Chunk type serves Firestore and any other data source. `Failure` is not
+// re-exported: it would clash with firefuel_core's.
+export 'package:chunk/chunk.dart' show Chunk, ChunkStatus, Chunker, DataChunker;
 export 'package:firefuel/src/batch.dart';
-export 'package:firefuel/src/chunk.dart';
 export 'package:firefuel/src/clause.dart';
 export 'package:firefuel/src/collection.dart';
 export 'package:firefuel/src/order_by.dart';

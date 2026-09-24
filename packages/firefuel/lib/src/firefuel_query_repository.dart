@@ -122,11 +122,14 @@ abstract class FirefuelQueryRepository<T extends Serializable>
   }
 
   @override
-  Future<Either<Failure, Chunk<T>>> paginate(
-    Chunk<T> chunk, {
+  Future<Either<Failure, FirefuelPage<T>>> paginate(
+    FirefuelQuery query, {
+    FirefuelPage<T>? after,
     GetOptions? getOptions,
   }) {
-    return guard(() => _source.paginate(chunk, getOptions: getOptions));
+    return guard(
+      () => _source.paginate(query, after: after, getOptions: getOptions),
+    );
   }
 
   @override

@@ -12,6 +12,7 @@ environment:
 resolution: workspace
 
 dependencies:
+  chunk: ^1.0.1+1
   cloud_firestore: ^6.10.0
   # 3.x removed EquatableMixin and runtimeType comparison; neither is relied on
   # (see the equality tests). 2.1 is resolved here because fake_cloud_firestore

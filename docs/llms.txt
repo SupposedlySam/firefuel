@@ -96,7 +96,7 @@ A collection returns the value and throws on failure. A repository returns `Eith
 | Query | `where(clauses, {orderBy, limit})`, `orderBy(orderBy, {limit})`, `query(FirefuelQuery)` |
 | Stream | `stream(docId)`, `streamAll()`, `streamMany(docIds)`, `streamWhere(...)`, `streamOrdered(...)`, `streamLimited(n)`, `streamQuery(q)`, `streamChanges({includeRemoved})` |
 | Listen with metadata | `snapshots(FirefuelQuery, {options: ListenOptions(...)})` → `FirefuelQuerySnapshot<T>`; `docSnapshots(docId, {options})` → `FirefuelSnapshot<T?>` |
-| Paginate | `paginate(Chunk)`: pass the returned `Chunk` back until `status == ChunkStatus.last`. `Chunk(orderBy:, clauses:, limit:)` or `Chunk.query(FirefuelQuery)` |
+| Paginate | `paginate(FirefuelQuery, {after})` → `Chunk<T, DocumentSnapshot<T?>>` (package:chunk, re-exported; alias `FirefuelPage<T>`): pass it back as `after` until `status == ChunkStatus.last`. Page size = the query's `limit`, else 50. `dataChunker(query)` → `DataChunker<T, DocumentId>` for package:chunk's `Chunker` / paginated_builder |
 | Count and aggregate | `countAll()`, `countWhere(clauses)`, `sumAll(field)`, `sumWhere(clauses, field)`, `averageAll`, `averageWhere`, `aggregate(query, count:, sums:, averages:)` → `AggregateResult`; `streamCountAll`, `streamCountWhere` (these read every matching doc) |
 | Update | `update(docId:, value:)`, `updateFields(docId:, fields:)`, `updateOrCreate(docId:, value:)`, `replace(docId:, value:)`, `replaceFields(docId:, value:, fieldPaths:)` |
 | Transforms | `increment(docId:, field:, by:)`, `arrayUnion(...)`, `arrayRemove(...)`, `serverTimestamp(docId:, field:)`, `deleteField(docId:, field:)` |

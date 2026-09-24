@@ -114,7 +114,7 @@ class _PlaygroundPageState extends State<PlaygroundPage> {
             _runAction(label: 'Calculated query stats', action: _showStats),
       ),
       _FeatureCard(
-        apis: const ['FirefuelCollection.paginate()', 'Chunk'],
+        apis: const ['FirefuelCollection.paginate()', 'FirefuelQuery'],
         description: 'Load one small page at a time.',
         title: 'Paginate',
         onPressed: () =>
@@ -471,9 +471,9 @@ class _PlaygroundPageState extends State<PlaygroundPage> {
 
   Future<String> _showFirstPage() async {
     final page = await _collection.paginate(
-      Chunk<PlaygroundNote>(
-        limit: 2,
+      FirefuelQuery(
         orderBy: [OrderBy(field: PlaygroundNote.fieldTitle)],
+        limit: 2,
       ),
     );
     final titles = page.data.map((note) => note.title).join(', ');

@@ -19,9 +19,15 @@ feat!: own the `Either`
 
 - `Either`, `Left`, `Right`, `left`, `right` come from firefuel_core instead of `package:dartz` (unmaintained since 2021). Same names and methods, plus `leftMap`, `flatMap` and exhaustive `switch`
 
+feat!: pages are package:chunk's `Chunk`
+
+- `paginate(FirefuelQuery, {after})` returns `Chunk<T, DocumentSnapshot<T?>>` (alias `FirefuelPage<T>`), the type paginated_builder uses; firefuel's own `Chunk` is removed. firefuel re-exports `Chunk`, `ChunkStatus`, `Chunker` and `DataChunker`.
+- `FirefuelCollection.dataChunker(query)` plugs a collection into `Chunker` and paginated_builder.
+- The default page size is 50 (`Chunk.defaultLimit`), not 25. A last chunk passed back is returned unchanged.
+
 feat: queries as values
 
-- `FirefuelQuery` (clauses, orderBy, limit / `limitToLast`, `StartCursor` / `EndCursor`) read through `query` / `streamQuery`, paginated with `Chunk.query`
+- `FirefuelQuery` (clauses, orderBy, limit / `limitToLast`, `StartCursor` / `EndCursor`) read through `query` / `streamQuery`
 - `Clause.or` / `Clause.and` (#35); `Clause` is sealed
 - `aggregate(query, count:, sums:, averages:)` in one request
 

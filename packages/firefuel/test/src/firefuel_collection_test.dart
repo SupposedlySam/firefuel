@@ -6,6 +6,7 @@ import 'package:firefuel/firefuel.dart';
 import '../utils/test_collection.dart';
 import '../utils/test_user.dart';
 import '../utils/test_backend.dart';
+import '../utils/page_through.dart';
 
 void main() {
   late TestCollection testCollection;
@@ -726,83 +727,66 @@ void main() {
   });
 
   group('#paginate', () {
-    setUp(() async {
-      final scenarioCount = ChunkStatus.values.length;
-      final seedCount = Chunk.defaultLimit * scenarioCount - 1;
+    const pageSize = 25;
+    final byName = FirefuelQuery(
+      orderBy: [OrderBy(field: TestUser.fieldName)],
+      limit: pageSize,
+    );
 
+    setUp(() async {
+      // One short of two full pages.
       await Future.wait(
         List.generate(
-          seedCount,
+          pageSize * 2 - 1,
           (i) => testCollection.create(TestUser('User$i')),
         ),
       );
     });
 
-    test('should use the Chunk.defaultLimit', () async {
-      final startingChunk = await testCollection.paginate(
-        Chunk(orderBy: [OrderBy(field: TestUser.fieldName)]),
-      );
+    test("should use the query's limit as the page size", () async {
+      final first = await testCollection.paginate(byName);
 
-      expect(startingChunk.data.length, Chunk.defaultLimit);
+      expect(first.data, hasLength(pageSize));
+      expect(first.limit, pageSize);
     });
 
-    test('should have status of $ChunkStatus.nextAvailable when receiving the '
-        'middle chunk', () async {
-      final middleChunk = await testCollection.paginate(
-        Chunk(orderBy: [OrderBy(field: TestUser.fieldName)]),
-      );
+    test('should report nextAvailable on a full page', () async {
+      final first = await testCollection.paginate(byName);
 
-      expect(middleChunk.status, ChunkStatus.nextAvailable);
+      expect(first.status, ChunkStatus.nextAvailable);
+    });
+
+    test('should report last on a short page', () async {
+      final first = await testCollection.paginate(byName);
+      final second = await testCollection.paginate(byName, after: first);
+
+      expect(second.status, ChunkStatus.last);
+      expect(second.data, hasLength(pageSize - 1));
+    });
+
+    test('should return a last chunk unchanged when passed back in', () async {
+      final first = await testCollection.paginate(byName);
+      final last = await testCollection.paginate(byName, after: first);
+
+      expect(await testCollection.paginate(byName, after: last), same(last));
     });
 
     test(
-      'should have status of $ChunkStatus.last when receiving the last chunk',
+      'should end with an empty last page after exactly full pages',
       () async {
-        final middleChunk = await testCollection.paginate(
-          Chunk(orderBy: [OrderBy(field: TestUser.fieldName)]),
-        );
-        final lastChunk = await testCollection.paginate(middleChunk);
+        await testCollection.create(const TestUser('LastUser'));
 
-        expect(lastChunk.status, ChunkStatus.last);
+        final first = await testCollection.paginate(byName);
+        final fullSecond = await testCollection.paginate(byName, after: first);
+        final empty = await testCollection.paginate(byName, after: fullSecond);
+
+        expect(fullSecond.status, ChunkStatus.nextAvailable);
+        expect(empty.status, ChunkStatus.last);
+        expect(empty.data, isEmpty);
+        // It keeps the previous cursor, so it cannot restart at page one.
+        expect(empty.cursor, fullSecond.cursor);
       },
     );
-
-    test(
-      'should return empty data when the last chunk is passed back in',
-      () async {
-        final middleChunk = await testCollection.paginate(
-          Chunk(orderBy: [OrderBy(field: TestUser.fieldName)]),
-        );
-        final lastChunk = await testCollection.paginate(middleChunk);
-
-        assert(lastChunk.status == ChunkStatus.last, 'should be last');
-
-        final emptyLastChunk2 = await testCollection.paginate(lastChunk);
-
-        expect(emptyLastChunk2.status, ChunkStatus.last);
-        expect(emptyLastChunk2.data.isEmpty, isTrue);
-        // Keeps the last page's cursor, so passing it in again stays at
-        // the end.
-        expect(emptyLastChunk2.cursor, lastChunk.cursor);
-      },
-    );
-
-    test('should return empty data when last chunk contains nothing', () async {
-      // We're starting with minus document to make a full chunk so adding one
-      // more user will allow two full chunks
-      await testCollection.create(const TestUser('LastUser'));
-
-      final middleChunk = await testCollection.paginate(
-        Chunk(orderBy: [OrderBy(field: TestUser.fieldName)]),
-      );
-      final lastFullChunk = await testCollection.paginate(middleChunk);
-
-      final emptyLastChunk = await testCollection.paginate(lastFullChunk);
-
-      expect(emptyLastChunk.status, ChunkStatus.last);
-      expect(emptyLastChunk.data.isEmpty, isTrue);
-      expect(emptyLastChunk.cursor, lastFullChunk.cursor);
-    });
   });
 
   group('#read', () {
@@ -1420,26 +1404,19 @@ void main() {
       });
 
       test('should keep clauses and limit on every page', () async {
-        final pages = <Chunk<TestUser>>[];
-        var chunk = Chunk<TestUser>(
-          orderBy: [OrderBy(field: TestUser.fieldName)],
-          clauses: [Clause(TestUser.fieldOccupation, isEqualTo: 'pilot')],
-          limit: 2,
+        final pages = await pageThrough(
+          testCollection,
+          FirefuelQuery(
+            orderBy: [OrderBy(field: TestUser.fieldName)],
+            clauses: [Clause(TestUser.fieldOccupation, isEqualTo: 'pilot')],
+            limit: 2,
+          ),
         );
-
-        do {
-          chunk = await testCollection.paginate(chunk);
-          pages.add(chunk);
-        } while (chunk.status == ChunkStatus.nextAvailable);
 
         final users = pages.expand((page) => page.data).toList();
 
         expect(users, hasLength(6));
         expect(users.every((user) => user.occupation == 'pilot'), isTrue);
-        expect(
-          pages.map((page) => page.data.length),
-          everyElement(lessThanOrEqualTo(2)),
-        );
         expect(pages.every((page) => page.limit == 2), isTrue);
       });
     });
