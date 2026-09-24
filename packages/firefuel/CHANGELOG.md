@@ -55,7 +55,7 @@ feat: observing and offline
 
 chore: upgrade dependencies
 
-- `cloud_firestore` ^6.3.0 → ^6.10.0, `fake_cloud_firestore` ^4.3.0, `very_good_analysis` ^11.0.0, `equatable` >=2.1.0 <4.0.0
+- New dependency `chunk` ^1.1.0; `cloud_firestore` ^6.3.0 → ^6.10.0, `fake_cloud_firestore` ^4.3.0, `very_good_analysis` ^11.0.0, `equatable` >=2.1.0 <4.0.0
 - Removed `dartz` and `universal_io`
 - Re-exports `FirebaseFirestore`, `Timestamp`, `Source`, `ListenSource`, `ServerTimestampBehavior`, `DocumentChangeType`, `DocumentReference`, `Transaction`, `WriteBatch` (#60); `QueryX` helpers are internal
 
