@@ -19,6 +19,12 @@ class EmulatorBackend implements TestBackend {
   static const project = 'demo-firefuel';
   static const otherProject = 'demo-firefuel-other';
 
+  /// Reuse one Firestore per project instead of a new app per test, as
+  /// LiveBackend must. Set with `--dart-define=FIREFUEL_SHARED_INSTANCE=true`
+  /// to check against the emulator that sharing an instance leaks nothing
+  /// between tests.
+  static const _shared = bool.fromEnvironment('FIREFUEL_SHARED_INSTANCE');
+  final _sharedInstances = <String, FirebaseFirestore>{};
   var _apps = 0;
 
   @override
@@ -43,6 +49,9 @@ class EmulatorBackend implements TestBackend {
   /// can serve a new listener the previous test's documents from its cache.
   Future<FirebaseFirestore> _empty(String projectId) async {
     await _wipe(projectId);
+    if (_shared) {
+      if (_sharedInstances[projectId] case final instance?) return instance;
+    }
 
     await ensureDefaultApp(_options(project));
 
@@ -51,9 +60,11 @@ class EmulatorBackend implements TestBackend {
       options: _options(projectId),
     );
 
-    return FirebaseFirestore.instanceFor(app: app)
+    final instance = FirebaseFirestore.instanceFor(app: app)
       ..settings = const Settings(persistenceEnabled: false)
       ..useFirestoreEmulator(host, firestorePort);
+    if (_shared) _sharedInstances[projectId] = instance;
+    return instance;
   }
 
   // Format-valid placeholders: the native SDK aborts on a malformed key, but

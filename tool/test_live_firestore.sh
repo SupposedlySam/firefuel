@@ -7,16 +7,15 @@
 # Every document in that project is deleted before each test. Never point this
 # at a project with data you want to keep.
 #
-# Needs: gcloud signed in with access to the project, an iOS simulator, and
-# ~/.config/firefuel/live.json holding the test user:
-#   {"email": "...", "password": "..."}
+# Needs: gcloud signed in as a user with the Service Account Token Creator
+# role on the project's Firebase Admin SDK service account (to mint the custom
+# token the suite signs in with), and an iOS simulator.
 set -euo pipefail
 
 root="$(cd "$(dirname "$0")/.." && pwd)"
-credentials="${FIREFUEL_LIVE_CREDENTIALS:-$HOME/.config/firefuel/live.json}"
+project=firefuel-integration
+service_account="firebase-adminsdk-fbsvc@$project.iam.gserviceaccount.com"
 simulator="${FIREFUEL_SIMULATOR:-iPhone 16}"
-
-[[ -f "$credentials" ]] || { echo "missing $credentials" >&2; exit 2; }
 
 udid="$(xcrun simctl list devices available -j | python3 -c "
 import json, sys
@@ -29,21 +28,32 @@ for runtime in json.load(sys.stdin)['devices'].values():
 [[ -n "$udid" ]] || { echo "no simulator named '$simulator'" >&2; exit 2; }
 xcrun simctl boot "$udid" 2>/dev/null || true
 
-# The defines hold a password and an OAuth token: write them outside the repo
-# and remove them on exit.
-defines="$(mktemp -t firefuel-live)"
-trap 'rm -f "$defines"' EXIT
-python3 - "$credentials" "$(gcloud auth print-access-token)" > "$defines" <<'PY'
+# Tokens are written outside the repo and removed on exit.
+scratch="$(mktemp -d -t firefuel-live)"
+trap 'rm -rf "$scratch"' EXIT
+
+# A Firebase custom token for the uid the rules admit, valid for an hour.
+now="$(date +%s)"
+cat > "$scratch/claims.json" <<CLAIMS
+{"iss": "$service_account", "sub": "$service_account",
+ "aud": "https://identitytoolkit.googleapis.com/google.identity.identitytoolkit.v1.IdentityToolkit",
+ "iat": $now, "exp": $((now + 3600)), "uid": "firefuel-integration-suite"}
+CLAIMS
+gcloud iam service-accounts sign-jwt "$scratch/claims.json" "$scratch/custom.jwt" \
+  --iam-account="$service_account" --project="$project" >/dev/null
+
+python3 - "$scratch/custom.jwt" "$(gcloud auth print-access-token)" > "$scratch/defines.json" <<'PY'
 import json, sys
-creds = json.load(open(sys.argv[1]))
 print(json.dumps({
     "FIREFUEL_BACKEND": "live",
-    "FIREFUEL_LIVE_EMAIL": creds["email"],
-    "FIREFUEL_LIVE_PASSWORD": creds["password"],
+    "FIREFUEL_LIVE_CUSTOM_TOKEN": open(sys.argv[1]).read().strip(),
     "FIREFUEL_LIVE_TOKEN": sys.argv[2],
 }))
 PY
+defines="$scratch/defines.json"
 
 cd "$root/packages/firefuel_integration"
+# Every write waits on the network; a 501-write batch test needs far more than
+# the default 30-second test timeout.
 flutter test integration_test/firefuel_suite_test.dart \
-  -d "$udid" --dart-define-from-file="$defines"
+  -d "$udid" --timeout=300s --dart-define-from-file="$defines"

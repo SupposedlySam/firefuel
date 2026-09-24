@@ -14,24 +14,26 @@ import 'default_app.dart';
 /// there: [fresh] deletes every document in it.
 ///
 /// Credentials come from `--dart-define`s that tool/test_live_firestore.sh
-/// passes: a test user (the rules only admit signed-in users) and a
-/// short-lived OAuth token for the deletes, which go through the REST API
-/// because the client SDK cannot list subcollections.
+/// passes, both minted for the run and valid for an hour:
+/// - a Firebase custom token for the uid the rules admit
+///   (`firefuel-integration-suite`), signed through the project's Admin SDK
+///   service account; custom-token sign-in allows 45,000 logins a minute,
+///   where password sign-in hit its quota after about 120 tests;
+/// - an OAuth token for the deletes, which go through the REST API because
+///   the client SDK cannot list subcollections.
 class LiveBackend implements TestBackend {
   LiveBackend()
-    : _email = const String.fromEnvironment('FIREFUEL_LIVE_EMAIL'),
-      _password = const String.fromEnvironment('FIREFUEL_LIVE_PASSWORD'),
+    : _customToken = const String.fromEnvironment('FIREFUEL_LIVE_CUSTOM_TOKEN'),
       _token = const String.fromEnvironment('FIREFUEL_LIVE_TOKEN') {
-    if (_email.isEmpty || _password.isEmpty || _token.isEmpty) {
+    if (_customToken.isEmpty || _token.isEmpty) {
       throw StateError(
-        'Live runs need FIREFUEL_LIVE_EMAIL, FIREFUEL_LIVE_PASSWORD and '
-        'FIREFUEL_LIVE_TOKEN; run tool/test_live_firestore.sh',
+        'Live runs need FIREFUEL_LIVE_CUSTOM_TOKEN and FIREFUEL_LIVE_TOKEN; '
+        'run tool/test_live_firestore.sh',
       );
     }
   }
 
-  final String _email;
-  final String _password;
+  final String _customToken;
   final String _token;
   var _apps = 0;
 
@@ -60,15 +62,17 @@ class LiveBackend implements TestBackend {
     await _deleteEverything();
 
     await ensureDefaultApp(_options);
-    // A new app per test, as in EmulatorBackend: an instance reused after
-    // the wipe could serve the previous test's documents from its cache.
+    // A new app per test, as in EmulatorBackend. Sharing one instance leaked
+    // state between tests when checked on the emulator
+    // (tool/test_real_firestore.sh --shared-instance): a write from one test
+    // held up the next test's writes.
     final app = await Firebase.initializeApp(
       name: 'firefuel-test-${_apps++}',
       options: _options,
     );
     await FirebaseAuth.instanceFor(
       app: app,
-    ).signInWithEmailAndPassword(email: _email, password: _password);
+    ).signInWithCustomToken(_customToken);
 
     return FirebaseFirestore.instanceFor(app: app)
       ..settings = const Settings(persistenceEnabled: false);

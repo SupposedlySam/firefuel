@@ -36,11 +36,8 @@ import 'support/live_backend.dart';
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
   // Installed before any test is declared: skip reasons read it.
-  installTestBackend(
-    const String.fromEnvironment('FIREFUEL_BACKEND') == 'live'
-        ? LiveBackend()
-        : EmulatorBackend(),
-  );
+  const live = String.fromEnvironment('FIREFUEL_BACKEND') == 'live';
+  installTestBackend(live ? LiveBackend() : EmulatorBackend());
 
   group('firefuel_batch_test.dart', firefuel_batch.main);
   group('firefuel_collection_group_test.dart', firefuel_collection_group.main);

@@ -1,14 +1,14 @@
 rules_version = '2';
 
 // The live `firefuel-integration` project exists only for firefuel's
-// integration suite (tool/test_live_firestore.sh). Only the suite's test user
-// may read or write. Email/Password sign-in is enabled, so "any signed-in
+// integration suite (tool/test_live_firestore.sh), which signs in with a
+// custom token for one uid. Only that uid may read or write: "any signed-in
 // user" would admit anyone who creates an account with the public API key.
 service cloud.firestore {
   match /databases/{database}/documents {
     match /{document=**} {
       allow read, write: if request.auth != null
-        && request.auth.uid == 'rpzeVHEaEdgxPY5Dh9J9aVSpOo92';
+        && request.auth.uid == 'firefuel-integration-suite';
     }
   }
 }
